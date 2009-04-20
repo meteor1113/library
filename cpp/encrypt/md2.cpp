@@ -1,0 +1,194 @@
+/**
+ * Copyright (C) 2008 Meteor Liu
+ *
+ * This code has been released into the Public Domain.
+ * You may do whatever you like with it.
+ *
+ * @file
+ * @author Meteor Liu <meteor1113@gmail.com>
+ * @date 2009-01-01
+ */
+
+
+// #include <standard library headers>
+#include <fstream>
+
+// #include <other library headers>
+
+// #include "customer headers"
+#include "md2.h"
+
+
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
+
+namespace encrypt
+{
+
+    // S-Box based on PI
+    static unsigned char MD2_S[256] =
+    {
+        41, 46, 67, 201, 162, 216, 124, 1, 61, 54, 84, 161, 236, 240, 6,
+        19, 98, 167, 5, 243, 192, 199, 115, 140, 152, 147, 43, 217, 188,
+        76, 130, 202, 30, 155, 87, 60, 253, 212, 224, 22, 103, 66, 111, 24,
+        138, 23, 229, 18, 190, 78, 196, 214, 218, 158, 222, 73, 160, 251,
+        245, 142, 187, 47, 238, 122, 169, 104, 121, 145, 21, 178, 7, 63,
+        148, 194, 16, 137, 11, 34, 95, 33, 128, 127, 93, 154, 90, 144, 50,
+        39, 53, 62, 204, 231, 191, 247, 151, 3, 255, 25, 48, 179, 72, 165,
+        181, 209, 215, 94, 146, 42, 172, 86, 170, 198, 79, 184, 56, 210,
+        150, 164, 125, 182, 118, 252, 107, 226, 156, 116, 4, 241, 69, 157,
+        112, 89, 100, 113, 135, 32, 134, 91, 207, 101, 230, 45, 168, 2, 27,
+        96, 37, 173, 174, 176, 185, 246, 28, 70, 97, 105, 52, 64, 126, 15,
+        85, 71, 163, 35, 221, 81, 175, 58, 195, 92, 249, 206, 186, 197,
+        234, 38, 44, 83, 13, 110, 133, 40, 132, 9, 211, 223, 205, 244, 65,
+        129, 77, 82, 106, 220, 55, 200, 108, 193, 171, 250, 36, 225, 123,
+        8, 12, 189, 177, 74, 120, 136, 149, 139, 227, 99, 232, 109, 233,
+        203, 213, 254, 59, 0, 29, 57, 242, 239, 183, 14, 102, 88, 208, 228,
+        166, 119, 114, 248, 235, 117, 75, 10, 49, 68, 80, 180, 143, 237,
+        31, 26, 219, 153, 141, 51, 159, 17, 131, 20
+    };
+
+
+    MD2::MD2()
+    {
+        Init();
+    }
+
+
+    MD2::~MD2()
+    {
+    }
+
+
+    void MD2::Init()
+    {
+        memset(m_X, 0, 48);
+        memset(m_C, 0, 16);
+        memset(m_buf, 0, 16);
+        m_count = 0;
+    }
+
+
+    void MD2::Update(const void* in, unsigned int len)
+    {
+        const unsigned char* buf = (const unsigned char*)in;
+        unsigned long L = 0;
+        unsigned char t = 0;
+        int i = 0, j = 0;
+
+        while(len)
+        {
+            L = (16 - m_count) < len ? (16 - m_count) : len;
+            memcpy(m_buf + m_count, buf, L);
+            m_count += L;
+            buf += L;
+            len -= L;
+
+            if(m_count == 16)
+            {
+                m_count = 0;
+                memcpy(m_X + 16, m_buf, 16);
+                t= m_C[15];
+
+                for(i = 0; i < 16; i++)
+                {
+                    m_X[32 + i] = m_X[16 + i] ^ m_X[i];
+                    t = m_C[i] ^= MD2_S[m_buf[i] ^ t];
+                }
+
+                t= 0;
+                for(i = 0; i < 18; i++)
+                {
+                    for(j = 0; j < 48; j++)
+                        t= m_X[j] ^= MD2_S[t];
+
+                    t = (t + i) & 0xFF;
+                }
+            }
+        }
+    }
+
+
+    void MD2::Final()
+    {
+        unsigned char padding[16];
+        unsigned long padlen = 0;
+        unsigned int i = 0;
+
+        padlen = 16 - m_count;
+
+        for(i = 0; i < padlen; i++) padding[i] = (unsigned char)padlen;
+
+        Update(padding, padlen);
+        Update(m_C, 16);
+
+        memcpy(_digest, m_X, 16);
+    }
+
+
+    /**
+     * Convert unsigned char array to hex string.
+     */
+    std::string MD2::BytesToHexString(const unsigned char* input,
+                                      unsigned int length)
+    {
+        std::string str;
+        str.reserve(length << 1);
+        char b[3];
+        for (unsigned int i = 0; i < length; i++)
+        {
+            sprintf(b, "%02X", input[i]);
+            str.append(1, b[0]);
+            str.append(1, b[1]);
+        }
+        return str;
+    }
+
+
+    std::string MD2Data(const void* data, unsigned int length)
+    {
+        MD2 obj;
+        obj.Update(data, length);
+        obj.Final();
+        return obj.ToString();
+    }
+
+
+    std::string MD2String(const std::string& str)
+    {
+        MD2 obj;
+        obj.Update((const unsigned char*)str.c_str(),
+                   static_cast<unsigned int>(str.length()));
+        obj.Final();
+        return obj.ToString();
+    }
+
+
+    std::string MD2File(const std::string& file)
+    {
+        MD2 obj;
+
+        std::ifstream fs(file.c_str(), std::ios::binary);
+        const unsigned int BUFFER_SIZE = 1024;
+        char buffer[BUFFER_SIZE];
+        while (!fs.eof())
+        {
+            fs.read(buffer, BUFFER_SIZE);
+            std::streamsize length = fs.gcount();
+            if (length > 0)
+            {
+                obj.Update((const unsigned char*)buffer, length);
+            }
+        }
+        fs.close();
+
+        obj.Final();
+        return obj.ToString();
+    }
+
+
+}
+
+
+#pragma warning(pop)
