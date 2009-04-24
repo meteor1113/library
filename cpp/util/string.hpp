@@ -41,6 +41,64 @@ namespace util
     namespace string
     {
 
+        // declaration
+
+        template <typename CharType>
+        bool
+        StartWith(const CharType* const str, const CharType* const sub);
+
+        template <typename CharType>
+        bool
+        EndWith(const CharType* const str, const CharType* const substr);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        ToUpper(const CharType* const str);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        ToLower(const CharType* const str);
+
+        template <typename CharType>
+        bool
+        EqualsIgnoreCase(const CharType* const s1, const CharType* const s2);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        Replace(const CharType* const str, const CharType* const o,
+                const CharType* const n);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        TrimLeft(const CharType* str);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        TrimRight(const CharType* str);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        Trim(const CharType* str);
+
+        template <typename InIt, typename CharType>
+        std::basic_string<CharType>
+        Join(InIt first, InIt last, const CharType* const ep);
+
+        template <typename CharType>
+        std::vector<std::basic_string<CharType> >
+        Split(const CharType* const str, const CharType* const ep);
+
+        template <int BUFSIZE, typename CharType>
+        std::basic_string<CharType>
+        Format(const CharType* fmt, ...);
+
+        template <typename CharType>
+        std::basic_string<CharType>
+        Format(const CharType* fmt, ...);
+
+
+        // implement
+
         template <typename CharType>
         bool
         StartWith(const CharType* const str, const CharType* const sub)
@@ -153,7 +211,8 @@ namespace util
 
 
         template <typename CharType>
-        std::basic_string<CharType> Trim(const CharType* str)
+        std::basic_string<CharType>
+        Trim(const CharType* str)
         {
             std::basic_string<CharType> s = TrimLeft(str);
             return TrimRight(s.c_str());
@@ -186,8 +245,7 @@ namespace util
 
         template <typename CharType>
         std::vector<std::basic_string<CharType> >
-        Split(const CharType* const str,
-              const CharType* const ep)
+        Split(const CharType* const str, const CharType* const ep)
         {
             std::basic_string<CharType> s = str;
             std::vector<std::basic_string<CharType> > vs;
@@ -195,7 +253,7 @@ namespace util
 
             if (s.empty())
             {
-                return (vs);
+                return vs;
             }
             if (sep.empty() || std::string::npos == s.find(sep))
             {
