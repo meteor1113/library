@@ -14,6 +14,8 @@
 #define UTIL_STRING_HPP_
 
 
+#pragma warning(disable: 4786)
+#pragma warning(disable: 4996)
 // #include <standard library headers>
 #include <cstdio>
 #include <cstdarg>
@@ -29,10 +31,6 @@
 // #include <other library headers>
 
 // #include "customer headers"
-
-
-#pragma warning(push)
-#pragma warning(disable: 4996)
 
 
 namespace util
@@ -124,9 +122,13 @@ namespace util
         {
             std::basic_string<CharType> s = str;
             std::locale loc;
+#if _MSC_VER < 1300 // < vc7
+            std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+#else
             const std::ctype<CharType>& ct =
                 std::use_facet<std::ctype<CharType> >(loc);
             ct.toupper(&s.at(0), &s.at(s.length() - 1) + 1);
+#endif
             return s;
         }
 
@@ -137,9 +139,13 @@ namespace util
         {
             std::basic_string<CharType> s = str;
             std::locale loc;
+#if _MSC_VER < 1300 // < vc7
+            std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+#else
             const std::ctype<CharType>& ct =
                 std::use_facet<std::ctype<CharType> >(loc);
             ct.tolower(&s.at(0), &s.at(s.length() - 1) + 1);
+#endif
             return s;
         }
 
@@ -190,7 +196,7 @@ namespace util
             {
                 ++it;
             }
-            return s.assign(it, s.end());
+            return std::basic_string<CharType>(it, s.end());
         }
 
 
@@ -206,7 +212,7 @@ namespace util
             {
                 ++it;
             }
-            return s.assign(s.begin(), it.base());
+            return std::basic_string<CharType>(s.begin(), it.base());
         }
 
 
@@ -282,8 +288,12 @@ namespace util
         int
         Vsnprintf(char* buf, size_t count, const char* fmt, va_list ap)
         {
+#ifdef _MSC_VER
 #if _MSC_VER < 1300 // < vc7
             return _vsnprintf(buf, count, fmt, ap);
+#else
+            return vsnprintf(buf, count, fmt, ap);
+#endif
 #else
             return vsnprintf(buf, count, fmt, ap);
 #endif
@@ -342,7 +352,5 @@ namespace util
 
 }
 
-
-#pragma warning(pop)
 
 #endif

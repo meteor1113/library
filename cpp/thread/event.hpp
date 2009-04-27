@@ -68,7 +68,7 @@ namespace thread
     {
     public:
         Event();
-        /*virtual*/ ~Event() { pthread_cond_destroy(&cond); }
+        /*virtual*/ ~Event();
 
     private:
         Event(const Event& rhs);
@@ -89,7 +89,14 @@ namespace thread
 
     inline Event::Event()
     {
-        pthread_cond_init(&cond, NULL); pthread_mutex_init(&mutex, NULL);
+        pthread_cond_init(&cond, NULL);
+        pthread_mutex_init(&mutex, NULL);
+    }
+
+    inline Event::~Event()
+    {
+        pthread_cond_destroy(&cond);
+        pthread_mutex_destroy(&mutex);
     }
 
     inline void Event::Wait()
@@ -105,7 +112,10 @@ namespace thread
         clock_gettime(CLOCK_REALTIME, &ts);
         ts.tv_sec += (ms / 1000);
         ts.tv_nsec += ((ms % 1000) * 1000);
-        return (pthread_cond_timedwait(&cond, &mutex, &ts) == 0);
+        pthread_mutex_lock(&mutex);
+        bool ret = (pthread_cond_timedwait(&cond, &mutex, &ts) == 0);
+        pthread_mutex_unlock(&mutex);
+        return ret;
     }
 
 #endif // _WIN32

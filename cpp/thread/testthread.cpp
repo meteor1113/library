@@ -9,14 +9,13 @@ using namespace std;
 class Thread1 : public thread::Thread
 {
 public:
-    Thread1(const std::string& threadName)
-        :Thread(threadName) {}
+    Thread1() {}
     virtual int Run()
         {
             for (int i = 0; i < 10; i++)
             {
 //            std::cout << "Thread1---" << GetName() << i << std::endl;
-                printf("Thread1---%s%i\n", GetName().c_str(), i);
+                printf("Thread1---%d, %i\n", GetId(), i);
                 thread::Thread::Sleep(2);
             }
             return 0;
@@ -39,7 +38,7 @@ public:
 };
 
 
-void Thread3()
+void Thread3(void* arg)
 {
     for (int i = 0; i < 10; i++)
     {
@@ -61,19 +60,19 @@ void Delete(T* obj)
 int main(int argc, char* argv[])
 {
 
-    Thread1 t("aaaa");
+    Thread1 t;
     t.Start();
     t.WaitForEnd();
 
     Thread2 tt;
-    thread::ThreadHolder<Thread2> t2(tt, "bbbb");
+    thread::ThreadHolder<Thread2> t2(tt);
     t2.Start();
 
     Thread2 tt2;
-    thread::ThreadHolder<Thread2> t3(tt2, "cccc");
+    thread::ThreadHolder<Thread2> t3(tt2);
 //    t3.Start();
 
-    thread::ThreadHelper t4(Thread3, "dddd");
+    thread::ThreadHelper t4(Thread3);
     t4.Start();
 
     t2.WaitForEnd();

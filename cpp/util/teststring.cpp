@@ -113,8 +113,8 @@ namespace util
             {
                 std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
                 s= util::string::TrimLeft(s.c_str());
-                assert(s == "dsa j;fJDKOG:Jd   DK;s 'ghg    ");
                 std::cout << s << std::endl;
+                assert(s == "dsa j;fJDKOG:Jd   DK;s 'ghg    ");
                 std::cout << util::string::Replace(s.c_str(), " ", "-") << std::endl;
 
                 std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
@@ -229,7 +229,7 @@ namespace util
                 try
                 {
                     s = util::string::Format<2>("%d,%s", 4, "dafkd");
-                    assert(false);
+                    assert(s == "4,dafkd");
                     std::cout << s << std::endl;
                 }
                 catch (const std::length_error& e)
@@ -250,7 +250,7 @@ namespace util
                 try
                 {
                     ws = util::string::Format<3>(L"%d,%s", 4, L"dafkd");
-                    assert(false);
+                    assert(ws == L"4,dafkd");
                     std::wcout << ws << std::endl;
                 }
                 catch (const std::length_error& e)
@@ -268,5 +268,5 @@ namespace util
 int main()
 {
     util::string::Test();
-    system("pause");
+    return 0;
 }

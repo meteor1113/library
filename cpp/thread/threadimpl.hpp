@@ -47,7 +47,7 @@ namespace thread
             void Cleanup();
             ~ThreadStruct() { Cleanup(); }
         };
-        typedef unsigned int (__stdcall *THREAD_FUNCTION)(void* param);
+        typedef void (*THREAD_FUNCTION)(void* param);
 
     private:
         ThreadImpl();
@@ -58,7 +58,7 @@ namespace thread
         static bool CreateThread(ThreadStruct& ts,
                                  THREAD_FUNCTION threadFunc,
                                  unsigned int cbStackSize,
-                                 Thread* pThread);
+                                 void* arg);
         static void DestroyThread(ThreadStruct& ts) { ts.Cleanup(); }
         static bool WaitForThreadEnd(const ThreadStruct& ts, int ms);
         static void TerminateThread(const ThreadStruct& ts);
@@ -82,22 +82,19 @@ namespace thread
 
     inline void ThreadImpl::ThreadStruct::Cleanup()
     {
-        if(hThread != NULL)
-        {
-            CloseHandle(hThread);
-            hThread = NULL;
-        }
+        // if(hThread != NULL)     // only when use CreateThread
+        // {
+        //     CloseHandle(hThread);
+        //     hThread = NULL;
+        // }
     }
 
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
                                          THREAD_FUNCTION threadFunc,
                                          unsigned int cbStackSize,
-                                         Thread* pThread)
+                                         void* arg)
     {
-        ts.hThread =
-            (HANDLE)_beginthreadex(NULL, cbStackSize,
-                                   threadFunc, pThread, 0,
-                                   (unsigned int*)&ts.dwThreadId);
+        ts.hThread = (HANDLE)_beginthread(threadFunc, cbStackSize, arg);
         return (ts.hThread != NULL);
     }
 
@@ -157,7 +154,7 @@ namespace thread
         static bool CreateThread(ThreadStruct& ts,
                                  THREAD_FUNCTION threadFunc,
                                  unsigned int cbStackSize,
-                                 Thread* pThread);
+                                 void* arg);
         static void DestroyThread(ThreadStruct& ts) {}
         static bool WaitForThreadEnd(const ThreadStruct& ts, int ms);
         static void TerminateThread(ThreadStruct& ts);
@@ -175,7 +172,7 @@ namespace thread
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
                                          THREAD_FUNCTION threadFunc,
                                          unsigned int cbStackSize,
-                                         Thread* pThread)
+                                         void* arg)
     {
         pthread_attr_t *pAttr = NULL;
         pthread_attr_t attr;
@@ -195,7 +192,7 @@ namespace thread
         int iRes = pthread_create(&(ts.tThread),
                                   pAttr,
                                   threadFunc,
-                                  pThread);
+                                  arg);
         if (NULL != pAttr)
         {
             pthread_attr_destroy(&attr);

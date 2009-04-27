@@ -34,7 +34,7 @@ namespace thread
     {
     public:
         ThreadException(const std::string& s = "") : msg(s) {}
-        virtual ~ThreadException() throw() {};
+        virtual ~ThreadException() throw() {}
 
     public:
         virtual const char* what() const throw () { return msg.c_str(); }
@@ -52,8 +52,7 @@ namespace thread
     class Thread
     {
     public:
-        explicit Thread(const std::string & name = "")
-            : mName(name), mRetValue(-1), mStop(false), mAlive(false) {}
+        explicit Thread() : mRetValue(0), mStop(false), mAlive(false) {}
         virtual ~Thread() { if (IsAlive()) { OnLeaking(); } }
 
     private:
@@ -62,13 +61,14 @@ namespace thread
 
     public:
         static void Sleep(int ms) { ThreadImpl::Sleep(ms); }
+
+    public:
         void Start(unsigned int stackSize = DEFAULT_STACK_SIZE);
         bool WaitForEnd(int ms = WAIT_INFINITE);
         void Terminate();
         void SetStop() { mStop = true; }
         bool GetStop() const { return mStop; }
         bool IsAlive() const { return mAlive; }
-        std::string GetName() const { return mName; }
         int GetId() const { return ThreadImpl::GetThreadId(mTs); }
         int GetRetValue() const { return mRetValue; }
 
@@ -76,9 +76,11 @@ namespace thread
         virtual int Run() = 0;
         virtual void OnException(const ThreadException& e);
         virtual void OnLeaking() throw() {printf("OnLeaking\n"); }
+
+    private:
         void SetRetValue(const int& ret) { mRetValue = ret; }
 #ifdef _WIN32
-        static unsigned int __stdcall ThreadFunction(void* param);
+        static void ThreadFunction(void* param);
 #else
         static void* ThreadFunction(void* param);
 #endif
@@ -98,7 +100,6 @@ namespace thread
 
     private:
         ThreadImpl::ThreadStruct mTs; /* thread information structure */
-        std::string mName;    /* The name of the thread */
         int mRetValue;
         bool mStop;
         bool mAlive;
@@ -110,8 +111,7 @@ namespace thread
     class ThreadHolder : public Thread
     {
     public:
-        ThreadHolder(T& t, const std::string & threadName = "")
-            :Thread(threadName), mT(t) {}
+        ThreadHolder(T& t) : mT(t) {}
         virtual ~ThreadHolder() {}
 
     protected:
@@ -123,21 +123,30 @@ namespace thread
     };
 
 
-    typedef void (*TypeThreadFunction)();
+    typedef void (*TypeThreadFunction)(void* arg);
     class ThreadHelper : public Thread
     {
     public:
-        ThreadHelper(TypeThreadFunction tf, const std::string & threadName = "")
-            :Thread(threadName), mTf(tf) {}
+        ThreadHelper(TypeThreadFunction tf, void* arg = NULL)
+            : mTf(tf), mArg(arg) {}
         virtual ~ThreadHelper() {}
 
     protected:
-        virtual int Run() { mTf(); return 0; }
+        virtual int Run() { mTf(mArg); return 0; }
 
     private:
         TypeThreadFunction mTf;
+        void* mArg;
 
     };
+
+
+    inline bool StartThread(TypeThreadFunction func, void* arg = NULL)
+    {
+        ThreadImpl::ThreadStruct ts;
+        return ThreadImpl::CreateThread(ts, (ThreadImpl::THREAD_FUNCTION)func,
+                                        Thread::DEFAULT_STACK_SIZE, arg);
+    }
 
 
     inline void Thread::Start(unsigned int stackSize)
@@ -186,13 +195,16 @@ namespace thread
     }
 
 #ifdef _WIN32
-    inline unsigned int __stdcall Thread::ThreadFunction(void* param)
+    inline void Thread::ThreadFunction(void* param)
 #else
     inline void* Thread::ThreadFunction(void* param)
 #endif
     {
         assert(param != NULL);
         Thread* thread = (Thread*)param;
+#ifdef _WIN32
+        thread->mTs.dwThreadId = ::GetCurrentThreadId();
+#endif
         try
         {
             int ret = thread->Run();
@@ -207,7 +219,6 @@ namespace thread
             thread->OnException(ThreadException("unknown exception"));
         }
         thread->mAlive = false;
-        return 0;
     }
 
 }
