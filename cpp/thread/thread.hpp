@@ -79,7 +79,7 @@ namespace thread
 
     private:
         void SetRetValue(const int& ret) { mRetValue = ret; }
-        void Clean() { ThreadImpl::DestroyThread(mTs); }
+        void Cleanup() { ThreadImpl::DestroyThread(mTs); }
 #ifdef _WIN32
         static unsigned int __stdcall ThreadFunction(void* param);
 #else
@@ -197,6 +197,7 @@ namespace thread
     {
         ThreadImpl::TerminateThread(mTs);
         ThreadImpl::DestroyThread(mTs);
+        mAlive = false;
     }
 
     inline void Thread::OnException(const ThreadException& e)
@@ -225,7 +226,7 @@ namespace thread
         {
             thread->OnException(ThreadException("unknown exception"));
         }
-        thread->Clean();
+        thread->Cleanup();
         thread->mAlive = false;
         return 0;
     }
