@@ -49,6 +49,16 @@ void Thread3(void* arg)
 }
 
 
+void Thread4(void* arg)
+{
+    for (int i = 0; i < 10; i++)
+    {
+        printf("Thread4---%i\n", i);
+        thread::Thread::Sleep(1);
+    }
+}
+
+
 template <typename T>
 void Delete(T* obj)
 {
@@ -67,6 +77,14 @@ int main(int argc, char* argv[])
     Thread2 tt;
     thread::ThreadHolder<Thread2> t2(tt);
     t2.Start();
+    try
+    {
+        t2.Start();
+    }
+    catch (...)
+    {
+        std::cout << "Start Thread2 failed." << std::endl;
+    }
 
     Thread2 tt2;
     thread::ThreadHolder<Thread2> t3(tt2);
@@ -76,19 +94,21 @@ int main(int argc, char* argv[])
     t4.Start();
 
     t2.WaitForEnd();
+    t2.Start();
+    t2.WaitForEnd();
     t2.WaitForEnd();
 
     thread::Thread::Sleep(9);
     std::cout << "main()" << std::endl;
 
 
-
     t3.WaitForEnd();
     t4.WaitForEnd();
+    t4.Start();
 
-#ifdef _MSC_VER
-    getchar();
-#endif
-
+    thread::StartThread(Thread4, NULL);
+    thread::StartThread(Thread4, NULL);
+    
+    thread::Thread::Sleep(10);
     return 0;
 }

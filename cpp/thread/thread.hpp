@@ -63,7 +63,7 @@ namespace thread
         static void Sleep(int ms) { ThreadImpl::Sleep(ms); }
 
     public:
-        void Start(unsigned int stackSize = DEFAULT_STACK_SIZE);
+        void Start(unsigned int ss = DEFAULT_STACK_SIZE);
         bool WaitForEnd(int ms = WAIT_INFINITE);
         void Terminate();
         void SetStop() { mStop = true; }
@@ -79,14 +79,15 @@ namespace thread
 
     private:
         void SetRetValue(const int& ret) { mRetValue = ret; }
+        void Clean() { ThreadImpl::DestroyThread(mTs); }
 #ifdef _WIN32
-        static void ThreadFunction(void* param);
+        static unsigned int __stdcall ThreadFunction(void* param);
 #else
         static void* ThreadFunction(void* param);
 #endif
 
     public:
-#if _MSC_VER < 1300
+#if _MSC_VER < 1300 // < vc7
         enum { WAIT_INFINITE = ThreadImpl::WAIT_INFINITE };
         enum { INVALID_THREAD_ID = ThreadImpl::INVALID_THREAD_ID };
         enum { DEFAULT_STACK_SIZE = ThreadImpl::DEFAULT_STACK_SIZE };
@@ -143,21 +144,31 @@ namespace thread
 
     inline bool StartThread(TypeThreadFunction func, void* arg = NULL)
     {
+#ifdef _WIN32
+        typedef void (*THREAD_FUNCTION)(void* param);
+        int handle = _beginthread((THREAD_FUNCTION)func,
+                                  Thread::DEFAULT_STACK_SIZE, arg);
+        return (handle != -1L);
+#else
         ThreadImpl::ThreadStruct ts;
         return ThreadImpl::CreateThread(ts, (ThreadImpl::THREAD_FUNCTION)func,
                                         Thread::DEFAULT_STACK_SIZE, arg);
+#endif
     }
 
 
-    inline void Thread::Start(unsigned int stackSize)
+    inline void Thread::Start(unsigned int ss)
     {
+        if (IsAlive())
+        {
+            throw ThreadException("Thread started.");
+        }
+
         mAlive = true;
-        bool res = ThreadImpl::CreateThread(mTs,
-                                            ThreadFunction,
-                                            stackSize,
-                                            static_cast<Thread*>(this));
+        bool res = ThreadImpl::CreateThread(mTs, ThreadFunction, ss, this);
         if (!res)
         {
+            mAlive = false;
             throw ThreadException("CreateThread failed.");
         }
     }
@@ -175,7 +186,6 @@ namespace thread
         {
             if (!IsAlive())
             {
-                ThreadImpl::DestroyThread(mTs);
                 return true;
             }
             Sleep(WAIT_TIME_SLICE);
@@ -195,16 +205,13 @@ namespace thread
     }
 
 #ifdef _WIN32
-    inline void Thread::ThreadFunction(void* param)
+    inline unsigned int __stdcall Thread::ThreadFunction(void* param)
 #else
-    inline void* Thread::ThreadFunction(void* param)
+        inline void* Thread::ThreadFunction(void* param)
 #endif
     {
         assert(param != NULL);
         Thread* thread = (Thread*)param;
-#ifdef _WIN32
-        thread->mTs.dwThreadId = ::GetCurrentThreadId();
-#endif
         try
         {
             int ret = thread->Run();
@@ -218,7 +225,9 @@ namespace thread
         {
             thread->OnException(ThreadException("unknown exception"));
         }
+        thread->Clean();
         thread->mAlive = false;
+        return 0;
     }
 
 }

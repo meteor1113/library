@@ -31,23 +31,29 @@
 namespace thread
 {
 
-
-    class Thread;
-
-#ifdef _WIN32
-
     class ThreadImpl
     {
     public:
+#ifdef _WIN32
         struct ThreadStruct
         {
-            HANDLE hThread;
-            DWORD dwThreadId;
-            ThreadStruct() : hThread(NULL), dwThreadId(INVALID_THREAD_ID) {}
-            void Cleanup();
+            HANDLE ht;
+            DWORD tid;
+            ThreadStruct() : ht(NULL), tid(INVALID_THREAD_ID) {}
+            void Cleanup() { if (ht != 0) { CloseHandle(ht); ht = 0; } }
             ~ThreadStruct() { Cleanup(); }
         };
-        typedef void (*THREAD_FUNCTION)(void* param);
+        typedef unsigned int (__stdcall *THREAD_FUNCTION)(void* param);
+#else
+        struct ThreadStruct
+        {
+            pthread_t tid;
+            ThreadStruct() : tid(INVALID_THREAD_ID) {}
+            void Cleanup() { tid = INVALID_THREAD_ID; }
+            ~ThreadStruct() { Cleanup(); }
+        };
+        typedef void* (*THREAD_FUNCTION)(void* param);
+#endif
 
     private:
         ThreadImpl();
@@ -56,18 +62,18 @@ namespace thread
 
     public:
         static bool CreateThread(ThreadStruct& ts,
-                                 THREAD_FUNCTION threadFunc,
-                                 unsigned int cbStackSize,
+                                 THREAD_FUNCTION func,
+                                 unsigned int stackSize,
                                  void* arg);
         static void DestroyThread(ThreadStruct& ts) { ts.Cleanup(); }
         static bool WaitForThreadEnd(const ThreadStruct& ts, int ms);
         static void TerminateThread(const ThreadStruct& ts);
         static bool IsAlive(const ThreadStruct& ts);
         static int GetThreadId(const ThreadStruct& ts);
-        static void Sleep(int iMs) { ::Sleep(iMs); }
+        static void Sleep(int ms);
 
     public:
-#if _MSC_VER < 1300
+#if _MSC_VER < 1300 // < vc7
         enum { WAIT_INFINITE = -1 };
         enum { INVALID_THREAD_ID = 0 };
         enum { DEFAULT_STACK_SIZE = 0 };
@@ -80,128 +86,87 @@ namespace thread
 #endif
     };
 
-    inline void ThreadImpl::ThreadStruct::Cleanup()
-    {
-        // if(hThread != NULL)     // only when use CreateThread
-        // {
-        //     CloseHandle(hThread);
-        //     hThread = NULL;
-        // }
-    }
+
+#ifdef _WIN32
 
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
-                                         THREAD_FUNCTION threadFunc,
-                                         unsigned int cbStackSize,
+                                         THREAD_FUNCTION func,
+                                         unsigned int stackSize,
                                          void* arg)
     {
-        ts.hThread = (HANDLE)_beginthread(threadFunc, cbStackSize, arg);
-        return (ts.hThread != NULL);
+        ts.ht = (HANDLE)_beginthreadex(NULL, stackSize, func, arg, 0,
+                                       (unsigned int*)&ts.tid);
+        return (ts.ht != NULL);
     }
 
     inline bool ThreadImpl::WaitForThreadEnd(const ThreadStruct& ts, int ms)
     {
-        DWORD dwTO = (DWORD)ms;
+        DWORD to = (DWORD)ms;
         if(ms == WAIT_INFINITE)
         {
-            dwTO = INFINITE;
+            to = INFINITE;
         }
-        DWORD dwRes = WaitForSingleObject(ts.hThread, dwTO);
-        return (dwRes != WAIT_TIMEOUT);
+        DWORD res = WaitForSingleObject(ts.ht, to);
+        return (res != WAIT_TIMEOUT);
     }
 
     inline void ThreadImpl::TerminateThread(const ThreadStruct& ts)
     {
-        ::TerminateThread(ts.hThread, 0);
+        ::TerminateThread(ts.ht, 0);
     }
 
     inline bool ThreadImpl::IsAlive(const ThreadStruct& ts)
     {
-        if (NULL == ts.hThread)
+        if (NULL == ts.ht)
         {
             return false;
         }
-        DWORD dwRes = WaitForSingleObject(ts.hThread, 0);
-        return (WAIT_TIMEOUT == dwRes);
+        DWORD res = WaitForSingleObject(ts.ht, 0);
+        return (WAIT_TIMEOUT == res);
     }
 
     inline int ThreadImpl::GetThreadId(const ThreadStruct& ts)
     {
-        return (int)ts.dwThreadId;
+        return (int)ts.tid;
+    }
+
+    inline void ThreadImpl::Sleep(int ms)
+    {
+        ::Sleep(ms);
     }
 
 #else
 
-    /**
-     * description
-     */
-    class ThreadImpl
-    {
-    public:
-        struct ThreadStruct
-        {
-            pthread_t tThread;
-            ThreadStruct() : tThread(INVALID_THREAD_ID) {}
-            ~ThreadStruct() {}
-        };
-        typedef void* (*THREAD_FUNCTION)(void* param);
-
-    private:
-        ThreadImpl();
-        ThreadImpl(const ThreadImpl&) throw();
-        void operator=(const ThreadImpl&);
-
-    public:
-        static bool CreateThread(ThreadStruct& ts,
-                                 THREAD_FUNCTION threadFunc,
-                                 unsigned int cbStackSize,
-                                 void* arg);
-        static void DestroyThread(ThreadStruct& ts) {}
-        static bool WaitForThreadEnd(const ThreadStruct& ts, int ms);
-        static void TerminateThread(ThreadStruct& ts);
-        static bool IsAlive(const ThreadStruct& ts);
-        static int GetThreadId(const ThreadStruct& ts);
-        static void Sleep(int iMs);
-
-    public:
-        static const int WAIT_INFINITE = -1;
-        static const int INVALID_THREAD_ID = 0;
-        static const unsigned int DEFAULT_STACK_SIZE = 0;
-        static const int WAIT_TIME_SLICE = 20;
-    };
-
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
-                                         THREAD_FUNCTION threadFunc,
-                                         unsigned int cbStackSize,
+                                         THREAD_FUNCTION func,
+                                         unsigned int stackSize,
                                          void* arg)
     {
         pthread_attr_t *pAttr = NULL;
         pthread_attr_t attr;
-        if (cbStackSize != DEFAULT_STACK_SIZE)
+        if (stackSize != DEFAULT_STACK_SIZE)
         {
             if (0 != pthread_attr_init(&attr))
             {
                 return false;
             }
-            if (0 != pthread_attr_setstacksize(&attr, cbStackSize))
+            if (0 != pthread_attr_setstacksize(&attr, stackSize))
             {
                 pthread_attr_destroy(&attr);
                 return false;
             }
             pAttr = &attr;
         }
-        int iRes = pthread_create(&(ts.tThread),
-                                  pAttr,
-                                  threadFunc,
-                                  arg);
+        int res = pthread_create(&(ts.tid), pAttr, func, arg);
         if (NULL != pAttr)
         {
             pthread_attr_destroy(&attr);
         }
-        if (0 != iRes)
+        if (0 != res)
         {
             return false;
         }
-        pthread_detach(ts.tThread);
+        pthread_detach(ts.tid);
         return true;
     }
 
@@ -228,40 +193,39 @@ namespace thread
         return false;
     }
 
-    inline void ThreadImpl::TerminateThread(ThreadStruct& ts)
+    inline void ThreadImpl::TerminateThread(const ThreadStruct& ts)
     {
-        ::pthread_cancel(ts.tThread);
+        ::pthread_cancel(ts.tid);
     }
 
     inline bool ThreadImpl::IsAlive(const ThreadStruct& ts)
     {
-        int iPolicy;
+        int policy;
         struct sched_param sp;
-        int iRes = pthread_getschedparam(ts.tThread, &iPolicy, &sp);
+        int iRes = pthread_getschedparam(ts.tid, &policy, &sp);
         return (0 == iRes);
     }
 
     inline int ThreadImpl::GetThreadId(const ThreadStruct& ts)
     {
-        return (int)ts.tThread;
+        return (int)ts.tid;
     }
 
-    inline void ThreadImpl::Sleep(int iMs)
+    inline void ThreadImpl::Sleep(int ms)
     {
-        int iS  = iMs / 1000;
-        int iUs = (iMs % 1000) * 1000;
-        if(iS > 0)
+        int s = ms / 1000;
+        int us = (ms % 1000) * 1000;
+        if (s > 0)
         {
-            sleep(iS);
+            sleep(s);
         }
-        if(iUs > 0)
+        if (us > 0)
         {
-            usleep(iUs);
+            usleep(us);
         }
     }
 
 #endif // _WIN32
-
 
 }
 
