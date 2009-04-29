@@ -14,6 +14,8 @@
 #define UTIL_ENCODE_HPP_
 
 
+#pragma warning(disable: 4786)
+#pragma warning(disable: 4996)
 // #include <standard library headers>
 #include <string>
 
@@ -29,6 +31,17 @@ namespace util
 
     namespace encode
     {
+
+        // declaration
+        std::string ToUtf8(const std::wstring& str);
+        std::string ToUtf8(const std::string& str);
+        std::wstring Utf8ToWstring(const std::string& strUtf8);
+        std::string Utf8ToAscii(const std::string& strUtf8);
+        std::wstring ToWstring(const std::string& str);
+        std::string ToAscii(const std::wstring& str);
+
+
+        // implement
 
         inline
         std::string

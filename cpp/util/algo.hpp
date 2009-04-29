@@ -14,6 +14,8 @@
 #define UTIL_ALGO_HPP_
 
 
+#pragma warning(disable: 4786)
+#pragma warning(disable: 4996)
 // #include <standard library headers>
 #include <string>
 #include <stdexcept>
@@ -31,6 +33,34 @@ namespace util
 
     namespace algo
     {
+
+        // declaration
+
+        template <typename T>
+        void
+        Delete(T* t);
+
+        template <typename Target, typename Source>
+        bool
+        LexicalCast(Target& t, const Source& s);
+
+        template <typename Target, typename Source>
+        Target
+        LexicalCast(const Source& s);
+
+        template <typename T>
+        bool
+        StringToNumber(T& t,
+                       const std::string& s,
+                       std::ios_base&(*f)(std::ios_base&) = std::dec);
+
+        template <typename T>
+        T
+        StringToNumber(const std::string& s,
+                       std::ios_base&(*f)(std::ios_base&) = std::dec);
+
+
+        // implement
 
         template <typename T>
         void
@@ -90,8 +120,8 @@ namespace util
 
         /**
          *
-         *@param s
-         *@param f one of std::hex, std::dec, std::oct
+         * @param s
+         * @param f one of std::hex, std::dec, std::oct
          */
         template <typename T>
         T
