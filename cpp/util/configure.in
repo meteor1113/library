@@ -1,16 +1,16 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libstring, 0.1, meteor1113@gmail.com)
+AC_INIT(libstring, 0.1.1, meteor1113@gmail.com)
 AC_CONFIG_SRCDIR([teststring.cpp])
 #AC_CONFIG_HEADER([config.h])
 
 # sets build, host, target variables and the same with _alias
-AC_CANONICAL_BUILD
-AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
+#AC_CANONICAL_BUILD
+#AC_CANONICAL_HOST
+#AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libstring, 0.1)
+AM_INIT_AUTOMAKE(libstring, 0.1.1)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -21,20 +21,20 @@ AC_PROG_RANLIB
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([inttypes.h memory.h stdint.h stdlib.h string.h unistd.h])
+#AC_CHECK_HEADERS([inttypes.h memory.h stdint.h stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_SIZE_T
-AC_STRUCT_TM
-AC_C_VOLATILE
+#AC_HEADER_STDBOOL
+#AC_C_CONST
+#AC_C_INLINE
+#AC_TYPE_SIZE_T
+#AC_STRUCT_TM
+#AC_C_VOLATILE
 
 # Checks for library functions.
-AC_FUNC_MALLOC
-AC_FUNC_STRFTIME
-AC_CHECK_FUNCS([floor memset pow sqrt])
+#AC_FUNC_MALLOC
+#AC_FUNC_STRFTIME
+#AC_CHECK_FUNCS([floor memset pow sqrt])
 
 # debug options support
 AC_ARG_ENABLE([debug],

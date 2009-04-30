@@ -1,4 +1,9 @@
+EXTRA_DIST = autogen.sh
+
+#noinst_HEADERS = 
+
 noinst_LIBRARIES = libsock.a
+
 noinst_PROGRAMS = tcpserver tcpclient udpserver udpclient
 
 libsock_a_SOURCES = \
