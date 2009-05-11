@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(libthread, 0.2.0, meteor1113@gmail.com)
+AC_INIT(libthread, 0.2.1, meteor1113@gmail.com)
 AC_CONFIG_SRCDIR([testthread.cpp])
 #AC_CONFIG_HEADER([config.h])
 
@@ -11,7 +11,7 @@ AC_CONFIG_SRCDIR([testthread.cpp])
 AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libthread, 0.2.0)
+AM_INIT_AUTOMAKE(libthread, 0.2.1)
 
 # Checks for programs.
 AC_PROG_CXX

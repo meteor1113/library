@@ -15,7 +15,7 @@ thread::Event gEvent;
 class Thread1 : public thread::Thread
 {
 public:
-    virtual int Run()
+    virtual void Run(void* arg)
         {
             for (int i = 0; i < 10; i++)
             {
@@ -25,7 +25,6 @@ public:
             }
             thread::Thread::Sleep(2000);
             gEvent.SignalAll();
-            return 0;
         }
 };
 
@@ -33,7 +32,7 @@ public:
 class Thread2
 {
 public:
-    void operator () ()
+    void operator()()
         {
             printf("Thread2-Wait\n"); fflush(stdout);
             gEvent.Wait();
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
     thread::ThreadHolder<Thread2> t2(tt);
     t2.Start();
 
-    thread::ThreadHelper t3(Thread3);
+    thread::Thread t3(Thread3);
     t3.Start();
 
     thread::Thread::Sleep(9);

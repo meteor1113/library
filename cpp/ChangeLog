@@ -1,3 +1,7 @@
+2009-05-08  Meteor Liu  <meteor1113@gmail.com>
+
+	* libthread 0.2.1
+
 2009-04-28  Meteor Liu  <meteor1113@gmail.com>
 
 	* Refactor thread library.

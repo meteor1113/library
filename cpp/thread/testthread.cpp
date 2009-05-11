@@ -8,9 +8,8 @@ using namespace std;
 
 class Thread1 : public thread::Thread
 {
-public:
-    Thread1() {}
-    virtual int Run()
+protected:
+    virtual void Run(void* arg)
         {
             for (int i = 0; i < 10; i++)
             {
@@ -18,7 +17,6 @@ public:
                 printf("Thread1---%d, %i\n", GetId(), i);
                 thread::Thread::Sleep(2);
             }
-            return 0;
         }
 };
 
@@ -26,7 +24,7 @@ public:
 class Thread2
 {
 public:
-    void operator () ()
+    void operator()()
         {
             for (int i = 0; i < 10; i++)
             {
@@ -54,6 +52,17 @@ void Thread4(void* arg)
     for (int i = 0; i < 10; i++)
     {
         printf("Thread4---%i\n", i);
+        thread::Thread::Sleep(1);
+    }
+}
+
+
+void Thread5(void* arg)
+{
+    char* p = (char*)arg;
+    for (int i = 0; i < 10; i++)
+    {
+        printf("Thread5---%i----(%s)\n", i, p);
         thread::Thread::Sleep(1);
     }
 }
@@ -90,7 +99,7 @@ int main(int argc, char* argv[])
     thread::ThreadHolder<Thread2> t3(tt2);
 //    t3.Start();
 
-    thread::ThreadHelper t4(Thread3);
+    thread::Thread t4(Thread3);
     t4.Start();
 
     t2.WaitForEnd();
@@ -101,14 +110,22 @@ int main(int argc, char* argv[])
     thread::Thread::Sleep(9);
     std::cout << "main()" << std::endl;
 
-
     t3.WaitForEnd();
     t4.WaitForEnd();
     t4.Start();
 
-    thread::StartThread(Thread4, NULL);
-    thread::StartThread(Thread4, NULL);
+    thread::Thread t6;
+    t6.Start();
+
+    thread::Thread t5(Thread5);
+    const char* p1 = "1";
+    const char* p2 = "2";
+    t5.Start((void*)p1);
+    t5.Start((void*)p2);
+    t5.WaitForEnd();
+    const char* p3 = "3";
+    t5.Start((void*)p3);
     
-    thread::Thread::Sleep(10);
+    thread::Thread::Sleep(20);
     return 0;
 }

@@ -40,7 +40,7 @@ namespace thread
             HANDLE ht;
             DWORD tid;
             ThreadStruct() : ht(NULL), tid(INVALID_THREAD_ID) {}
-            void Cleanup() { if (ht != 0) { CloseHandle(ht); ht = 0; } }
+            void Cleanup();
             ~ThreadStruct() { Cleanup(); }
         };
         typedef unsigned int (__stdcall *THREAD_FUNCTION)(void* param);
@@ -89,6 +89,16 @@ namespace thread
 
 #ifdef _WIN32
 
+    inline void ThreadImpl::ThreadStruct::Cleanup()
+    {
+        if (ht != NULL)
+        {
+            CloseHandle(ht);
+            ht = NULL;
+        }
+        tid = INVALID_THREAD_ID;
+    }
+
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
                                          THREAD_FUNCTION func,
                                          unsigned int stackSize,
@@ -117,7 +127,7 @@ namespace thread
 
     inline bool ThreadImpl::IsAlive(const ThreadStruct& ts)
     {
-        if (NULL == ts.ht)
+        if (ts.ht == NULL)
         {
             return false;
         }
@@ -200,6 +210,11 @@ namespace thread
 
     inline bool ThreadImpl::IsAlive(const ThreadStruct& ts)
     {
+        if (ts.tid == INVALID_THREAD_ID)
+        {
+            return false;
+        }
+
         int policy;
         struct sched_param sp;
         int iRes = pthread_getschedparam(ts.tid, &policy, &sp);
