@@ -15,6 +15,7 @@
 
 
 // #include <standard C library headers>
+#include <time.h>
 
 // #include <standard C++ library headers>
 
@@ -23,7 +24,7 @@
 #include <Windows.h>
 #else
 #include <pthread.h>
-#include <time.h>
+#include <sys/time.h>
 #endif
 
 // #include "custom headers"
@@ -117,9 +118,13 @@ namespace thread
     inline bool Event::Wait(int ms)
     {
         struct timespec ts;
-        clock_gettime(CLOCK_REALTIME, &ts);
-        ts.tv_sec += (ms / 1000);
-        ts.tv_nsec += ((ms % 1000) * 1000);
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        ts.tv_sec = tv.tv_sec + (ms / 1000);
+        ts.tv_nsec = tv.tv_usec * 1000 + ((ms % 1000) * 1000 * 1000);
+//        clock_gettime(CLOCK_REALTIME, &ts);
+//        ts.tv_sec += (ms / 1000);
+//        ts.tv_nsec += ((ms % 1000) * 1000 * 1000);
         pthread_mutex_lock(&mutex);
         bool ret = (pthread_cond_timedwait(&cond, &mutex, &ts) == 0);
         pthread_mutex_unlock(&mutex);

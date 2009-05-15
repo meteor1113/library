@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     t2.WaitForEnd();
     t3.WaitForEnd();
 
-#ifdef _MSC_VER
+#ifndef _MSC_VER
     getchar();
 #endif
 

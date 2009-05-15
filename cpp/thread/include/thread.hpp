@@ -16,10 +16,9 @@
 
 // #include <standard library headers>
 #include <stdio.h>
-#include <cassert>
+#include <assert.h>
 #include <string>
 #include <exception>
-#include <iostream>
 
 // #include <other library headers>
 
@@ -30,16 +29,17 @@
 namespace thread
 {
 
-    typedef void (*TypeThreadFunction)(void* arg);
+    typedef void (*ThreadFunc)(void* arg);
     /**
      * class Thread
      */
     class Thread
     {
     public:
-        explicit Thread(TypeThreadFunction tf = NULL)
-            : mTf(tf), mStop(false) {}
-        virtual ~Thread() { ThreadImpl::DestroyThread(mTs); }
+        explicit Thread(ThreadFunc tf = 0)
+            : mTf(tf), mStop(false), mAlive(false) {}
+        /** destructor will SetStop() and WaitForEnd */
+        virtual ~Thread();
 
     private:
         Thread(const Thread &);
@@ -49,16 +49,17 @@ namespace thread
         static void Sleep(int ms) { ThreadImpl::Sleep(ms); }
 
     public:
-        bool Start(void* arg = NULL);
-        bool WaitForEnd(int ms = WAIT_INFINITE);
+        bool Start(void* arg = 0);
+        bool WaitForEnd(int ms = ThreadImpl::WAIT_INFINITE);
         void Terminate() { ThreadImpl::TerminateThread(mTs); }
         void SetStop() { mStop = true; }
         bool GetStop() const { return mStop; }
-        bool IsAlive() const { return ThreadImpl::IsAlive(mTs); }
+        // bool IsAlive() const { return ThreadImpl::IsAlive(mTs); }
+        bool IsAlive() const { return mAlive; }
         int GetId() const { return ThreadImpl::GetThreadId(mTs); }
 
     protected:
-        virtual void Run(void* arg) { if (mTf != NULL) { mTf(arg); } }
+        virtual void Run(void* arg) { assert(mTf != 0); mTf(arg); }
 
     private:
 #ifdef _WIN32
@@ -67,24 +68,12 @@ namespace thread
         static void* ThreadFunction(void* param);
 #endif
 
-    public:
-#if _MSC_VER < 1300 // < vc7
-        enum { WAIT_INFINITE = ThreadImpl::WAIT_INFINITE };
-        enum { INVALID_THREAD_ID = ThreadImpl::INVALID_THREAD_ID };
-        enum { DEFAULT_STACK_SIZE = ThreadImpl::DEFAULT_STACK_SIZE };
-        enum { WAIT_TIME_SLICE = ThreadImpl::WAIT_TIME_SLICE };
-#elif
-        static const int WAIT_INFINITE = ThreadImpl::WAIT_INFINITE;
-        static const int INVALID_THREAD_ID = ThreadImpl::INVALID_THREAD_ID;
-        static const size_t DEFAULT_STACK_SIZE = ThreadImpl::DEFAULT_STACK_SIZE;
-        static const int WAIT_TIME_SLICE = ThreadImpl::WAIT_TIME_SLICE;
-#endif
-
     private:
         ThreadImpl::ThreadStruct mTs; /* thread information structure */
         bool mStop;
-        TypeThreadFunction mTf;
+        ThreadFunc mTf;
         void* mArg;
+        bool mAlive;
 
     };
 
@@ -105,6 +94,24 @@ namespace thread
     };
 
 
+    inline bool StartThread(ThreadFunc tf, void* arg = NULL)
+    {
+#ifdef _WIN32
+        return (_beginthread(tf, 0, arg) != -1);
+#else
+        ThreadImpl::ThreadStruct ts;
+        return ThreadImpl::CreateThread(ts, (ThreadImpl::ThreadFuncT)tf, arg);
+#endif
+    }
+
+
+    inline Thread::~Thread()
+    {
+        SetStop();
+        WaitForEnd();
+        ThreadImpl::DestroyThread(mTs);
+    }
+
     inline bool Thread::Start(void* arg)
     {
         if (IsAlive())
@@ -114,13 +121,37 @@ namespace thread
 
         ThreadImpl::DestroyThread(mTs);
         mArg = arg;
-        return ThreadImpl::CreateThread(mTs, ThreadFunction,
-                                        DEFAULT_STACK_SIZE, this);
+        mAlive = true;
+        bool ret = ThreadImpl::CreateThread(mTs, ThreadFunction, this);
+        if (!ret)
+        {
+            mAlive = false;
+        }
+        return ret;
     }
 
+    // inline bool Thread::WaitForEnd(int ms)
+    // {
+    //     return ThreadImpl::WaitForThreadEnd(mTs, ms);
+    // }
     inline bool Thread::WaitForEnd(int ms)
     {
-        return ThreadImpl::WaitForThreadEnd(mTs, ms);
+        int iDelta = ThreadImpl::WAIT_TIME_SLICE;
+        int iTotal = ms;
+        if (ms == ThreadImpl::WAIT_INFINITE)
+        {
+            iDelta = 0;
+            iTotal = 1;
+        }
+        for (int i = 0; i < iTotal; i += iDelta)
+        {
+            if (!IsAlive())
+            {
+                return true;
+            }
+            Sleep(ThreadImpl::WAIT_TIME_SLICE);
+        }
+        return false;
     }
 
 #ifdef _WIN32
@@ -129,9 +160,11 @@ namespace thread
         inline void* Thread::ThreadFunction(void* param)
 #endif
     {
-        assert(param != NULL);
+        assert(param != 0);
         Thread* thread = (Thread*)param;
+        thread->mAlive = true;
         thread->Run(thread->mArg);
+        thread->mAlive = false;
         return 0;
     }
 

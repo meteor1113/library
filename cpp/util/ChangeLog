@@ -1,0 +1,4 @@
+2009-04-27  Meteor Liu  <meteor1113@gmail.com>
+
+	* Refactor util/string.hpp for compatible vc6.
+

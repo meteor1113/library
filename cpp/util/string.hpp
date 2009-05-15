@@ -122,7 +122,7 @@ namespace util
         {
             std::basic_string<CharType> s = str;
             std::locale loc;
-#if _MSC_VER < 1300 // < vc7
+#if _MSC_VER < 1400 // < vc8
             std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 #else
             const std::ctype<CharType>& ct =
@@ -139,7 +139,7 @@ namespace util
         {
             std::basic_string<CharType> s = str;
             std::locale loc;
-#if _MSC_VER < 1300 // < vc7
+#if _MSC_VER < 1400 // < vc8
             std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 #else
             const std::ctype<CharType>& ct =
@@ -289,7 +289,7 @@ namespace util
         Vsnprintf(char* buf, size_t count, const char* fmt, va_list ap)
         {
 #ifdef _MSC_VER
-#if _MSC_VER < 1300 // < vc7
+#if _MSC_VER < 1400 // < vc8
             return _vsnprintf(buf, count, fmt, ap);
 #else
             return vsnprintf(buf, count, fmt, ap);

@@ -9,3 +9,4 @@
 *.pyc
 *.ropeproject*
 tempcreate/tempcreate.ini
+*autom4te.cache*

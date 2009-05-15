@@ -43,16 +43,16 @@ namespace thread
             void Cleanup();
             ~ThreadStruct() { Cleanup(); }
         };
-        typedef unsigned int (__stdcall *THREAD_FUNCTION)(void* param);
+        typedef unsigned int (__stdcall *ThreadFuncT)(void* param);
 #else
         struct ThreadStruct
         {
-            pthread_t tid;
-            ThreadStruct() : tid(INVALID_THREAD_ID) {}
-            void Cleanup() { tid = INVALID_THREAD_ID; }
+            pthread_t pt;
+            ThreadStruct() : pt(0) {}
+            void Cleanup() { pt = 0; }
             ~ThreadStruct() { Cleanup(); }
         };
-        typedef void* (*THREAD_FUNCTION)(void* param);
+        typedef void* (*ThreadFuncT)(void* param);
 #endif
 
     private:
@@ -62,8 +62,7 @@ namespace thread
 
     public:
         static bool CreateThread(ThreadStruct& ts,
-                                 THREAD_FUNCTION func,
-                                 unsigned int stackSize,
+                                 ThreadFuncT func,
                                  void* arg);
         static void DestroyThread(ThreadStruct& ts) { ts.Cleanup(); }
         static bool WaitForThreadEnd(const ThreadStruct& ts, int ms);
@@ -73,15 +72,13 @@ namespace thread
         static void Sleep(int ms);
 
     public:
-#if _MSC_VER < 1300 // < vc7
+#if _MSC_VER < 1400 // < vc8
         enum { WAIT_INFINITE = -1 };
         enum { INVALID_THREAD_ID = 0 };
-        enum { DEFAULT_STACK_SIZE = 0 };
         enum { WAIT_TIME_SLICE = 20 };
 #else
         static const int WAIT_INFINITE = -1;
         static const int INVALID_THREAD_ID = 0;
-        static const unsigned int DEFAULT_STACK_SIZE = 0;
         static const int WAIT_TIME_SLICE = 20;
 #endif
     };
@@ -100,11 +97,10 @@ namespace thread
     }
 
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
-                                         THREAD_FUNCTION func,
-                                         unsigned int stackSize,
+                                         ThreadFuncT func,
                                          void* arg)
     {
-        ts.ht = (HANDLE)_beginthreadex(NULL, stackSize, func, arg, 0,
+        ts.ht = (HANDLE)_beginthreadex(NULL, 0, func, arg, 0,
                                        (unsigned int*)&ts.tid);
         return (ts.ht != NULL);
     }
@@ -148,35 +144,15 @@ namespace thread
 #else
 
     inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
-                                         THREAD_FUNCTION func,
-                                         unsigned int stackSize,
+                                         ThreadFuncT func,
                                          void* arg)
     {
-        pthread_attr_t *pAttr = NULL;
-        pthread_attr_t attr;
-        if (stackSize != DEFAULT_STACK_SIZE)
-        {
-            if (0 != pthread_attr_init(&attr))
-            {
-                return false;
-            }
-            if (0 != pthread_attr_setstacksize(&attr, stackSize))
-            {
-                pthread_attr_destroy(&attr);
-                return false;
-            }
-            pAttr = &attr;
-        }
-        int res = pthread_create(&(ts.tid), pAttr, func, arg);
-        if (NULL != pAttr)
-        {
-            pthread_attr_destroy(&attr);
-        }
-        if (0 != res)
+        int res = pthread_create(&(ts.pt), NULL, func, arg);
+        if (res != 0)
         {
             return false;
         }
-        pthread_detach(ts.tid);
+        pthread_detach(ts.pt);
         return true;
     }
 
@@ -197,7 +173,7 @@ namespace thread
             }
             else
             {
-                Sleep(WAIT_TIME_SLICE);
+                ThreadImpl::Sleep(WAIT_TIME_SLICE);
             }
         }
         return false;
@@ -205,25 +181,30 @@ namespace thread
 
     inline void ThreadImpl::TerminateThread(const ThreadStruct& ts)
     {
-        ::pthread_cancel(ts.tid);
+        ::pthread_cancel(ts.pt);
     }
 
     inline bool ThreadImpl::IsAlive(const ThreadStruct& ts)
     {
-        if (ts.tid == INVALID_THREAD_ID)
+        if (ts.pt == 0)
         {
             return false;
         }
 
         int policy;
         struct sched_param sp;
-        int iRes = pthread_getschedparam(ts.tid, &policy, &sp);
-        return (0 == iRes);
+        // in linux, pthread_getschedparam may SIGSEGV when tid is invalid.
+        int res = pthread_getschedparam(ts.pt, &policy, &sp);
+        return (res == 0);
     }
 
     inline int ThreadImpl::GetThreadId(const ThreadStruct& ts)
     {
+#ifdef _WIN32
         return (int)ts.tid;
+#else
+        return (int)ts.pt;
+#endif
     }
 
     inline void ThreadImpl::Sleep(int ms)

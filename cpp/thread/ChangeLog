@@ -1,3 +1,7 @@
+2009-05-13  Meteor Liu  <meteor1113@gmail.com>
+
+	* libthread 0.3.0: Add threadpool support.
+
 2009-05-08  Meteor Liu  <meteor1113@gmail.com>
 
 	* libthread 0.2.1
@@ -8,13 +12,7 @@
 
 2009-04-27  Meteor Liu  <meteor1113@gmail.com>
 
-	* Refactor util/string.hpp for compatible vc6.
-
 	* Refactor thread library.
-
-2009-04-09  Meteor Liu  <meteor1113@gmail.com>
-
-	* Refactor sock library(add udp support).
 
 2009-03-04  Meteor Liu  <meteor1113@gmail.com>
 
