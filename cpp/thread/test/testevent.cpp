@@ -24,7 +24,7 @@ public:
                 thread::Thread::Sleep(2);
             }
             thread::Thread::Sleep(2000);
-            gEvent.SignalAll();
+            gEvent.NotifyAll();
         }
 };
 

@@ -45,7 +45,7 @@ namespace thread
         Event& operator=(const Event& rhs);
 
     public:
-        void SignalAll();
+        void NotifyAll();
         void Wait();
         bool Wait(int ms);
 
@@ -74,7 +74,7 @@ namespace thread
         ::CloseHandle(event);
     }
 
-    inline void Event::SignalAll()
+    inline void Event::NotifyAll()
     {
         ::PulseEvent(event);
     }
@@ -103,7 +103,7 @@ namespace thread
         pthread_mutex_destroy(&mutex);
     }
 
-    inline void Event::SignalAll()
+    inline void Event::NotifyAll()
     {
         pthread_cond_broadcast(&cond);
     }

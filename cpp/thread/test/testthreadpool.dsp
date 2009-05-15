@@ -88,29 +88,13 @@ LINK32=link.exe
 SOURCE=.\testthreadpool.cpp
 # End Source File
 # End Group
-# Begin Group "Header Files"
-
-# PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=.\mutex.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\thread.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\threadimpl.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\threadpool.hpp
-# End Source File
-# End Group
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# End Group
+# Begin Group "Header Files"
+
+# PROP Default_Filter "h;hpp;hxx;hm;inl"
 # End Group
 # End Target
 # End Project

@@ -93,10 +93,6 @@ SOURCE=.\teststring.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\string.hpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\teststring.h
 # End Source File
 # End Group

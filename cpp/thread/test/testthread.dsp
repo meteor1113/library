@@ -91,22 +91,6 @@ SOURCE=.\testthread.cpp
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
-# Begin Source File
-
-SOURCE=.\event.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\mutex.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\thread.hpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\threadimpl.hpp
-# End Source File
 # End Group
 # Begin Group "Resource Files"
 
