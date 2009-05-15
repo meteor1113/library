@@ -1,15 +1,4 @@
-EXTRA_DIST = autogen.sh teststring.dsp util.dsw csvfile.cpp
+SUBDIRS = include test
 
-noinst_HEADERS = \
-	algo.hpp \
-	csvfile.hpp \
-	encode.hpp \
-	logfile.hpp \
-	properties.hpp \
-	string.hpp
+EXTRA_DIST = autogen.sh util.dsw
 
-noinst_PROGRAMS = teststring
-
-teststring_SOURCES = \
-	teststring.cpp \
-	teststring.h

@@ -10,8 +10,8 @@
  */
 
 
-#ifndef SOCK_SOCKET_HPP_
-#define SOCK_SOCKET_HPP_
+#ifndef SOCK_SOCKET_H_
+#define SOCK_SOCKET_H_
 
 
 // #include <standard library headers>
@@ -113,4 +113,5 @@ namespace sock
 
 }
 
-#endif // SOCK_SOCKET_HPP_
+
+#endif // SOCK_SOCKET_H_

@@ -1,16 +1,16 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libstring, 0.1.1, meteor1113@gmail.com)
-AC_CONFIG_SRCDIR([teststring.cpp])
+AC_INIT(libutil, 0.1.2, meteor1113@gmail.com)
+AC_CONFIG_SRCDIR([include/string.hpp])
 #AC_CONFIG_HEADER([config.h])
 
 # sets build, host, target variables and the same with _alias
 #AC_CANONICAL_BUILD
-#AC_CANONICAL_HOST
+AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libstring, 0.1.1)
+AM_INIT_AUTOMAKE(libutil, 0.1.2)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -50,12 +50,15 @@ else
     CXXFLAGS="-O2 -DNDEBUG"
 fi
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+			include/Makefile
+			test/Makefile])
 AC_OUTPUT
 #AC_OUTPUT([Makefile src/Makefile])
 
 AC_MSG_RESULT([
 Build options:
+  Host                     ${host}
   Version                  $VERSION
   Install prefix           $prefix
   Debug	  		   $enable_debug

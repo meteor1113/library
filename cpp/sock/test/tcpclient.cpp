@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "socket.hpp"
+#include "socket.h"
 
 
 int main(int argc, char *argv[])
