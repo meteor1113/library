@@ -40,13 +40,13 @@ int main(int argc, char* argv[])
     {
         if (pool.GetThreadCount() > 60) randdiv = 10;
         if (pool.GetThreadCount() < 50) randdiv = 1000;
-        if (pool.GetTaskCount() > 100)
+        if (pool.GetPendingTaskCount() > 100)
         {
             pool.SetMinThread(pool.GetMinThread() + 10);
             pool.SetMaxThread(pool.GetMaxThread() + 10);
             pool.SetIdleTime(pool.GetIdleTime() + 10);
         }
-        if (pool.GetTaskCount() <= 0)
+        if (pool.GetPendingTaskCount() <= 0)
         {
             //pool.RemoveAllThreads();
             pool.SetMinThread(40);
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         unsigned short sleep = (unsigned short)rand() / randdiv;
         std::cout << "thread=" << pool.GetThreadCount()
                   << " idle=" << pool.GetIdleThreadCount()
-                  << " tcount=" << pool.GetTaskCount()
+                  << " tcount=" << pool.GetPendingTaskCount()
                   << " sleep=" << sleep
                   << " idx=" << index + 1
                   << " min=" << pool.GetMinThread()

@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     {
         std::cout << "thread=" << pool.GetThreadCount()
                   << " idle=" << pool.GetIdleThreadCount()
-                  << " tcount=" << pool.GetTaskCount()
+                  << " tcount=" << pool.GetPendingTaskCount()
                   << " idx=" << index + 1
                   << " min=" << pool.GetMinThread()
                   << " max=" << pool.GetMaxThread()

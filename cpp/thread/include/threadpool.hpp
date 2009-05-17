@@ -36,8 +36,8 @@ namespace thread
     class Task
     {
     public:
-        virtual void Run() = 0;
         virtual ~Task()	{}
+        virtual void Run() = 0;
     };
 
 
@@ -55,7 +55,6 @@ namespace thread
     private:
         std::queue<Task*> queue;
         Mutex mutex;
-
     };
 
 
@@ -76,8 +75,34 @@ namespace thread
         TaskQueue& queue;
         bool running;
         int idleStart;
-
     };
+
+
+    // class FuncTask
+    // {
+    // public:
+    //     FuncTask(ThreadFunc tf) : mTf(tf) {}
+    //     virtual ~FuncTask()	{}
+    //     virtual void Run() { mTf(); delete this; }
+
+    // private:
+    //     ThreadFunc mTf;
+        
+    // };
+
+
+    // template <typename T>
+    // class ObjTask
+    // {
+    // public:
+    //     ObjTask(T& t) : mt(t) {}
+    //     virtual ~ObjTask();
+    //     virtual void Run() { mt(); delete this; }
+
+    // private:
+    //     T& mt;
+
+    // };
 
 
     class ThreadPool
@@ -97,11 +122,13 @@ namespace thread
 
     public:
         void AddTask(Task* t);
-        void RemoveAllThreads();
-        const TaskQueue& GetTasks() const { return queue; }
+        // void AddTask(ThreadFunc tf) { AddTask(new FuncTask(tf)); }
+        // template <typename T> AddTask(T& t) { AddTask(new ObjTask(t)); }
+        void StopAll();
+        const TaskQueue& GetPendingTasks() const { return queue; }
         int GetThreadCount() const{ return threads.size(); }
         int GetIdleThreadCount() const;
-        int GetTaskCount() const { return queue.Size(); }
+        int GetPendingTaskCount() const { return queue.Size(); }
         int GetMinThread() const { return minThread; }
         void SetMinThread(const int& value) { minThread = value; }
         int GetMaxThread() const { return maxThread; }
@@ -129,7 +156,6 @@ namespace thread
 #ifdef _DEBUG
         int histThreadCount;
 #endif
-
     };
 
 
@@ -177,7 +203,18 @@ namespace thread
 
     inline ThreadPool::~ThreadPool()
     {
-        RemoveAllThreads();
+        StopAll();
+        std::list<TaskThread*>::iterator i;
+        for (i = stopThreads.begin(); i != threads.end(); ++i)
+        {
+            delete (*i);
+        }
+        stopThreads.clear();
+        for (i = threads.begin(); i != threads.end(); ++i)
+        {
+            delete (*i);
+        }
+        threads.clear();
     }
 
 
@@ -204,27 +241,13 @@ namespace thread
     }
 
 
-    inline void ThreadPool::RemoveAllThreads()
+    inline void ThreadPool::StopAll()
     {
-        // std::for_each(threads.begin(), threads.end(),
-        //               std::mem_fun(&TaskThread::SetStop));
         std::list<TaskThread*>::iterator i;
         for (i = threads.begin(); i != threads.end(); ++i)
         {
             (*i)->SetStop();
         }
-
-        for (i = threads.begin(); i != threads.end(); ++i)
-        {
-            delete (*i);
-        }
-        for (i = stopThreads.begin(); i != threads.end(); ++i)
-        {
-            delete (*i);
-        }
-
-        threads.clear();
-        stopThreads.clear();
     }
 
 
@@ -288,6 +311,7 @@ namespace thread
 #endif
         }
     }
+
 
 }
 

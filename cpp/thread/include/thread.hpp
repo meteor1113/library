@@ -29,6 +29,31 @@
 namespace thread
 {
 
+
+    // class ThreadData
+    // {
+    // private:
+    //     ThreadData() {}
+    //     virtual ~ThreadData() {}
+    //     ThreadData(const ThreadData &);
+    //     void operator=(const ThreadData &);
+
+    // public:
+    //     static ThreadData* Create() { return new ThreadData; }
+    //     void AddRef() { Lock l(mMutex); mRefCount++; }
+    //     void Release() { Lock l(mMutex); mRefCount--; if (mRefCount == 0) { delete this; } }
+
+    // private:
+    //     ThreadImpl::ThreadStruct mTs;
+    //     bool mStop;
+    //     ThreadFunc mTf;
+    //     void* mArg;
+    //     bool mAlive;
+    //     int mRefCount;
+    //     Mutex mMutex;
+    // };
+
+
     typedef void (*ThreadFunc)(void* arg);
     /**
      * class Thread
@@ -74,7 +99,6 @@ namespace thread
         ThreadFunc mTf;
         void* mArg;
         bool mAlive;
-
     };
 
 
@@ -90,7 +114,6 @@ namespace thread
 
     private:
         T& mT;
-
     };
 
 
@@ -112,6 +135,7 @@ namespace thread
         ThreadImpl::DestroyThread(mTs);
     }
 
+
     inline bool Thread::Start(void* arg)
     {
         if (IsAlive())
@@ -129,6 +153,7 @@ namespace thread
         }
         return ret;
     }
+
 
     // inline bool Thread::WaitForEnd(int ms)
     // {
@@ -154,6 +179,7 @@ namespace thread
         return false;
     }
 
+
 #ifdef _WIN32
     inline unsigned int __stdcall Thread::ThreadFunction(void* param)
 #else
@@ -167,6 +193,7 @@ namespace thread
         thread->mAlive = false;
         return 0;
     }
+
 
 }
 
