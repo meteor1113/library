@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "libsock"=.\SRC\libsock.dsp - Package Owner=<4>
+Project: "libsock"=.\libsock.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -23,9 +23,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name libsock
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -38,9 +35,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name libsock
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -53,9 +47,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name libsock
-    End Project Dependency
 }}}
 
 ###############################################################################
@@ -68,9 +59,6 @@ Package=<5>
 
 Package=<4>
 {{{
-    Begin Project Dependency
-    Project_Dep_Name libsock
-    End Project Dependency
 }}}
 
 ###############################################################################

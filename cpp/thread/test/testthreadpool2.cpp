@@ -36,9 +36,7 @@ int main(int argc, char* argv[])
                   << " min=" << pool.GetMinThread()
                   << " max=" << pool.GetMaxThread()
                   << " itime=" << pool.GetIdleTime() << "s"
-#ifdef _DEBUG
                   << " hist=" << pool.GetHistThreadCount()
-#endif
                   << std::endl;
         pool.AddTask(new MyTask(index++));
         thread::Thread::Sleep(10);

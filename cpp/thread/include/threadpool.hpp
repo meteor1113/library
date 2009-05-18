@@ -78,37 +78,10 @@ namespace thread
     };
 
 
-    // class FuncTask
-    // {
-    // public:
-    //     FuncTask(ThreadFunc tf) : mTf(tf) {}
-    //     virtual ~FuncTask()	{}
-    //     virtual void Run() { mTf(); delete this; }
-
-    // private:
-    //     ThreadFunc mTf;
-        
-    // };
-
-
-    // template <typename T>
-    // class ObjTask
-    // {
-    // public:
-    //     ObjTask(T& t) : mt(t) {}
-    //     virtual ~ObjTask();
-    //     virtual void Run() { mt(); delete this; }
-
-    // private:
-    //     T& mt;
-
-    // };
-
-
     class ThreadPool
     {
     public:
-        /** 
+        /**
          * @param min min threads
          * @param max max threads
          * @param idle in seconds
@@ -122,12 +95,11 @@ namespace thread
 
     public:
         void AddTask(Task* t);
-        // void AddTask(ThreadFunc tf) { AddTask(new FuncTask(tf)); }
-        // template <typename T> AddTask(T& t) { AddTask(new ObjTask(t)); }
         void StopAll();
-        const TaskQueue& GetPendingTasks() const { return queue; }
         int GetThreadCount() const{ return threads.size(); }
         int GetIdleThreadCount() const;
+        int GetHistThreadCount() const { return histThreadCount; }
+        TaskQueue& GetPendingTasks() { return queue; }
         int GetPendingTaskCount() const { return queue.Size(); }
         int GetMinThread() const { return minThread; }
         void SetMinThread(const int& value) { minThread = value; }
@@ -135,9 +107,6 @@ namespace thread
         void SetMaxThread(const int& value) { maxThread = value; }
         int GetIdleTime() const { return idleTime; }
         void SetIdleTime(const int& value) { idleTime = value; }
-#ifdef _DEBUG
-        int GetHistThreadCount() const { return histThreadCount; }
-#endif
 
     protected:
 
@@ -153,9 +122,7 @@ namespace thread
         int minThread;
         int maxThread;
         int idleTime;
-#ifdef _DEBUG
         int histThreadCount;
-#endif
     };
 
 
@@ -192,11 +159,8 @@ namespace thread
 
 
     inline ThreadPool::ThreadPool(int min, int max, int idle)
-        : minThread(min), maxThread(max), idleTime(idle)
+        : minThread(min), maxThread(max), idleTime(idle), histThreadCount(0)
     {
-#ifdef _DEBUG
-        histThreadCount = 0;
-#endif
         AddNewThread(minThread);
     }
 
@@ -248,6 +212,8 @@ namespace thread
         {
             (*i)->SetStop();
         }
+        stopThreads.insert(stopThreads.end(), threads.begin(), threads.end());
+        threads.clear();
     }
 
 
@@ -306,9 +272,7 @@ namespace thread
             TaskThread* thread = new TaskThread(queue);
             thread->Start();
             threads.push_back(thread);
-#ifdef _DEBUG
             histThreadCount++;
-#endif
         }
     }
 

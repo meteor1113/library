@@ -15,10 +15,7 @@
 
 
 // #include <standard library headers>
-#include <stdio.h>
 #include <assert.h>
-#include <string>
-#include <exception>
 
 // #include <other library headers>
 
@@ -30,41 +27,13 @@ namespace thread
 {
 
 
-    // class ThreadData
-    // {
-    // private:
-    //     ThreadData() {}
-    //     virtual ~ThreadData() {}
-    //     ThreadData(const ThreadData &);
-    //     void operator=(const ThreadData &);
-
-    // public:
-    //     static ThreadData* Create() { return new ThreadData; }
-    //     void AddRef() { Lock l(mMutex); mRefCount++; }
-    //     void Release() { Lock l(mMutex); mRefCount--; if (mRefCount == 0) { delete this; } }
-
-    // private:
-    //     ThreadImpl::ThreadStruct mTs;
-    //     bool mStop;
-    //     ThreadFunc mTf;
-    //     void* mArg;
-    //     bool mAlive;
-    //     int mRefCount;
-    //     Mutex mMutex;
-    // };
-
-
     typedef void (*ThreadFunc)(void* arg);
-    /**
-     * class Thread
-     */
     class Thread
     {
     public:
         explicit Thread(ThreadFunc tf = 0)
             : mTf(tf), mStop(false), mAlive(false) {}
-        /** destructor will SetStop() and WaitForEnd */
-        virtual ~Thread();
+        virtual ~Thread() { SetStop(); WaitForEnd(); }
 
     private:
         Thread(const Thread &);
@@ -76,6 +45,7 @@ namespace thread
     public:
         bool Start(void* arg = 0);
         bool WaitForEnd(int ms = ThreadImpl::WAIT_INFINITE);
+            // { return ThreadImpl::WaitForThreadEnd(mTs, ms); }
         void Terminate() { ThreadImpl::TerminateThread(mTs); }
         void SetStop() { mStop = true; }
         bool GetStop() const { return mStop; }
@@ -95,10 +65,10 @@ namespace thread
 
     private:
         ThreadImpl::ThreadStruct mTs; /* thread information structure */
-        bool mStop;
         ThreadFunc mTf;
         void* mArg;
         bool mAlive;
+        bool mStop;
     };
 
 
@@ -128,14 +98,6 @@ namespace thread
     }
 
 
-    inline Thread::~Thread()
-    {
-        SetStop();
-        WaitForEnd();
-        ThreadImpl::DestroyThread(mTs);
-    }
-
-
     inline bool Thread::Start(void* arg)
     {
         if (IsAlive())
@@ -146,6 +108,7 @@ namespace thread
         ThreadImpl::DestroyThread(mTs);
         mArg = arg;
         mAlive = true;
+        mStop = false;
         bool ret = ThreadImpl::CreateThread(mTs, ThreadFunction, this);
         if (!ret)
         {
@@ -155,10 +118,6 @@ namespace thread
     }
 
 
-    // inline bool Thread::WaitForEnd(int ms)
-    // {
-    //     return ThreadImpl::WaitForThreadEnd(mTs, ms);
-    // }
     inline bool Thread::WaitForEnd(int ms)
     {
         int iDelta = ThreadImpl::WAIT_TIME_SLICE;
@@ -189,7 +148,9 @@ namespace thread
         assert(param != 0);
         Thread* thread = (Thread*)param;
         thread->mAlive = true;
+
         thread->Run(thread->mArg);
+
         thread->mAlive = false;
         return 0;
     }

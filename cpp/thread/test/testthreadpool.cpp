@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
         }
         if (pool.GetPendingTaskCount() <= 0)
         {
-            //pool.RemoveAllThreads();
             pool.SetMinThread(40);
             pool.SetMaxThread(50);
             pool.SetIdleTime(10);
@@ -63,9 +62,7 @@ int main(int argc, char* argv[])
                   << " min=" << pool.GetMinThread()
                   << " max=" << pool.GetMaxThread()
                   << " itime=" << pool.GetIdleTime() << "s"
-#ifdef _DEBUG
                   << " hist=" << pool.GetHistThreadCount()
-#endif
                   << std::endl;
         pool.AddTask(new MyTask(index++));
         thread::Thread::Sleep(sleep);
