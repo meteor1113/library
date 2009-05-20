@@ -172,7 +172,7 @@ namespace thread
                 currentTask = NULL;
                 idleStart = time(NULL);
             }
-            Sleep(10);
+            Sleep(1);
         }
         while (!data.GetStop());
     }

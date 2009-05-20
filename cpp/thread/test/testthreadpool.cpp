@@ -43,6 +43,9 @@ int main(int argc, char* argv[])
         if (pool.GetThreadCount() < 50) randdiv = 1000;
         if (pool.GetPendingTaskCount() > 100)
         {
+            MyTask* t = new MyTask(index++);
+            pool.Add(t);
+            pool.Priority(t);
             pool.SetMaxThread(pool.GetMaxThread() + 10);
             pool.SetIdleTime(pool.GetIdleTime() + 10);
         }
