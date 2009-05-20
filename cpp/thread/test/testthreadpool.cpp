@@ -18,6 +18,7 @@ public:
     virtual void Run()
         {
             std::cout << "task:" << index << std::endl;
+            fflush(stdout);
             thread::Thread::Sleep(10000);
 
             delete this;
@@ -25,7 +26,7 @@ public:
 
 private:
     int index;
-    double a[10000];
+    double a[100000];
 
 };
 
@@ -35,22 +36,33 @@ int main(int argc, char* argv[])
     int index = 0;
     int randdiv = 100;
     srand((unsigned)time(NULL));
-    thread::ThreadPool pool(40, 50, 10);
+    thread::ThreadPool pool(50, 10);
     while (true)
     {
         if (pool.GetThreadCount() > 60) randdiv = 10;
         if (pool.GetThreadCount() < 50) randdiv = 1000;
         if (pool.GetPendingTaskCount() > 100)
         {
-            pool.SetMinThread(pool.GetMinThread() + 10);
             pool.SetMaxThread(pool.GetMaxThread() + 10);
             pool.SetIdleTime(pool.GetIdleTime() + 10);
         }
         if (pool.GetPendingTaskCount() <= 0)
         {
-            pool.SetMinThread(40);
             pool.SetMaxThread(50);
             pool.SetIdleTime(10);
+        }
+
+        if (index == 100)
+        {
+            pool.Stop();
+            std::list<thread::Task*> l = pool.GetPendingTasks();
+            pool.ClearPendingTasks();
+            for (std::list<thread::Task*>::iterator i = l.begin();
+                i != l.end(); ++i)
+            {
+                delete (*i);
+            }
+            int j = 0;
         }
 
         unsigned short sleep = (unsigned short)rand() / randdiv;
@@ -59,12 +71,13 @@ int main(int argc, char* argv[])
                   << " tcount=" << pool.GetPendingTaskCount()
                   << " sleep=" << sleep
                   << " idx=" << index + 1
-                  << " min=" << pool.GetMinThread()
+//                  << " min=" << pool.GetMinThread()
                   << " max=" << pool.GetMaxThread()
                   << " itime=" << pool.GetIdleTime() << "s"
                   << " hist=" << pool.GetHistThreadCount()
                   << std::endl;
-        pool.AddTask(new MyTask(index++));
+        fflush(stdout);
+        pool.Add(new MyTask(index++));
         thread::Thread::Sleep(sleep);
     }
     

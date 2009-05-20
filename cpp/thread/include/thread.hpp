@@ -21,6 +21,7 @@
 
 // #include "customer headers"
 #include "threadimpl.hpp"
+#include "mutex.hpp"
 
 
 namespace thread
@@ -28,12 +29,42 @@ namespace thread
 
 
     typedef void (*ThreadFunc)(void* arg);
+
+
     class Thread
     {
+    protected:
+        class ThreadData
+        {
+            friend class Thread;
+        private:
+            ThreadData()
+                : arg(NULL), start(false), alive(false), stop(false), ref(1) {}
+            /*virtual*/ ~ThreadData() {}
+
+        public:
+            bool GetStop() const { return stop; }
+
+        private:
+            static ThreadData* Create() { return new ThreadData(); }
+            void AddRef() { Lock l(mutex); ref++; }
+            void Release();
+
+        private:
+            ThreadImpl::ThreadStruct ts;
+            void* arg;
+            bool start;
+            bool alive;
+            bool stop;
+
+        private:
+            Mutex mutex;
+            int ref;
+        };
+
     public:
-        explicit Thread(ThreadFunc tf = 0)
-            : mTf(tf), mStop(false), mAlive(false) {}
-        virtual ~Thread() { SetStop(); WaitForEnd(); }
+        explicit Thread(ThreadFunc f = 0) : data(NULL), tf(f) {}
+        virtual ~Thread() { if (data != NULL) { data->Release(); } }
 
     private:
         Thread(const Thread &);
@@ -44,17 +75,17 @@ namespace thread
 
     public:
         bool Start(void* arg = 0);
+        bool IsAlive() const { return (data == NULL) ? false : data->alive; }
+        void SetStop() { if (data != NULL) { data->stop = true; } }
         bool WaitForEnd(int ms = ThreadImpl::WAIT_INFINITE);
-            // { return ThreadImpl::WaitForThreadEnd(mTs, ms); }
-        void Terminate() { ThreadImpl::TerminateThread(mTs); }
-        void SetStop() { mStop = true; }
-        bool GetStop() const { return mStop; }
-        // bool IsAlive() const { return ThreadImpl::IsAlive(mTs); }
-        bool IsAlive() const { return mAlive; }
-        int GetId() const { return ThreadImpl::GetThreadId(mTs); }
+        void Terminate()
+            { if (data != NULL) { ThreadImpl::TerminateThread(data->ts); } }
+        int GetId() const
+            { return (data == NULL) ? 0 : ThreadImpl::GetThreadId(data->ts); }
 
     protected:
-        virtual void Run(void* arg) { assert(mTf != 0); mTf(arg); }
+        virtual void Run(const ThreadData& data, void* arg)
+            { assert(tf != 0); tf(arg); }
 
     private:
 #ifdef _WIN32
@@ -64,11 +95,8 @@ namespace thread
 #endif
 
     private:
-        ThreadImpl::ThreadStruct mTs; /* thread information structure */
-        ThreadFunc mTf;
-        void* mArg;
-        bool mAlive;
-        bool mStop;
+        ThreadData* data;
+        ThreadFunc tf;
     };
 
 
@@ -80,7 +108,7 @@ namespace thread
         virtual ~ThreadHolder() {}
 
     protected:
-        virtual void Run(void* arg) { mT(); }
+        virtual void Run(const ThreadData& data, void* arg) { mT(); }
 
     private:
         T& mT;
@@ -98,21 +126,37 @@ namespace thread
     }
 
 
+    inline void Thread::ThreadData::Release()
+    {
+        mutex.Lock();
+        int r = --ref;
+        mutex.UnLock();
+        if (r == 0)
+        {
+            delete this;
+        }
+    }
+
+
     inline bool Thread::Start(void* arg)
     {
-        if (IsAlive())
+        if (data != NULL)
         {
             return false;
         }
 
-        ThreadImpl::DestroyThread(mTs);
-        mArg = arg;
-        mAlive = true;
-        mStop = false;
-        bool ret = ThreadImpl::CreateThread(mTs, ThreadFunction, this);
+        data = ThreadData::Create();
+        data->arg = arg;
+        bool ret = ThreadImpl::CreateThread(data->ts, ThreadFunction, this);
         if (!ret)
         {
-            mAlive = false;
+            data->Release();
+            data = NULL;
+            return false;
+        }
+        while (!data->start)
+        {
+            Sleep(1);
         }
         return ret;
     }
@@ -147,11 +191,15 @@ namespace thread
     {
         assert(param != 0);
         Thread* thread = (Thread*)param;
-        thread->mAlive = true;
+        ThreadData* data = thread->data;
+        data->AddRef();
+        data->alive = true;
+        data->start = true;
 
-        thread->Run(thread->mArg);
+        thread->Run(*data, data->arg);
 
-        thread->mAlive = false;
+        data->alive = false;
+        data->Release();
         return 0;
     }
 

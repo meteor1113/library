@@ -15,15 +15,15 @@ thread::Event gEvent;
 class Thread1 : public thread::Thread
 {
 public:
-    virtual void Run(void* arg)
+    virtual void Run(const ThreadData& data, void* arg)
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
             {
                 printf("Thread1---%d, %i\n", GetId(), i);
                 fflush(stdout);
                 thread::Thread::Sleep(2);
             }
-            thread::Thread::Sleep(2000);
+            thread::Thread::Sleep(200);
             gEvent.NotifyAll();
         }
 };
@@ -37,7 +37,7 @@ public:
             printf("Thread2-Wait\n"); fflush(stdout);
             gEvent.Wait();
             printf("Thread2-Waited\n"); fflush(stdout);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
             {
                 printf("Thread2---%i\n", i);
                 fflush(stdout);
@@ -52,7 +52,7 @@ void Thread3(void* arg)
     printf("Thread3-Wait\n"); fflush(stdout);
     gEvent.Wait();
     printf("Thread3-Waited\n"); fflush(stdout);
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 5; i++)
     {
         printf("Thread3---%i\n", i);
         fflush(stdout);
@@ -89,10 +89,6 @@ int main(int argc, char* argv[])
     t.WaitForEnd();
     t2.WaitForEnd();
     t3.WaitForEnd();
-
-#ifndef _MSC_VER
-    getchar();
-#endif
 
     return 0;
 }

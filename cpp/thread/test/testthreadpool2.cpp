@@ -15,6 +15,7 @@ public:
     virtual void Run()
         {
             std::cout << "task:" << index << std::endl;
+            fflush(stdout);
             delete this;
         }
 
@@ -26,19 +27,20 @@ private:
 int main(int argc, char* argv[])
 {
     int index = 0;
-    thread::ThreadPool pool(10, 50, 60);
+    thread::ThreadPool pool(50, 60);
     while (true)
     {
         std::cout << "thread=" << pool.GetThreadCount()
                   << " idle=" << pool.GetIdleThreadCount()
                   << " tcount=" << pool.GetPendingTaskCount()
                   << " idx=" << index + 1
-                  << " min=" << pool.GetMinThread()
+//                  << " min=" << pool.GetMinThread()
                   << " max=" << pool.GetMaxThread()
                   << " itime=" << pool.GetIdleTime() << "s"
                   << " hist=" << pool.GetHistThreadCount()
                   << std::endl;
-        pool.AddTask(new MyTask(index++));
+        fflush(stdout);
+        pool.Add(new MyTask(index++));
         thread::Thread::Sleep(10);
     }
     
