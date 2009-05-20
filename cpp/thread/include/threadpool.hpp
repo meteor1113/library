@@ -208,6 +208,7 @@ namespace thread
             thread->Start();
             thread->SetStop();
             stopThreads.push_back(thread);
+            histThread++;
         }
     }
 

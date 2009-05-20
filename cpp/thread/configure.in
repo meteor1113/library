@@ -75,7 +75,6 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 Build options:
-  Host                     ${host}
   Version                  $VERSION
   Install prefix           $prefix
   Debug	  		   $enable_debug
