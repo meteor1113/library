@@ -32,10 +32,25 @@ namespace thread
 {
 
 
+    class Stopable
+    {
+    public:
+        Stopable() : stop(false) {}
+        virtual ~Stopable() {}
+
+    public:
+        bool GetStop() const { return stop; }
+        void SetStop(bool value = true) { stop = value;}
+
+    private:
+        bool stop;
+    };
+
+
     class Task
     {
     public:
-        virtual ~Task()	{}
+        virtual ~Task() {}
         virtual void Run() = 0;
     };
 

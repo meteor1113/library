@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libthread, 0.4.1, meteor1113@gmail.com)
+AC_INIT(libthread, 0.4.2, meteor1113@gmail.com)
 AC_CONFIG_SRCDIR([include/thread.hpp])
 #AC_CONFIG_HEADER([config.h])
 
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR([include/thread.hpp])
 AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libthread, 0.4.1)
+AM_INIT_AUTOMAKE(libthread, 0.4.2)
 
 # Checks for programs.
 AC_PROG_CXX

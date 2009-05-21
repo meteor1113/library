@@ -1,0 +1,23 @@
+Version 0.4.2 (2009-05-21)
+* Add Stopable class in threadpool.hpp.
+
+Version 0.4.1 (2009-05-20)
+* Public Domain.
+
+Version 0.4.0 (2009-05-20)
+* Add ThreadData, now thread can use data.GetStop() safely.
+
+Version 0.3.2 (2009-05-18)
+* Some bugfixes.
+
+Version 0.3.1 (2009-05-18)
+* Some bugfixes.
+
+Version 0.3.0 (2009-05-18)
+* Add threadpool support.
+
+Version 0.2.1 (2009-05-11)
+* Some bugfixed.
+
+Version 0.2.1 (2009-04-30)
+* First release.

@@ -1,4 +1,4 @@
 SUBDIRS = include test
 
-EXTRA_DIST = autogen.sh util.dsw
+EXTRA_DIST = autogen.sh libutil.dsw libutil.dsp
 
