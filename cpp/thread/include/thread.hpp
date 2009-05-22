@@ -38,8 +38,7 @@ namespace thread
         {
             friend class Thread;
         private:
-            ThreadData()
-                : arg(NULL), start(false), alive(false), stop(false), ref(1) {}
+            ThreadData() : ref(1) {}
             /*virtual*/ ~ThreadData() {}
 
         public:
@@ -63,8 +62,8 @@ namespace thread
         };
 
     public:
-        explicit Thread(ThreadFunc f = 0) : data(NULL), tf(f) {}
-        virtual ~Thread() { if (data != NULL) { data->Release(); } }
+        explicit Thread(ThreadFunc f = 0) : td(0), tf(f) {}
+        virtual ~Thread() { if (td != 0) { td->Release(); } }
 
     private:
         Thread(const Thread &);
@@ -75,13 +74,11 @@ namespace thread
 
     public:
         bool Start(void* arg = 0);
-        bool IsAlive() const { return (data == NULL) ? false : data->alive; }
-        void SetStop() { if (data != NULL) { data->stop = true; } }
+        bool IsAlive() const { return (td == 0) ? false : td->alive; }
+        void SetStop() { if (td != 0) { td->stop = true; } }
         bool WaitForEnd(int ms = ThreadImpl::WAIT_INFINITE);
-        void Terminate()
-            { if (data != NULL) { ThreadImpl::TerminateThread(data->ts); } }
-        int GetId() const
-            { return (data == NULL) ? 0 : ThreadImpl::GetThreadId(data->ts); }
+        void Terminate() { if (td != 0) { ThreadImpl::Terminate(td->ts); } }
+        int GetId() const { return (td == 0) ? 0 : ThreadImpl::GetId(td->ts); }
 
     protected:
         virtual void Run(const ThreadData& data, void* arg)
@@ -95,7 +92,7 @@ namespace thread
 #endif
 
     private:
-        ThreadData* data;
+        ThreadData* td;
         ThreadFunc tf;
     };
 
@@ -104,24 +101,24 @@ namespace thread
     class ThreadHolder : public Thread
     {
     public:
-        ThreadHolder(T& t) : mT(t) {}
+        ThreadHolder(T& t) : obj(t) {}
         virtual ~ThreadHolder() {}
 
     protected:
-        virtual void Run(const ThreadData& data, void* arg) { mT(); }
+        virtual void Run(const ThreadData& data, void* arg) { obj(); }
 
     private:
-        T& mT;
+        T& obj;
     };
 
 
-    inline bool StartThread(ThreadFunc tf, void* arg = NULL)
+    inline bool StartThread(ThreadFunc tf, void* arg = 0)
     {
 #ifdef _WIN32
         return (_beginthread(tf, 0, arg) != -1);
 #else
         ThreadImpl::ThreadStruct ts;
-        return ThreadImpl::CreateThread(ts, (ThreadImpl::ThreadFuncT)tf, arg);
+        return ThreadImpl::Create(ts, (ThreadImpl::ThreadFuncT)tf, arg);
 #endif
     }
 
@@ -131,7 +128,7 @@ namespace thread
         mutex.Lock();
         int r = --ref;
         mutex.UnLock();
-        if (r == 0)
+        if (r <= 0)
         {
             delete this;
         }
@@ -140,21 +137,24 @@ namespace thread
 
     inline bool Thread::Start(void* arg)
     {
-        if (data != NULL)
+        if (td != 0)
         {
             return false;
         }
 
-        data = ThreadData::Create();
-        data->arg = arg;
-        bool ret = ThreadImpl::CreateThread(data->ts, ThreadFunction, this);
+        td = ThreadData::Create();
+        td->arg = arg;
+        td->start = false;
+        td->alive = false;
+        td->stop = false;
+        bool ret = ThreadImpl::Create(td->ts, ThreadFunction, this);
         if (!ret)
         {
-            data->Release();
-            data = NULL;
+            td->Release();
+            td = 0;
             return false;
         }
-        while (!data->start)
+        while (!td->start)
         {
             Sleep(1);
         }
@@ -191,7 +191,7 @@ namespace thread
     {
         assert(param != 0);
         Thread* thread = (Thread*)param;
-        ThreadData* data = thread->data;
+        ThreadData* data = thread->td;
         data->AddRef();
         data->alive = true;
         data->start = true;

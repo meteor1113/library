@@ -38,7 +38,7 @@ namespace thread
         struct ThreadStruct
         {
             HANDLE ht;
-            DWORD tid;
+            unsigned int tid;
             ThreadStruct() : ht(NULL), tid(INVALID_THREAD_ID) {}
             void Cleanup();
             ~ThreadStruct() { Cleanup(); }
@@ -61,14 +61,12 @@ namespace thread
         void operator=(const ThreadImpl&);
 
     public:
-        static bool CreateThread(ThreadStruct& ts,
-                                 ThreadFuncT func,
-                                 void* arg);
-        static void DestroyThread(ThreadStruct& ts) { ts.Cleanup(); }
-        static bool WaitForThreadEnd(const ThreadStruct& ts, int ms);
-        static void TerminateThread(const ThreadStruct& ts);
+        static bool Create(ThreadStruct& ts, ThreadFuncT func, void* arg);
+        static void Destroy(ThreadStruct& ts) { ts.Cleanup(); }
+        static bool WaitForEnd(const ThreadStruct& ts, int ms);
+        static void Terminate(const ThreadStruct& ts);
         static bool IsAlive(const ThreadStruct& ts);
-        static int GetThreadId(const ThreadStruct& ts);
+        static int GetId(const ThreadStruct& ts);
         static void Sleep(int ms);
 
     public:
@@ -96,16 +94,14 @@ namespace thread
         tid = INVALID_THREAD_ID;
     }
 
-    inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
-                                         ThreadFuncT func,
-                                         void* arg)
+    inline bool ThreadImpl::Create(ThreadStruct& ts, ThreadFuncT func,
+                                   void* arg)
     {
-        ts.ht = (HANDLE)_beginthreadex(NULL, 0, func, arg, 0,
-                                       (unsigned int*)&ts.tid);
+        ts.ht = (HANDLE)_beginthreadex(NULL, 0, func, arg, 0, &ts.tid);
         return (ts.ht != NULL);
     }
 
-    inline bool ThreadImpl::WaitForThreadEnd(const ThreadStruct& ts, int ms)
+    inline bool ThreadImpl::WaitForEnd(const ThreadStruct& ts, int ms)
     {
         DWORD to = (DWORD)ms;
         if(ms == WAIT_INFINITE)
@@ -116,7 +112,7 @@ namespace thread
         return (res != WAIT_TIMEOUT);
     }
 
-    inline void ThreadImpl::TerminateThread(const ThreadStruct& ts)
+    inline void ThreadImpl::Terminate(const ThreadStruct& ts)
     {
         ::TerminateThread(ts.ht, 0);
     }
@@ -131,7 +127,7 @@ namespace thread
         return (WAIT_TIMEOUT == res);
     }
 
-    inline int ThreadImpl::GetThreadId(const ThreadStruct& ts)
+    inline int ThreadImpl::GetId(const ThreadStruct& ts)
     {
         return (int)ts.tid;
     }
@@ -143,9 +139,8 @@ namespace thread
 
 #else
 
-    inline bool ThreadImpl::CreateThread(ThreadStruct& ts,
-                                         ThreadFuncT func,
-                                         void* arg)
+    inline bool ThreadImpl::Create(ThreadStruct& ts, ThreadFuncT func,
+                                   void* arg)
     {
         int res = pthread_create(&(ts.pt), NULL, func, arg);
         if (res != 0)
@@ -156,7 +151,7 @@ namespace thread
         return true;
     }
 
-    inline bool ThreadImpl::WaitForThreadEnd(const ThreadStruct& ts, int ms)
+    inline bool ThreadImpl::WaitForEnd(const ThreadStruct& ts, int ms)
     {
         int iDelta = WAIT_TIME_SLICE;
         int iTotal = ms;
@@ -179,7 +174,7 @@ namespace thread
         return false;
     }
 
-    inline void ThreadImpl::TerminateThread(const ThreadStruct& ts)
+    inline void ThreadImpl::Terminate(const ThreadStruct& ts)
     {
         ::pthread_cancel(ts.pt);
     }
@@ -198,13 +193,9 @@ namespace thread
         return (res == 0);
     }
 
-    inline int ThreadImpl::GetThreadId(const ThreadStruct& ts)
+    inline int ThreadImpl::GetId(const ThreadStruct& ts)
     {
-#ifdef _WIN32
-        return (int)ts.tid;
-#else
         return (int)ts.pt;
-#endif
     }
 
     inline void ThreadImpl::Sleep(int ms)
