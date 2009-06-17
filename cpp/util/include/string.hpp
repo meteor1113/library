@@ -175,13 +175,16 @@ namespace util
             const std::string::size_type newLen = newS.size();
             std::string::size_type beg = 0;
             std::string::size_type tmp = 0;
-            while (std::string::npos != (beg = (s.find(oldS, tmp))))
+            while ((beg = (s.find(oldS, tmp))) != std::string::npos)
             {
                 s.replace(beg, oldLen, newS);
                 tmp = beg + newLen;
+                if (tmp >= s.length())
+                {
+                    break;
+                }
             }
             return s;
-
         }
 
 
