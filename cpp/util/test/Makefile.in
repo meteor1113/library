@@ -14,7 +14,7 @@
 
 @SET_MAKE@
 
-SOURCES = $(teststring_SOURCES)
+SOURCES = $(testalgo_SOURCES) $(testcsvfile_SOURCES) $(testencode_SOURCES) $(testlogfile_SOURCES) $(testproperties_SOURCES) $(teststring_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -37,7 +37,9 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-noinst_PROGRAMS = teststring$(EXEEXT)
+noinst_PROGRAMS = testalgo$(EXEEXT) testcsvfile$(EXEEXT) \
+	testencode$(EXEEXT) testlogfile$(EXEEXT) \
+	testproperties$(EXEEXT) teststring$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -47,24 +49,44 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
+am_testalgo_OBJECTS = testalgo.$(OBJEXT)
+testalgo_OBJECTS = $(am_testalgo_OBJECTS)
+testalgo_LDADD = $(LDADD)
+am_testcsvfile_OBJECTS = testcsvfile.$(OBJEXT)
+testcsvfile_OBJECTS = $(am_testcsvfile_OBJECTS)
+testcsvfile_LDADD = $(LDADD)
+am_testencode_OBJECTS = testencode.$(OBJEXT)
+testencode_OBJECTS = $(am_testencode_OBJECTS)
+testencode_LDADD = $(LDADD)
+am_testlogfile_OBJECTS = testlogfile.$(OBJEXT)
+testlogfile_OBJECTS = $(am_testlogfile_OBJECTS)
+testlogfile_LDADD = $(LDADD)
+am_testproperties_OBJECTS = testproperties.$(OBJEXT)
+testproperties_OBJECTS = $(am_testproperties_OBJECTS)
+testproperties_LDADD = $(LDADD)
 am_teststring_OBJECTS = teststring.$(OBJEXT)
 teststring_OBJECTS = $(am_teststring_OBJECTS)
 teststring_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/teststring.Po
+@AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/testalgo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/testcsvfile.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/testencode.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/testlogfile.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/testproperties.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/teststring.Po
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(teststring_SOURCES)
-DIST_SOURCES = $(teststring_SOURCES)
+SOURCES = $(testalgo_SOURCES) $(testcsvfile_SOURCES) \
+	$(testencode_SOURCES) $(testlogfile_SOURCES) \
+	$(testproperties_SOURCES) $(teststring_SOURCES)
+DIST_SOURCES = $(testalgo_SOURCES) $(testcsvfile_SOURCES) \
+	$(testencode_SOURCES) $(testlogfile_SOURCES) \
+	$(testproperties_SOURCES) $(teststring_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -154,10 +176,31 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir)/include
-EXTRA_DIST = teststring.dsp
+EXTRA_DIST = \
+	testalgo.dsp \
+	testcsvfile.dsp \
+	testencode.dsp \
+	testlogfile.dsp \
+	testproperties.dsp \
+	teststring.dsp
+
+testalgo_SOURCES = \
+	testalgo.cpp
+
+testcsvfile_SOURCES = \
+	testcsvfile.cpp
+
+testencode_SOURCES = \
+	testencode.cpp
+
+testlogfile_SOURCES = \
+	testlogfile.cpp
+
+testproperties_SOURCES = \
+	testproperties.cpp
+
 teststring_SOURCES = \
-	teststring.cpp \
-	teststring.h
+	teststring.cpp
 
 all: all-am
 
@@ -195,6 +238,21 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
+testalgo$(EXEEXT): $(testalgo_OBJECTS) $(testalgo_DEPENDENCIES) 
+	@rm -f testalgo$(EXEEXT)
+	$(CXXLINK) $(testalgo_LDFLAGS) $(testalgo_OBJECTS) $(testalgo_LDADD) $(LIBS)
+testcsvfile$(EXEEXT): $(testcsvfile_OBJECTS) $(testcsvfile_DEPENDENCIES) 
+	@rm -f testcsvfile$(EXEEXT)
+	$(CXXLINK) $(testcsvfile_LDFLAGS) $(testcsvfile_OBJECTS) $(testcsvfile_LDADD) $(LIBS)
+testencode$(EXEEXT): $(testencode_OBJECTS) $(testencode_DEPENDENCIES) 
+	@rm -f testencode$(EXEEXT)
+	$(CXXLINK) $(testencode_LDFLAGS) $(testencode_OBJECTS) $(testencode_LDADD) $(LIBS)
+testlogfile$(EXEEXT): $(testlogfile_OBJECTS) $(testlogfile_DEPENDENCIES) 
+	@rm -f testlogfile$(EXEEXT)
+	$(CXXLINK) $(testlogfile_LDFLAGS) $(testlogfile_OBJECTS) $(testlogfile_LDADD) $(LIBS)
+testproperties$(EXEEXT): $(testproperties_OBJECTS) $(testproperties_DEPENDENCIES) 
+	@rm -f testproperties$(EXEEXT)
+	$(CXXLINK) $(testproperties_LDFLAGS) $(testproperties_OBJECTS) $(testproperties_LDADD) $(LIBS)
 teststring$(EXEEXT): $(teststring_OBJECTS) $(teststring_DEPENDENCIES) 
 	@rm -f teststring$(EXEEXT)
 	$(CXXLINK) $(teststring_LDFLAGS) $(teststring_OBJECTS) $(teststring_LDADD) $(LIBS)
@@ -205,6 +263,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testalgo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testcsvfile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testencode.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testlogfile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testproperties.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/teststring.Po@am__quote@
 
 .cpp.o:

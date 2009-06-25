@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2008 Meteor Liu
+ * Copyright (C) 2009 Meteor Liu
  *
  * This code has been released into the Public Domain.
  * You may do whatever you like with it.
@@ -10,8 +10,8 @@
  */
 
 
-#ifndef UTIL_ENCODE_HPP_
-#define UTIL_ENCODE_HPP_
+#ifndef ENCODE_HPP_
+#define ENCODE_HPP_
 
 
 #pragma warning(disable: 4786)
@@ -23,163 +23,123 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+
 // #include "customer headers"
 
 
-namespace util
+namespace encode
 {
 
-    namespace encode
+    inline
+    std::string
+    ToUtf8(const wchar_t* str)
     {
-
-        // declaration
-        std::string ToUtf8(const std::wstring& str);
-        std::string ToUtf8(const std::string& str);
-        std::wstring Utf8ToWstring(const std::string& strUtf8);
-        std::string Utf8ToAscii(const std::string& strUtf8);
-        std::wstring ToWstring(const std::string& str);
-        std::string ToAscii(const std::wstring& str);
-
-
-        // implement
-
-        inline
-        std::string
-        ToUtf8(const std::wstring& str)
-        {
 #ifdef _WIN32
-            int len = WideCharToMultiByte(CP_UTF8, 0, str.c_str(), -1,
-                                          NULL, 0, NULL, NULL);
-            char *szUtf8=new char[len + 1];
-            memset(szUtf8, 0, len + 1);
-            WideCharToMultiByte (CP_UTF8, 0, str.c_str(), -1, szUtf8,
-                                 len, NULL,NULL);
-
-            std::string utf8Str = szUtf8;
-            delete[] szUtf8;
-
-            return utf8Str;
+        int len = WideCharToMultiByte(CP_UTF8, 0, str, -1, NULL, 0, NULL, NULL);
+        char* buf = new char[len + 1];
+        memset(buf, 0, len + 1);
+        WideCharToMultiByte(CP_UTF8, 0, str, -1, buf, len, NULL, NULL);
+        std::string ret = buf;
+        delete[] buf;
+        return ret;
 #else
 #error "not support"
 #endif
-        }
+    }
 
 
-        inline
-        std::string
-        ToUtf8(const std::string& str)
-        {
+    inline
+    std::string
+    ToUtf8(const char* str)
+    {
 #ifdef _WIN32
-            int len=MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL,0);
-            wchar_t* wszUtf8 = new wchar_t[len+1];
-            memset(wszUtf8, 0, len * 2 + 2);
-            MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, wszUtf8, len);
-
-            std::string utf8Str = ToUtf8(wszUtf8);
-            delete[] wszUtf8;
-            wszUtf8 = NULL;
-
-            return utf8Str;
+        int len = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
+        wchar_t* buf = new wchar_t[len + 1];
+        memset(buf, 0, (len + 1)* sizeof(wchar_t));
+        MultiByteToWideChar(CP_ACP, 0, str, -1, buf, len);
+        std::string ret = ToUtf8(buf);
+        delete[] buf;
+        return ret;
 #else
 #error "not support"
 #endif
-        }
+    }
 
 
-        inline
-        std::wstring
-        Utf8ToWstring(const std::string& strUtf8)
-        {
+    inline
+    std::wstring
+    Utf8ToWstring(const char* str)
+    {
 #ifdef _WIN32
-            int len=MultiByteToWideChar(CP_UTF8, 0, strUtf8.c_str(),
-                                        -1, NULL,0);
-            wchar_t* wsz = new wchar_t[len+1];
-            memset(wsz, 0, len * 2 + 2);
-            MultiByteToWideChar(CP_UTF8, 0, strUtf8.c_str(), -1, wsz, len);
-
-            std::wstring wstr = wsz;
-            delete[] wsz;
-            wsz = NULL;
-
-            return wstr;
+        int len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0);
+        wchar_t* buf = new wchar_t[len + 1];
+        memset(buf, 0, (len + 1) * sizeof(wchar_t));
+        MultiByteToWideChar(CP_UTF8, 0, str, -1, buf, len);
+        std::wstring ret = buf;
+        delete[] buf;
+        return ret;
 #else
 #error "not support"
 #endif
-        }
+    }
 
 
-        inline
-        std::string
-        Utf8ToAscii(const std::string& strUtf8)
-        {
+    inline
+    std::string
+    Utf8ToAscii(const char* str)
+    {
 #ifdef _WIN32
-            std::wstring wStr = Utf8ToWstring(strUtf8);
-
-            int len = WideCharToMultiByte(CP_ACP, 0, wStr.c_str(), -1,
-                                          NULL, 0, NULL, NULL);
-            char *szAscii=new char[len + 1];
-            memset(szAscii, 0, len + 1);
-            WideCharToMultiByte (CP_ACP, 0, wStr.c_str(), -1, szAscii,
-                                 len, NULL,NULL);
-
-            std::string strAscii = szAscii;
-            delete[] szAscii;
-            szAscii = NULL;
-            //delete[] wszGBK;
-
-            return strAscii;
+        const std::wstring wstr = Utf8ToWstring(str);
+        const wchar_t* tmp = wstr.c_str();
+        int len = WideCharToMultiByte(CP_ACP, 0, tmp, -1, NULL, 0, NULL, NULL);
+        char* buf = new char[len + 1];
+        memset(buf, 0, len + 1);
+        WideCharToMultiByte(CP_ACP, 0, tmp, -1, buf, len, NULL, NULL);
+        std::string ret = buf;
+        delete[] buf;
+        return ret;
 #else
 #error "not support"
 #endif
-        }
+    }
 
 
-        inline
-        std::wstring
-        ToWstring(const std::string& str)
-        {
+    inline
+    std::wstring
+    ToWstring(const char* str)
+    {
 #ifdef _WIN32
-            int len=MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL,0);
-            wchar_t* wszUtf8 = new wchar_t[len+1];
-            memset(wszUtf8, 0, len * 2 + 2);
-            MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, wszUtf8, len);
-
-            std::wstring wstr = wszUtf8;
-            delete[] wszUtf8;
-            wszUtf8 = NULL;
-
-            return wstr;
+        int len = MultiByteToWideChar(CP_ACP, 0, str, -1, NULL, 0);
+        wchar_t* buf = new wchar_t[len+1];
+        memset(buf, 0, (len + 1) * sizeof(wchar_t));
+        MultiByteToWideChar(CP_ACP, 0, str, -1, buf, len);
+        std::wstring ret = buf;
+        delete[] buf;
+        return ret;
 #else
 #error "not support"
 #endif
-        }
+    }
 
 
-        inline
-        std::string
-        ToAscii(const std::wstring& str)
-        {
+    inline
+    std::string
+    ToAscii(const wchar_t* str)
+    {
 #ifdef _WIN32
-            int len = WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1,
-                                          NULL, 0, NULL, NULL);
-            char *szAscii=new char[len + 1];
-            memset(szAscii, 0, len + 1);
-            WideCharToMultiByte (CP_ACP, 0, str.c_str(), -1, szAscii,
-                                 len, NULL,NULL);
-
-            std::string strAscii = szAscii;
-            delete[] szAscii;
-            szAscii = NULL;
-
-            return strAscii;
+        int len = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
+        char* buf = new char[len + 1];
+        memset(buf, 0, len + 1);
+        WideCharToMultiByte(CP_ACP, 0, str, -1, buf, len, NULL, NULL);
+        std::string ret = buf;
+        delete[] buf;
+        return ret;
 #else
 #error "not support"
 #endif
-        }
+    }
 
-    } // // end of namespace encode
-
-} // // end of namespace util
+} // // end of namespace encode
 
 
-#endif // UTIL_ENCODE_HPP_
+#endif // ENCODE_HPP_
