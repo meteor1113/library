@@ -20,7 +20,6 @@
 #include <string>
 #include <sstream>
 #include <limits>
-//#include <typeinfo>
 
 // #include <other library headers>
 
