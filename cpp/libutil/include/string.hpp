@@ -369,7 +369,7 @@ namespace string
      * "/"                 -> "/"
      * "scratch.tiff"      -> ""(an empty string)
      *
-     * is sep is "\"
+     * if sep is "\"
      * "\tmp\scratch.tiff" -> "\tmp"
      * "\tmp\lock\"        -> "\tmp"
      * "\tmp\"             -> "\"

@@ -1,6 +1,10 @@
 Version 0.1.5 (2009-07-01)
-* modify string.hpp (add AppendPathComponent and DeleteLastPathComponent).
-* add xcode project for osx.
+* Modify string.hpp (add AppendPathComponent and DeleteLastPathComponent).
+* Add xcode project for osx.
+
+Version 0.1.4 (2009-06-25)
+* Remove namespace.
+* Add some unittest.
 
 Version 0.1.3 (2009-05-21)
 * Public Domain.
