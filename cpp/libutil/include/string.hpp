@@ -17,6 +17,7 @@
 #pragma warning(disable: 4786)
 #pragma warning(disable: 4996)
 // #include <standard library headers>
+#include <assert.h>
 #include <stdarg.h>
 #include <string>
 #include <locale>
@@ -36,6 +37,9 @@ namespace string
     bool
     StartWith(const T* str, const T* sub)
     {
+        assert(str != NULL);
+        assert(sub != NULL);
+
         const std::basic_string<T> s = str;
         return (s.find(sub) == 0);
     }
@@ -43,11 +47,18 @@ namespace string
 
     template <typename T>
     bool
-    EndWith(const T* str, const T* substr)
+    EndWith(const T* str, const T* sub)
     {
+        assert(str != NULL);
+        assert(sub != NULL);
+
         const std::basic_string<T> s = str;
-        const std::basic_string<T> sub = substr;
-        return (s.rfind(sub) == (s.length() - sub.length()));
+        const std::basic_string<T> d = sub;
+        if (s.length() < d.length())
+        {
+            return false;
+        }
+        return (s.rfind(d) == (s.length() - d.length()));
     }
 
 
@@ -55,6 +66,8 @@ namespace string
     std::basic_string<T>
     ToUpper(const T* str)
     {
+        assert(str != NULL);
+
         std::basic_string<T> s = str;
         std::locale loc;
 #if _MSC_VER < 1400 // < vc8
@@ -71,6 +84,8 @@ namespace string
     std::basic_string<T>
     ToLower(const T* str)
     {
+        assert(str != NULL);
+
         std::basic_string<T> s = str;
         std::locale loc;
 #if _MSC_VER < 1400 // < vc8
@@ -87,6 +102,9 @@ namespace string
     bool
     EqualsIgnoreCase(const T* s1, const T* s2)
     {
+        assert(s1 != NULL);
+        assert(s2 != NULL);
+
         return (ToLower(s1) == ToLower(s2));
     }
 
@@ -95,6 +113,10 @@ namespace string
     std::basic_string<T>
     Replace(const T* str, const T* o, const T* n)
     {
+        assert(str != NULL);
+        assert(o != NULL);
+        assert(n != NULL);
+
         std::basic_string<T> s = str;
         if (std::string::npos == s.find(o))
         {
@@ -124,6 +146,8 @@ namespace string
     std::basic_string<T>
     TrimLeft(const T* str)
     {
+        assert(str != NULL);
+
         std::basic_string<T> s = str;
         const std::locale loc;
         typename std::basic_string<T>::iterator it = s.begin();
@@ -139,6 +163,8 @@ namespace string
     std::basic_string<T>
     TrimRight(const T* str)
     {
+        assert(str != NULL);
+
         std::basic_string<T> s = str;
         const std::locale loc;
         typename std::basic_string<T>::reverse_iterator it = s.rbegin();
@@ -154,6 +180,8 @@ namespace string
     std::basic_string<T>
     Trim(const T* str)
     {
+        assert(str != NULL);
+
         std::basic_string<T> s = TrimLeft(str);
         return TrimRight(s.c_str());
     }
@@ -163,21 +191,20 @@ namespace string
     std::basic_string<T>
     Join(InIt first, InIt last, const T* ep)
     {
-        std::basic_string<T> s;
+        assert(ep != NULL);
 
+        std::basic_string<T> s;
         const std::basic_string<T> sep = ep;
         for (InIt it = first; it != last; ++it)
         {
             s+= *it;
             s+= sep;
         }
-
         const typename std::basic_string<T>::size_type sepLen = sep.size();
         if (s.size() >= sepLen)
         {
             s.erase(s.length() - sepLen, sepLen);
         }
-
         return s;
     }
 
@@ -219,6 +246,9 @@ namespace string
     int
     Vsnprintf(char* buf, size_t count, const char* fmt, va_list ap)
     {
+        assert(buf != NULL);
+        assert(fmt != NULL);
+
 #ifdef _WIN32
 #if _MSC_VER < 1400 // < vc8
         return _vsnprintf(buf, count, fmt, ap);
@@ -235,6 +265,9 @@ namespace string
     int
     Vsnprintf(wchar_t* buf, size_t count, const wchar_t* fmt, va_list ap)
     {
+        assert(buf != NULL);
+        assert(fmt != NULL);
+
 #ifdef _WIN32
         return _vsnwprintf(buf, count, fmt, ap);
 #else
@@ -247,6 +280,8 @@ namespace string
     std::basic_string<T>
     Format(const T* fmt, ...)
     {
+        assert(fmt != NULL);
+
         T buf[BUFSIZE] = {0};
         va_list ap;
         va_start(ap, fmt);
@@ -266,6 +301,8 @@ namespace string
     std::basic_string<T>
     Format(const T* fmt, ...)
     {
+        assert(fmt != NULL);
+
         static const int MAX_LINE_LEN = 1024 * 8; // default buffer size
         static T buf[MAX_LINE_LEN] = {0};
         buf[0] = 0;
@@ -280,6 +317,96 @@ namespace string
             throw std::length_error(b);
         }
         return buf;
+    }
+
+
+    /**
+     * if sep is "/" and comp is "scratch.tiff":
+     * "/tmp"              -> "/tmp/scratch.tiff"
+     * "/tmp/"             -> "/tmp/scratch.tiff"
+     * "/"                 -> "/scratch.tiff"
+     * ""(an empty string) -> "scratch.tiff"
+     * "tmp"               -> "tmp/scratch.tiff"
+     *
+     * if sep is "\" and comp is "scratch.tiff":
+     * "\tmp"              -> "\tmp\scratch.tiff"
+     * "\tmp\"             -> "\tmp\scratch.tiff"
+     * "\"                 -> "\scratch.tiff"
+     * ""(an empty string) -> "scratch.tiff"
+     * "tmp"               -> "tmp\scratch.tiff"
+     * "c:\aaa\bbb"        -> "c:\aaa\bbb\scratch.tiff"
+     * "c:\"               -> "c:\scratch.tiff"
+     * "c:"                -> "c:\scratch.tiff"
+     */
+    template <typename T>
+    std::basic_string<T>
+    AppendPathComponent(const T* str, const T* comp, const T* sep)
+    {
+        assert(str != NULL);
+        assert(comp != NULL);
+        assert(sep != NULL);
+
+        std::basic_string<T> s = str;
+        if (s.empty())
+        {
+            return comp;
+        }
+        if (!EndWith(str, sep))
+        {
+            s.append(sep);
+        }
+        s.append(comp);
+        return s;
+    }
+
+
+    /**
+     * if sep is "/":
+     * ¡°/tmp/scratch.tiff¡± -> "/tmp¡±
+     * "/tmp/lock/¡±        -> "/tmp"
+     * "/tmp/"             -> "/"
+     * "/tmp"              -> "/"
+     * "/"                 -> "/"
+     * "scratch.tiff"      -> ""(an empty string)
+     *
+     * is sep is "\"
+     * "\tmp\scratch.tiff" -> "\tmp"
+     * "\tmp\lock\"        -> "\tmp"
+     * "\tmp\"             -> "\"
+     * "\tmp"              -> "\"
+     * "\"                 -> "\"
+     * "scratch.tiff"      -> ""(an empty string)
+     * "c:\aaa\bbb"        -> "c:\aaa"
+     * "c:\"               -> ""(an empty string)
+     * "c:"                -> ""(an empty string)
+     */
+    template <typename T>
+    std::basic_string<T>
+    DeleteLastPathComponent(const T* str, const T* sep)
+    {
+        assert(str != NULL);
+        assert(sep != NULL);
+
+        std::basic_string<T> s = str;
+        const std::string::size_type len = std::basic_string<T>(sep).length();
+        while (EndWith(s.c_str(), sep))
+        {
+            s.resize(s.length() - len);
+        }
+        std::string::size_type pos = s.rfind(sep);
+        if (pos == std::string::npos)
+        {
+            s = std::basic_string<T>();
+        }
+        else
+        {
+            s.resize(pos);
+        }
+        if (StartWith(str, sep) && s.empty())
+        {
+            s = sep;
+        }
+        return s;
     }
 
 }

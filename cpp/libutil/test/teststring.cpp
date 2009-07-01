@@ -1,3 +1,7 @@
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include <assert.h>
 
 #include <iostream>
@@ -210,14 +214,14 @@ void Test()
     std::cout << std::endl << "Format----------------:" << std::endl;
     {
         std::string s = string::Format("%d", 4);
+        std::cout << s << std::endl;
         assert(s == "4");
-        std::cout << s << std::endl;
         s= string::Format("%d,%s", 4, "dafkd");
-        assert(s == "4,dafkd");
         std::cout << s << std::endl;
+        assert(s == "4,dafkd");
         s= string::Format<2000>("%d,%s", 4, "dafkd");
-        assert(s == "4,dafkd");
         std::cout << s << std::endl;
+        assert(s == "4,dafkd");
         try
         {
             s = string::Format<2>("%d,%s", 4, "dafkd");
@@ -231,20 +235,28 @@ void Test()
         
         
         std::wstring ws = string::Format(L"%d", 4);
+#ifndef __MINGW32__
+        std::wcout << ws << std::endl;
+#endif
         assert(ws == L"4");
-#ifndef __MINGW32__
-        std::wcout << ws << std::endl;
-#endif
+#ifdef _WIN32
         ws = string::Format(L"%d,%s", 4, L"dafkd");
-        assert(ws == L"4,dafkd");
+#else
+        ws = string::Format(L"%d,%s", 4, "dafkd");
+#endif
 #ifndef __MINGW32__
         std::wcout << ws << std::endl;
 #endif
+        assert(ws == L"4,dafkd");
+#ifdef _WIN32
         ws = string::Format<2000>(L"%d,%s", 4, L"dafkd");
-        assert(ws == L"4,dafkd");
+#else
+        ws = string::Format<2000>(L"%d,%S", 4, L"dafkd");
+#endif
 #ifndef __MINGW32__
         std::wcout << ws << std::endl;
 #endif
+        assert(ws == L"4,dafkd");
         try
         {
             ws = string::Format<3>(L"%d,%s", 4, L"dafkd");
@@ -258,6 +270,249 @@ void Test()
             std::cout << e.what() << std::endl;
         }
     }
+
+    std::cout << std::endl << "AppendPathComponent----------------:" << std::endl;
+    {
+        std::string name = "scratch.tiff";
+        std::string s = "/tmp";
+        std::string s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/scratch.tiff");
+        s = "/tmp/";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/scratch.tiff");
+        s = "/";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/scratch.tiff");
+        s = "";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch.tiff");
+        s = "tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tmp/scratch.tiff");
+        s = "\\tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\tmp\\scratch.tiff");
+        s = "\\tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\tmp\\scratch.tiff");
+        s = "\\";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\scratch.tiff");
+        s = "";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch.tiff");
+        s = "tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tmp\\scratch.tiff");
+        s = "c:\\aaa\\bbb";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:\\aaa\\bbb\\scratch.tiff");
+        s = "c:\\";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:\\scratch.tiff");
+        s = "c:";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:\\scratch.tiff");
+    }
+#ifndef __MINGW32__
+    {
+        std::wstring name = L"scratch.tiff";
+        std::wstring s = L"/tmp";
+        std::wstring s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/scratch.tiff");
+        s = L"/tmp/";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/scratch.tiff");
+        s = L"/";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/scratch.tiff");
+        s = L"";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch.tiff");
+        s = L"tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tmp/scratch.tiff");
+        s = L"\\tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"\\tmp\\scratch.tiff");
+        s = L"\\tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"\\tmp\\scratch.tiff");
+        s = L"\\";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"\\scratch.tiff");
+        s = L"";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch.tiff");
+        s = L"tmp";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tmp\\scratch.tiff");
+        s = L"c:\\aaa\\bbb";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"c:\\aaa\\bbb\\scratch.tiff");
+        s = L"c:\\";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"c:\\scratch.tiff");
+        s = L"c:";
+        s1 = string::AppendPathComponent(s.c_str(), name.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"c:\\scratch.tiff");
+    }
+#endif
+
+    std::cout << std::endl << "DeleteLastPathComponent----------------:" << std::endl;
+    {
+        std::string s = "/tmp/scratch.tiff";
+        std::string s1 = string::DeleteLastPathComponent(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp");
+        s = "/tmp/lock/";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp");
+        s = "/tmp/";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/");
+        s = "/tmp";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/");
+        s = "/";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/");
+        s = "scratch.tiff";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+        s = "\\tmp\\scratch.tiff";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\tmp");
+        s = "\\tmp\\lock\\";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\tmp");
+        s = "\\tmp\\";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\");
+        s = "\\tmp";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\");
+        s = "\\";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\");
+        s = "scratch.tiff";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+        s = "c:\\aaa\\bbb";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:\\aaa");
+        s = "c:\\";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+        s = "c:";
+        s1 = string::DeleteLastPathComponent(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+    }
+#ifndef __MINGW32__
+    {
+        std::wstring ws = L"/tmp/scratch.tiff";
+        std::wstring ws1 = string::DeleteLastPathComponent(ws.c_str(), L"/");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"/tmp");
+        ws = L"/tmp/lock/";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"/");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"/tmp");
+        ws = L"/tmp/";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"/");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"/");
+        ws = L"/tmp";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"/");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"/");
+        ws = L"/";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"/");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"/");
+        ws = L"scratch.tiff";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"/");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"");
+        ws = L"\\tmp\\scratch.tiff";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"\\tmp");
+        ws = L"\\tmp\\lock\\";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"\\tmp");
+        ws = L"\\tmp\\";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"\\");
+        ws = L"\\tmp";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"\\");
+        ws = L"\\";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"\\");
+        ws = L"scratch.tiff";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"");
+        ws = L"c:\\aaa\\bbb";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"c:\\aaa");
+        ws = L"c:\\";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"");
+        ws = L"c:";
+        ws1 = string::DeleteLastPathComponent(ws.c_str(), L"\\");
+        std::wcout << ws << L" --> " << ws1 << std::endl;
+        assert(ws1 == L"");
+    }
+#endif
+
 }
         
         

@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libutil, 0.1.4, meteor1113@gmail.com)
+AC_INIT(libutil, 0.1.5, meteor1113@gmail.com)
 AC_CONFIG_SRCDIR([include/string.hpp])
 #AC_CONFIG_HEADER([config.h])
 
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR([include/string.hpp])
 AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libutil, 0.1.4)
+AM_INIT_AUTOMAKE(libutil, 0.1.5)
 
 # Checks for programs.
 AC_PROG_CXX
@@ -52,7 +52,8 @@ fi
 
 AC_CONFIG_FILES([Makefile
 			include/Makefile
-			test/Makefile])
+			test/Makefile
+			util.xcodeproj/Makefile])
 AC_OUTPUT
 #AC_OUTPUT([Makefile src/Makefile])
 
