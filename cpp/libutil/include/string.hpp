@@ -340,7 +340,7 @@ namespace string
      */
     template <typename T>
     std::basic_string<T>
-    AppendPathComponent(const T* str, const T* comp, const T* sep)
+    AppendPath(const T* str, const T* comp, const T* sep)
     {
         assert(str != NULL);
         assert(comp != NULL);
@@ -382,7 +382,7 @@ namespace string
      */
     template <typename T>
     std::basic_string<T>
-    DeleteLastPathComponent(const T* str, const T* sep)
+    DeleteLastPath(const T* str, const T* sep)
     {
         assert(str != NULL);
         assert(sep != NULL);
