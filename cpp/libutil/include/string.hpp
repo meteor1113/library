@@ -70,7 +70,7 @@ namespace string
 
         std::basic_string<T> s = str;
         std::locale loc;
-#if _MSC_VER < 1400 // < vc8
+#if _MSC_VER < 1400 // < vc8(vs2005)
         std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 #else
         const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);
@@ -88,7 +88,7 @@ namespace string
 
         std::basic_string<T> s = str;
         std::locale loc;
-#if _MSC_VER < 1400 // < vc8
+#if _MSC_VER < 1400 // < vc8(vs2005)
         std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 #else
         const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);

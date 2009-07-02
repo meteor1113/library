@@ -6,7 +6,6 @@
 # *~
 *.svn*
 *~
-*.pyc
-*.ropeproject*
-tempcreate/tempcreate.ini
 *autom4te.cache*
+*.mode1v3
+*.pbxuser

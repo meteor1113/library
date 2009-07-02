@@ -28,10 +28,10 @@
 		18E020FC0FFB4816002C15A9 /* testproperties.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testproperties.cpp; sourceTree = "<group>"; };
 		18E021000FFB4816002C15A9 /* teststring.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = teststring.cpp; sourceTree = "<group>"; };
 		18E021200FFB4899002C15A9 /* teststring */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = teststring; sourceTree = BUILT_PRODUCTS_DIR; };
-		18E021EB0FFB6343002C15A9 /* testalgo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = testalgo; path = build/Debug/testalgo; sourceTree = "<group>"; };
-		18E021F30FFB6350002C15A9 /* testcsvfile */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = testcsvfile; path = build/Debug/testcsvfile; sourceTree = "<group>"; };
-		18E021FB0FFB6360002C15A9 /* testlogfile */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = testlogfile; path = build/Debug/testlogfile; sourceTree = "<group>"; };
-		18E022030FFB6370002C15A9 /* testproperties */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = testproperties; path = build/Debug/testproperties; sourceTree = "<group>"; };
+		18E021EB0FFB6343002C15A9 /* testalgo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testalgo; sourceTree = BUILT_PRODUCTS_DIR; };
+		18E021F30FFB6350002C15A9 /* testcsvfile */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testcsvfile; sourceTree = BUILT_PRODUCTS_DIR; };
+		18E021FB0FFB6360002C15A9 /* testlogfile */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testlogfile; sourceTree = BUILT_PRODUCTS_DIR; };
+		18E022030FFB6370002C15A9 /* testproperties */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testproperties; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2AAC046055464E500DB518D /* libutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
