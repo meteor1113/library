@@ -54,11 +54,8 @@ namespace string
 
         const std::basic_string<T> s = str;
         const std::basic_string<T> d = sub;
-        if (s.length() < d.length())
-        {
-            return false;
-        }
-        return (s.rfind(d) == (s.length() - d.length()));
+        std::string::size_type p = s.rfind(d);
+        return ((p != std::string::npos) && (p == s.length() - d.length()));
     }
 
 
@@ -321,6 +318,74 @@ namespace string
 
 
     /**
+     * if sep is "/":
+     * "/tmp/scratch.tiff" -> "scratch.tiff"
+     * "/tmp/scratch"      -> "scratch"
+     * "/tmp/"             -> "tmp"
+     * "scratch"           -> "scratch"
+     * "/"                 -> "/"
+     *
+     * if sep is "\"
+     * "\tmp\scratch.tiff" -> "scratch.tiff"
+     * "\tmp\scratch"      -> "scratch"
+     * "\tmp\"             -> "tmp"
+     * "scratch"           -> "scratch"
+     * "\"                 -> "\"
+     * "c:\aaa\bbb"        -> "bbb"
+     * "c:\"               -> "c:"
+     * "c:"                -> "c:"
+     */
+    template <typename T>
+    std::basic_string<T>
+    GetLastPath(const T* str, const T* sep)
+    {
+        assert(str != NULL);
+        assert(sep != NULL);
+
+        std::basic_string<T> s = str;
+        const std::string::size_type len = std::basic_string<T>(sep).length();
+        while (EndWith(s.c_str(), sep))
+        {
+            s.resize(s.length() - len);
+        }
+        std::string::size_type pos = s.rfind(sep);
+        if (pos != std::string::npos)
+        {
+            s = s.substr(pos + 1);
+        }
+        if (StartWith(str, sep) && s.empty())
+        {
+            s = sep;
+        }
+        return s;
+    }
+
+
+    inline
+    std::string
+    GetLastPath(const char* str)
+    {
+#ifdef _WIN32
+        return GetLastPath(str, "\\");
+#else
+        return GetLastPath(str, "/");
+#endif
+    }
+
+
+    inline
+    std::wstring
+    GetLastPath(const wchar_t* str)
+    {
+#ifdef _WIN32
+        return GetLastPath(str, L"\\");
+#else
+        return GetLastPath(str, L"/");
+#endif
+    }
+
+
+    /**
      * if sep is "/" and comp is "scratch.tiff":
      * "/tmp"              -> "/tmp/scratch.tiff"
      * "/tmp/"             -> "/tmp/scratch.tiff"
@@ -360,10 +425,34 @@ namespace string
     }
 
 
+    inline
+    std::string
+    AppendPath(const char* str, const char* comp)
+    {
+#ifdef _WIN32
+        return AppendPath(str, comp, "\\");
+#else
+        return AppendPath(str, comp, "/");
+#endif
+    }
+
+
+    inline
+    std::wstring
+    AppendPath(const wchar_t* str, const wchar_t* comp)
+    {
+#ifdef _WIN32
+        return AppendPath(str, comp, L"\\");
+#else
+        return AppendPath(str, comp, L"/");
+#endif
+    }
+
+
     /**
      * if sep is "/":
-     * ¡°/tmp/scratch.tiff¡± -> "/tmp¡±
-     * "/tmp/lock/¡±        -> "/tmp"
+     * "/tmp/scratch.tiff" -> "/tmp"
+     * "/tmp/lock/"        -> "/tmp"
      * "/tmp/"             -> "/"
      * "/tmp"              -> "/"
      * "/"                 -> "/"
@@ -407,6 +496,162 @@ namespace string
             s = sep;
         }
         return s;
+    }
+
+
+    inline
+    std::string
+    DeleteLastPath(const char* str)
+    {
+#ifdef _WIN32
+        return DeleteLastPath(str, "\\");
+#else
+        return DeleteLastPath(str, "/");
+#endif
+    }
+
+
+    inline
+    std::wstring
+    DeleteLastPath(const wchar_t* str)
+    {
+#ifdef _WIN32
+        return DeleteLastPath(str, L"\\");
+#else
+        return DeleteLastPath(str, L"/");
+#endif
+    }
+
+
+    /**
+     * if you want get path extension from full path, e.g. /scratch.tiff/tmp,
+     * you must call GetLastPath() before call this function
+     *
+     * if sep is ".":
+     * "/tmp/scratch.tiff" -> "tiff"
+     * "/tmp/scratch"      -> ""(an empty string)
+     * "/tmp/"             -> ""(an empty string)
+     * "/scratch..tiff"    -> "tiff"
+     * "/scratch.tiff/tmp" -> "tiff/tmp"
+     */
+    template <typename T>
+    std::basic_string<T>
+    GetPathExtension(const T* str, const T* sep)
+    {
+        assert(str != NULL);
+        assert(sep != NULL);
+
+        std::basic_string<T> s = str;
+        std::string::size_type pos = s.rfind(sep);
+        if (pos != std::string::npos)
+        {
+            return s.substr(pos + 1);
+        }
+        else
+        {
+            return std::basic_string<T>();
+        }
+    }
+
+
+    inline
+    std::string
+    GetPathExtension(const char* str)
+    {
+        return GetPathExtension(GetLastPath(str).c_str(), ".");
+    }
+
+
+    inline
+    std::wstring
+    GetPathExtension(const wchar_t* str)
+    {
+        return GetPathExtension(GetLastPath(str).c_str(), L".");
+    }
+
+
+    /**
+     * append sep and ext to str directly.
+     *
+     * if ext is "tiff" and sep is ".":
+     * "/tmp/scratch.old"  -> "/tmp/scratch.old.tiff"
+     * "/tmp/scratch."     -> "/tmp/scratch..tiff"
+     * "/tmp/"             -> "/tmp/.tiff"
+     * "/scratch"          -> "scratch.tiff"
+     * "c:\a"              -> "c:\a.tiff"
+     */
+    template <typename T>
+    std::basic_string<T>
+    AppendPathExtension(const T* str, const T* ext, const T* sep)
+    {
+        assert(str != NULL);
+        assert(ext != NULL);
+        assert(sep != NULL);
+
+        std::basic_string<T> s = str;
+        s.append(sep);
+        s.append(ext);
+        return s;
+    }
+
+
+    inline
+    std::string
+    AppendPathExtension(const char* str, const char* ext)
+    {
+        return AppendPathExtension(str, ext, ".");
+    }
+
+
+    inline
+    std::wstring
+    AppendPathExtension(const wchar_t* str, const wchar_t* ext)
+    {
+        return AppendPathExtension(str, ext, L".");
+    }
+
+
+    /**
+     * if ext is "tiff" and sep is ".":
+     * "/tmp/scratch.tiff" -> "/tmp/scratch"
+     * "/tmp/"             -> "/tmp/"
+     * "scratch.bundle/"   -> "scratch"
+     * "scratch..tiff"     -> "scratch."
+     * ".tiff"             -> ""(an empty string)
+     * "/"                 -> "/"
+     * "scratch..."        -> "scratch.."
+     * "tmp.bundle/scrtch" -> "tmp"
+     */
+    template <typename T>
+    std::basic_string<T>
+    DeletePathExtension(const T* str, const T* sep)
+    {
+        assert(str != NULL);
+        assert(sep != NULL);
+
+        std::basic_string<T> s = str;
+        std::string::size_type pos = s.rfind(sep);
+        if (pos != std::string::npos)
+        {
+            s.resize(pos);
+        }
+        return s;
+    }
+
+
+    inline
+    std::string
+    DeletePathExtension(const char* str)
+    {
+        return DeletePathExtension(str, ".");
+    }
+
+
+    inline
+    std::wstring
+    DeletePathExtension(const wchar_t* str)
+    {
+        return DeletePathExtension(str, L".");
     }
 
 }

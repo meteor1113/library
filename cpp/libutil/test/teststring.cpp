@@ -36,17 +36,21 @@ void Test()
         bool b1 = string::EndWith(s.c_str(), "'ghg");
         bool b2 = string::EndWith(s.c_str(), "ghg    ");
         bool b3 = string::EndWith(s.c_str(), ";fJDKOG:Jd   DK;s 'ghg    ");
+        bool b4 = string::EndWith("", "a");
         assert(!b1);
         assert(b2);
         assert(b3);
+        assert(!b4);
         
         std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
         bool wb1 = string::EndWith(ws.c_str(), L"'ghg");
         bool wb2 = string::EndWith(ws.c_str(), L"ghg    ");
         bool wb3 = string::EndWith(ws.c_str(), L";fJDKOG:Jd   DK;s 'ghg    ");
+        bool wb4 = string::EndWith(L"", L"a");
         assert(!wb1);
         assert(wb2);
         assert(wb3);
+        assert(!wb4);
     }
     
     std::cout << std::endl << "ToUpper----------------:" << std::endl;
@@ -270,6 +274,118 @@ void Test()
             std::cout << e.what() << std::endl;
         }
     }
+
+    std::cout << std::endl << "GetLastPath----------------:" << std::endl;
+    {
+        std::string s = "/tmp/scratch.tiff";
+        std::string s1 = string::GetLastPath(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch.tiff");
+        s = "/tmp/scratch";
+        s1 = string::GetLastPath(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch");
+        s = "/tmp/";
+        s1 = string::GetLastPath(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tmp");
+        s = "scratch";
+        s1 = string::GetLastPath(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch");
+        s = "/";
+        s1 = string::GetLastPath(s.c_str(), "/");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/");
+        s = "\\tmp\\scratch.tiff";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch.tiff");
+        s = "\\tmp\\scratch";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch");
+        s = "\\tmp\\";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tmp");
+        s = "scratch";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch");
+        s = "\\";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "\\");
+        s = "c:\\aaa\\bbb";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "bbb");
+        s = "c:\\";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:");
+        s = "c:";
+        s1 = string::GetLastPath(s.c_str(), "\\");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:");
+    }
+#ifndef __MINGW32__
+    {
+        std::wstring s = L"/tmp/scratch.tiff";
+        std::wstring s1 = string::GetLastPath(s.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch.tiff");
+        s = L"/tmp/scratch";
+        s1 = string::GetLastPath(s.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch");
+        s = L"/tmp/";
+        s1 = string::GetLastPath(s.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tmp");
+        s = L"scratch";
+        s1 = string::GetLastPath(s.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch");
+        s = L"/";
+        s1 = string::GetLastPath(s.c_str(), L"/");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/");
+        s = L"\\tmp\\scratch.tiff";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch.tiff");
+        s = L"\\tmp\\scratch";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch");
+        s = L"\\tmp\\";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tmp");
+        s = L"scratch";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch");
+        s = L"\\";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"\\");
+        s = L"c:\\aaa\\bbb";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"bbb");
+        s = L"c:\\";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"c:");
+        s = L"c:";
+        s1 = string::GetLastPath(s.c_str(), L"\\");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"c:");
+    }
+#endif
 
     std::cout << std::endl << "AppendPath----------------:" << std::endl;
     {
@@ -513,6 +629,191 @@ void Test()
     }
 #endif
 
+    std::cout << std::endl << "GetPathExtension----------------:" << std::endl;
+    {
+        std::string s = "/tmp/scratch.tiff";
+        std::string s1 = string::GetPathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tiff");
+        s = "/tmp/scratch";
+        s1 = string::GetPathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+        s = "/tmp/";
+        s1 = string::GetPathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+        s = "/scratch..tiff";
+        s1 = string::GetPathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tiff");
+        s = "/scratch.tiff/tmp";
+        s1 = string::GetPathExtension(s.c_str(), ".");
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tiff/tmp");
+#ifdef _WIN32
+        s = "\\scratch.tiff\\tmp";
+#else
+        s = "/scratch.tiff/tmp";
+#endif
+        s1 = string::GetPathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+    }
+#ifndef __MINGW32__
+    {
+        std::wstring s = L"/tmp/scratch.tiff";
+        std::wstring s1 = string::GetPathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tiff");
+        s = L"/tmp/scratch";
+        s1 = string::GetPathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"");
+        s = L"/tmp/";
+        s1 = string::GetPathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"");
+        s = L"/scratch..tiff";
+        s1 = string::GetPathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tiff");
+        s = L"/scratch.tiff/tmp";
+        s1 = string::GetPathExtension(s.c_str(), L".");
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tiff/tmp");
+#ifdef _WIN32
+        s = L"\\scratch.tiff\\tmp";
+#else
+        s = L"/scratch.tiff/tmp";
+#endif
+        s1 = string::GetPathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"");
+    }
+#endif
+
+    std::cout << std::endl << "AppendPathExtension----------------:" << std::endl;
+    {
+        std::string ext = "tiff";
+        std::string s = "/tmp/scratch.old";
+        std::string s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/scratch.old.tiff");
+        s = "/tmp/scratch.";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/scratch..tiff");
+        s = "/tmp/";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/.tiff");
+        s = "scratch";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch.tiff");
+        s = "c:\\a";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "c:\\a.tiff");
+    }
+#ifndef __MINGW32__
+    {
+        std::wstring ext = L"tiff";
+        std::wstring s = L"/tmp/scratch.old";
+        std::wstring s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/scratch.old.tiff");
+        s = L"/tmp/scratch.";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/scratch..tiff");
+        s = L"/tmp/";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/.tiff");
+        s = L"scratch";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch.tiff");
+        s = L"c:\\a";
+        s1 = string::AppendPathExtension(s.c_str(), ext.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"c:\\a.tiff");
+    }
+#endif
+
+    std::cout << std::endl << "DeletePathExtension----------------:" << std::endl;
+    {
+        std::string s = "/tmp/scratch.tiff";
+        std::string s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/scratch");
+        s = "/tmp/";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/tmp/");
+        s = "scratch.bundle/";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch");
+        s = "scratch..tiff";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch.");
+        s = ".tiff";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "");
+        s = "/";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "/");
+        s = "scratch...";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scratch..");
+        s = "tmp.bundle/scrtch";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "tmp");
+    }
+#ifndef __MINGW32__
+    {
+        std::wstring s = L"/tmp/scratch.tiff";
+        std::wstring s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/scratch");
+        s = L"/tmp/";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/tmp/");
+        s = L"scratch.bundle/";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch");
+        s = L"scratch..tiff";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch.");
+        s = L".tiff";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"");
+        s = L"/";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"/");
+        s = L"scratch...";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scratch..");
+        s = L"tmp.bundle/scrtch";
+        s1 = string::DeletePathExtension(s.c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"tmp");
+    }
+#endif
 }
         
         

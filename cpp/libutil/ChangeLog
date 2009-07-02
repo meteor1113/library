@@ -2,6 +2,7 @@
 
 	* include/string.hpp: Rename AppendPathComponent to AppendPath.
 	Rename DeleteLastPathComponent to DeleteLastPath.
+	Add function GetLastpath, GetPathExtension, AppendPathExtension, DeletePathExtension.
 
 2009-07-01  Meteor Liu  <meteor1113@gmail.com>
 
