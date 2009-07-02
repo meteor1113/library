@@ -1,8 +1,14 @@
+2009-07-02  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/string.hpp: Rename AppendPathComponent to AppendPath.
+	Rename DeleteLastPathComponent to DeleteLastPath.
+
 2009-07-01  Meteor Liu  <meteor1113@gmail.com>
 
 	* Add util.xcodeproj/project.pbxproj.(xcode project for osx)
+
 	* util/string.hpp(EndWith): fix bug.
-	: Add function AppendPathComponent and DeleteLastPathComponent.
+	* util/string.hpp: Add function AppendPathComponent and DeleteLastPathComponent.
 
 2009-04-27  Meteor Liu  <meteor1113@gmail.com>
 
