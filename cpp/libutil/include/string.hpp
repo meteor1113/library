@@ -320,17 +320,17 @@ namespace string
     /**
      * if sep is "/":
      * "/tmp/scratch.tiff" -> "scratch.tiff"
-     * "/tmp/scratch"      -> "scratch"
+     * "/tmp//scratch"     -> "scratch"
      * "/tmp/"             -> "tmp"
      * "scratch"           -> "scratch"
-     * "/"                 -> "/"
+     * "/"                 -> ""(an empty string)
      *
      * if sep is "\"
      * "\tmp\scratch.tiff" -> "scratch.tiff"
-     * "\tmp\scratch"      -> "scratch"
+     * "\tmp\\scratch"     -> "scratch"
      * "\tmp\"             -> "tmp"
      * "scratch"           -> "scratch"
-     * "\"                 -> "\"
+     * "\"                 -> ""(an empty string)
      * "c:\aaa\bbb"        -> "bbb"
      * "c:\"               -> "c:"
      * "c:"                -> "c:"
@@ -352,10 +352,6 @@ namespace string
         if (pos != std::string::npos)
         {
             s = s.substr(pos + 1);
-        }
-        if (StartWith(str, sep) && s.empty())
-        {
-            s = sep;
         }
         return s;
     }
@@ -392,6 +388,7 @@ namespace string
      * "/"                 -> "/scratch.tiff"
      * ""(an empty string) -> "scratch.tiff"
      * "tmp"               -> "tmp/scratch.tiff"
+     * "//tmp///"          -> "//tmp///scratch.tiff"
      *
      * if sep is "\" and comp is "scratch.tiff":
      * "\tmp"              -> "\tmp\scratch.tiff"
@@ -399,6 +396,7 @@ namespace string
      * "\"                 -> "\scratch.tiff"
      * ""(an empty string) -> "scratch.tiff"
      * "tmp"               -> "tmp\scratch.tiff"
+     * "\\tmp\\"           -> "\\tmp\\scratch.tiff"
      * "c:\aaa\bbb"        -> "c:\aaa\bbb\scratch.tiff"
      * "c:\"               -> "c:\scratch.tiff"
      * "c:"                -> "c:\scratch.tiff"
@@ -416,7 +414,7 @@ namespace string
         {
             return comp;
         }
-        if (!EndWith(str, sep))
+        if (!EndWith(s.c_str(), sep))
         {
             s.append(sep);
         }
@@ -452,7 +450,7 @@ namespace string
     /**
      * if sep is "/":
      * "/tmp/scratch.tiff" -> "/tmp"
-     * "/tmp/lock/"        -> "/tmp"
+     * "/tmp//lock/"       -> "/tmp/"
      * "/tmp/"             -> "/"
      * "/tmp"              -> "/"
      * "/"                 -> "/"
@@ -460,7 +458,7 @@ namespace string
      *
      * if sep is "\"
      * "\tmp\scratch.tiff" -> "\tmp"
-     * "\tmp\lock\"        -> "\tmp"
+     * "\tmp\\lock\"       -> "\tmp\"
      * "\tmp\"             -> "\"
      * "\tmp"              -> "\"
      * "\"                 -> "\"
@@ -491,7 +489,7 @@ namespace string
         {
             s.resize(pos);
         }
-        if (StartWith(str, sep) && s.empty())
+        if (s.empty() && StartWith(str, sep))
         {
             s = sep;
         }
@@ -529,10 +527,11 @@ namespace string
      *
      * if sep is ".":
      * "/tmp/scratch.tiff" -> "tiff"
-     * "/tmp/scratch"      -> ""(an empty string)
+     * "/tmp//scratch"     -> ""(an empty string)
      * "/tmp/"             -> ""(an empty string)
      * "/scratch..tiff"    -> "tiff"
      * "/scratch.tiff/tmp" -> "tiff/tmp"
+     * "/"                 -> ""(an empty string)
      */
     template <typename T>
     std::basic_string<T>
@@ -558,7 +557,7 @@ namespace string
     std::string
     GetPathExtension(const char* str)
     {
-        return GetPathExtension(GetLastPath(str).c_str(), ".");
+        return GetPathExtension(str, ".");
     }
 
 
@@ -566,7 +565,7 @@ namespace string
     std::wstring
     GetPathExtension(const wchar_t* str)
     {
-        return GetPathExtension(GetLastPath(str).c_str(), L".");
+        return GetPathExtension(str, L".");
     }
 
 
@@ -576,7 +575,7 @@ namespace string
      * if ext is "tiff" and sep is ".":
      * "/tmp/scratch.old"  -> "/tmp/scratch.old.tiff"
      * "/tmp/scratch."     -> "/tmp/scratch..tiff"
-     * "/tmp/"             -> "/tmp/.tiff"
+     * "/tmp//"            -> "/tmp//.tiff"
      * "/scratch"          -> "scratch.tiff"
      * "c:\a"              -> "c:\a.tiff"
      */
