@@ -826,7 +826,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-debug          Turn on debugging
+  --enable-debug          enable debug (default: no)
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -1647,8 +1647,8 @@ fi
 
 
 # Define the identity of the package.
- PACKAGE=libutil
- VERSION=0.1.6
+ PACKAGE='libutil'
+ VERSION='0.1.6'
 
 
 cat >>confdefs.h <<_ACEOF
@@ -3855,15 +3855,21 @@ else
   enable_debug=no
 fi;
 if test x$enable_debug = xyes ; then
-    CFLAGS="${CFLAGS} -g -D_DEBUG"
-    CXXFLAGS="${CXXFLAGS} -g -D_DEBUG"
+
+cat >>confdefs.h <<\_ACEOF
+#define _DEBUG 1
+_ACEOF
+
+#   CFLAGS="-g"	     # "${CFLAGS} -g"
+#   CXXFLAGS="-g"     # "${CXXFLAGS} -g"
 else
-#   CFLAGS="${CFLAGS} -O2 -DNDEBUG"
-    CFLAGS="-O2 -DNDEBUG"
-    CXXFLAGS="-O2 -DNDEBUG"
+   cat >>confdefs.h <<\_ACEOF
+#define NDEBUG 1
+_ACEOF
+
 fi
 
-                                        ac_config_files="$ac_config_files Makefile include/Makefile test/Makefile util.xcodeproj/Makefile"
+                              ac_config_files="$ac_config_files Makefile include/Makefile test/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4450,7 +4456,6 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile" ;;
   "include/Makefile" ) CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
   "test/Makefile" ) CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
-  "util.xcodeproj/Makefile" ) CONFIG_FILES="$CONFIG_FILES util.xcodeproj/Makefile" ;;
   "depfiles" ) CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}

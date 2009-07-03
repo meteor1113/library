@@ -826,7 +826,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-debug          Turn on debugging
+  --enable-debug          enable debug (default: no)
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -1647,8 +1647,8 @@ fi
 
 
 # Define the identity of the package.
- PACKAGE=libsock
- VERSION=0.2.2
+ PACKAGE='libsock'
+ VERSION='0.2.2'
 
 
 cat >>confdefs.h <<_ACEOF
@@ -3855,12 +3855,18 @@ else
   enable_debug=no
 fi;
 if test x$enable_debug = xyes ; then
-    CFLAGS="${CFLAGS} -g -D_DEBUG"
-    CXXFLAGS="${CXXFLAGS} -g -D_DEBUG"
+
+cat >>confdefs.h <<\_ACEOF
+#define _DEBUG 1
+_ACEOF
+
+#   CFLAGS="-g"	     # "${CFLAGS} -g"
+#   CXXFLAGS="-g"     # "${CXXFLAGS} -g"
 else
-#   CFLAGS="${CFLAGS} -O2 -DNDEBUG"
-    CFLAGS="-O2 -DNDEBUG"
-    CXXFLAGS="-O2 -DNDEBUG"
+   cat >>confdefs.h <<\_ACEOF
+#define NDEBUG 1
+_ACEOF
+
 fi
 
 case "${host}" in

@@ -54,6 +54,13 @@ void Test()
         std::cout << "0x12345g ->" << i << "(false)" << std::endl;
     }
 
+#ifdef _DEBUG
+    std::cout << "_DEBUG" << std::endl;
+#endif
+#ifdef NDEBUG
+    std::cout << "NDEBUG" << std::endl;
+#endif
+
 }
         
         

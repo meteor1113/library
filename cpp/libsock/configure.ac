@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libsock, 0.2.2, meteor1113@gmail.com)
+AC_INIT([libsock], [0.2.2], [meteor1113@gmail.com])
 AC_CONFIG_SRCDIR([src/socket.cpp])
 #AC_CONFIG_HEADER([config.h])
 
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR([src/socket.cpp])
 AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libsock, 0.2.2)
+AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX
@@ -38,16 +38,15 @@ AC_HEADER_STDC
 
 # debug options support
 AC_ARG_ENABLE([debug],
-	      AC_HELP_STRING([--enable-debug], [Turn on debugging]),
+	      AC_HELP_STRING([--enable-debug], [enable debug (default: no)]),
 	      [enable_debug=$enableval],
 	      [enable_debug=no])
 if test x$enable_debug = xyes ; then
-    CFLAGS="${CFLAGS} -g -D_DEBUG"
-    CXXFLAGS="${CXXFLAGS} -g -D_DEBUG"
+   AC_DEFINE(_DEBUG, 1, [_DEBUG])
+#   CFLAGS="-g"	     # "${CFLAGS} -g"
+#   CXXFLAGS="-g"     # "${CXXFLAGS} -g"
 else
-#   CFLAGS="${CFLAGS} -O2 -DNDEBUG"
-    CFLAGS="-O2 -DNDEBUG"
-    CXXFLAGS="-O2 -DNDEBUG"
+   AC_DEFINE(NDEBUG)
 fi
 
 case "${host}" in
@@ -56,9 +55,9 @@ case "${host}" in
 esac
 
 AC_CONFIG_FILES([Makefile
-			include/Makefile
-			src/Makefile
-			test/Makefile])
+		include/Makefile
+		src/Makefile
+		test/Makefile])
 AC_OUTPUT
 #AC_OUTPUT([Makefile src/Makefile])
 

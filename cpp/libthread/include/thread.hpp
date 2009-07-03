@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2008 Meteor Liu
+ * Copyright (C) 2009 Meteor Liu
  *
  * This code has been released into the Public Domain.
  * You may do whatever you like with it.
@@ -40,6 +40,10 @@ namespace thread
         private:
             ThreadData() : ref(1) {}
             /*virtual*/ ~ThreadData() {}
+
+        private:
+            ThreadData(const ThreadData& rhs);
+            ThreadData& operator=(const ThreadData& rhs);
 
         public:
             bool GetStop() const { return stop; }

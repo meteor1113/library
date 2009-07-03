@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(libthread, 0.4.2, meteor1113@gmail.com)
-AC_CONFIG_SRCDIR([include/thread.hpp])
+AC_INIT([libutil], [0.1.6], [meteor1113@gmail.com])
+AC_CONFIG_SRCDIR([include/string.hpp])
 #AC_CONFIG_HEADER([config.h])
 
 # sets build, host, target variables and the same with _alias
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR([include/thread.hpp])
 AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(libthread, 0.4.2)
+AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX
@@ -24,9 +24,9 @@ AC_HEADER_STDC
 #AC_CHECK_HEADERS([inttypes.h memory.h stdint.h stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_C_CONST
-AC_C_INLINE
+#AC_HEADER_STDBOOL
+#AC_C_CONST
+#AC_C_INLINE
 #AC_TYPE_SIZE_T
 #AC_STRUCT_TM
 #AC_C_VOLATILE
@@ -38,38 +38,20 @@ AC_C_INLINE
 
 # debug options support
 AC_ARG_ENABLE([debug],
-	      AC_HELP_STRING([--enable-debug], [Turn on debugging]),
+	      AC_HELP_STRING([--enable-debug], [enable debug (default: no)]),
 	      [enable_debug=$enableval],
 	      [enable_debug=no])
 if test x$enable_debug = xyes ; then
-    CFLAGS="${CFLAGS} -g -D_DEBUG"
-    CXXFLAGS="${CXXFLAGS} -g -D_DEBUG"
+   AC_DEFINE(_DEBUG, 1, [_DEBUG])
+#   CFLAGS="-g"	     # "${CFLAGS} -g"
+#   CXXFLAGS="-g"     # "${CXXFLAGS} -g"
 else
-#   CFLAGS="${CFLAGS} -O2 -DNDEBUG"
-    CFLAGS="-O2 -DNDEBUG"
-    CXXFLAGS="-O2 -DNDEBUG"
+   AC_DEFINE(NDEBUG)
 fi
-
-USE_PTHREAD=yes
-#USE_RT=no			dnl clock_gettime() need -lrt
-case "${host}" in
-    *mingw32* )
-        USE_PTHREAD=no;;
-#    *linux* )
-#    	USE_RT=yes;;
-esac
-
-if test x$USE_PTHREAD = xyes ; then
-    LIBS="${LIBS} -lpthread"
-fi
-
-#if test x$USE_RT = xyes ; then
-#    LIBS="${LIBS} -lrt"
-#fi
 
 AC_CONFIG_FILES([Makefile
-			include/Makefile
-			test/Makefile])
+		include/Makefile
+		test/Makefile])
 AC_OUTPUT
 #AC_OUTPUT([Makefile src/Makefile])
 
