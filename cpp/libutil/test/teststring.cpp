@@ -826,6 +826,14 @@ void Test()
         s1 = string::DeletePathExtension(s.c_str());
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "tmp");
+#ifdef _WIN32
+        s = "tmp.bundle\\scrtch";
+#else
+        s = "tmp.bundle/scrtch";
+#endif
+        s1 = string::DeletePathExtension(string::GetLastPath(s.c_str()).c_str());
+        std::cout << s << " --> " << s1 << std::endl;
+        assert(s1 == "scrtch");
     }
 #ifndef __MINGW32__
     {
@@ -869,6 +877,14 @@ void Test()
         s1 = string::DeletePathExtension(s.c_str());
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"tmp");
+#ifdef _WIN32
+        s = L"tmp.bundle\\scrtch";
+#else
+        s = L"tmp.bundle/scrtch";
+#endif
+        s1 = string::DeletePathExtension(string::GetLastPath(s.c_str()).c_str());
+        std::wcout << s << L" --> " << s1 << std::endl;
+        assert(s1 == L"scrtch");
     }
 #endif
 }

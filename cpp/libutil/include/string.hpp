@@ -611,6 +611,10 @@ namespace string
 
 
     /**
+     * if you want get thin path from full path, e.g. /scratch.tiff/tmp,
+     * you must call GetLastPath() before call this function,
+     * DeleteLastPath(GetLastPath("/tmp.bundle/scratch")) will get "scratch".
+     *
      * if ext is "tiff" and sep is ".":
      * "/tmp/scratch.tiff" -> "/tmp/scratch"
      * "/tmp/"             -> "/tmp/"
