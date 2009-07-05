@@ -627,9 +627,8 @@ namespace string
      */
     template <typename T>
     std::basic_string<T>
-    DeletePathExtension(const T* str, const T* sep)
+    DeletePathExtension(const std::basic_string<T>& str, const T* sep)
     {
-        assert(str != NULL);
         assert(sep != NULL);
 
         std::basic_string<T> s = str;
@@ -644,7 +643,7 @@ namespace string
 
     inline
     std::string
-    DeletePathExtension(const char* str)
+    DeletePathExtension(const std::string& str)
     {
         return DeletePathExtension(str, ".");
     }
@@ -652,7 +651,7 @@ namespace string
 
     inline
     std::wstring
-    DeletePathExtension(const wchar_t* str)
+    DeletePathExtension(const std::wstring& str)
     {
         return DeletePathExtension(str, L".");
     }
