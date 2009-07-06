@@ -1,3 +1,5 @@
+This NEWS file records noteworthy changes, very tersely.
+
 Version 0.4.2 (2009-05-21)
 * Add Stopable class in threadpool.hpp.
 

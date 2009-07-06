@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([libutil], [0.1.6], [meteor1113@gmail.com])
+AC_INIT([libutil], [0.1.7], [meteor1113@gmail.com])
 AC_CONFIG_SRCDIR([include/string.hpp])
 #AC_CONFIG_HEADER([config.h])
 

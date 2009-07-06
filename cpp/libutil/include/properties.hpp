@@ -85,7 +85,7 @@ inline void Properties::Load(const std::string& filename)
                 std::string key = line.substr(0, pos);
                 std::string value =
                     line.substr(pos + 1, line.length() - pos);
-                Set(string::Trim(key.c_str()), string::Trim(value.c_str()));
+                Set(string::Trim<char>(key), string::Trim<char>(value));
             }
         }
     }
@@ -124,19 +124,19 @@ inline std::string Properties::Get(const std::string& key,
 
     if (param1 != NULL)
     {
-        value = string::Replace(value.c_str(), "{1}", param1);
+        value = string::Replace<char>(value, "{1}", param1);
     }
     if (param2 != NULL)
     {
-        value = string::Replace(value.c_str(), "{2}", param2);
+        value = string::Replace<char>(value, "{2}", param2);
     }
     if (param3 != NULL)
     {
-        value = string::Replace(value.c_str(), "{3}", param3);
+        value = string::Replace<char>(value, "{3}", param3);
     }
     if (param4 != NULL)
     {
-        value = string::Replace(value.c_str(), "{4}", param4);
+        value = string::Replace<char>(value, "{4}", param4);
     }
 
     return value;

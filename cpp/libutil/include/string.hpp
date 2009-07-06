@@ -33,103 +33,84 @@
 namespace string
 {
 
-    template <typename T>
+    template<typename T>
     bool
-    StartWith(const T* str, const T* sub)
+    StartWith(const std::basic_string<T>& str,
+              const std::basic_string<T>& sub)
     {
-        assert(str != NULL);
-        assert(sub != NULL);
-
-        const std::basic_string<T> s = str;
-        return (s.find(sub) == 0);
+        return (str.find(sub) == 0);
     }
 
 
-    template <typename T>
+    template<typename T>
     bool
-    EndWith(const T* str, const T* sub)
+    EndWith(const std::basic_string<T>& str,
+            const std::basic_string<T>& sub)
     {
-        assert(str != NULL);
-        assert(sub != NULL);
-
-        const std::basic_string<T> s = str;
-        const std::basic_string<T> d = sub;
-        std::string::size_type p = s.rfind(d);
-        return ((p != std::string::npos) && (p == s.length() - d.length()));
+        const std::string::size_type p = str.rfind(sub);
+        const std::string::size_type len = str.length() - sub.size();
+        return ((p != std::string::npos) && (p == len));
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    ToUpper(const T* str)
+    ToUpper(const std::basic_string<T>& str)
     {
-        assert(str != NULL);
-
         std::basic_string<T> s = str;
-        std::locale loc;
 #if _MSC_VER < 1400 // < vc8(vs2005)
         std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 #else
-        const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);
-        ct.toupper(&s.at(0), &s.at(s.length() - 1) + 1);
+        const std::locale loc;
+        std::use_facet<std::ctype<T> >(loc).toupper(s.begin(), s.end());
+        //const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);
+        //ct.toupper(&s.at(0), &s.at(s.length() - 1) + 1);
 #endif
         return s;
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    ToLower(const T* str)
+    ToLower(const std::basic_string<T>& str)
     {
-        assert(str != NULL);
-
         std::basic_string<T> s = str;
-        std::locale loc;
 #if _MSC_VER < 1400 // < vc8(vs2005)
         std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 #else
-        const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);
-        ct.tolower(&s.at(0), &s.at(s.length() - 1) + 1);
+        const std::locale loc;
+        std::use_facet<std::ctype<T> >(loc).tolower(s.begin(), s.end());
 #endif
         return s;
     }
 
 
-    template <typename T>
+    template<typename T>
     bool
-    EqualsIgnoreCase(const T* s1, const T* s2)
+    EqualsIgnoreCase(const std::basic_string<T>& s1,
+                     const std::basic_string<T>& s2)
     {
-        assert(s1 != NULL);
-        assert(s2 != NULL);
-
         return (ToLower(s1) == ToLower(s2));
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    Replace(const T* str, const T* o, const T* n)
+    Replace(const std::basic_string<T>& str,
+            const std::basic_string<T>& o,
+            const std::basic_string<T>& n)
     {
-        assert(str != NULL);
-        assert(o != NULL);
-        assert(n != NULL);
-
-        std::basic_string<T> s = str;
-        if (std::string::npos == s.find(o))
+        if (std::string::npos == str.find(o))
         {
-            return s;
+            return str;
         }
-
-        const std::basic_string<T> oldS = o;
-        const std::basic_string<T> newS = n;
-        const std::string::size_type oldLen = oldS.size();
-        const std::string::size_type newLen = newS.size();
+        std::basic_string<T> s = str;
         std::string::size_type beg = 0;
         std::string::size_type tmp = 0;
-        while ((beg = (s.find(oldS, tmp))) != std::string::npos)
+        while ((beg = (s.find(o, tmp))) != std::string::npos)
         {
-            s.replace(beg, oldLen, newS);
-            tmp = beg + newLen;
+            s.replace(beg, o.length(), n);
+            tmp = beg + n.size();
             if (tmp >= s.length())
             {
                 break;
@@ -139,102 +120,84 @@ namespace string
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    TrimLeft(const T* str)
+    TrimLeft(const std::basic_string<T>& str)
     {
-        assert(str != NULL);
-
-        std::basic_string<T> s = str;
         const std::locale loc;
-        typename std::basic_string<T>::iterator it = s.begin();
-        while (it != s.end() && std::isspace(*it, loc))
+        typename std::basic_string<T>::const_iterator i = str.begin();
+        while ((i != str.end()) && std::isspace(*i, loc))
         {
-            ++it;
+            ++i;
         }
-        return std::basic_string<T>(it, s.end());
+        return std::basic_string<T>(i, str.end());
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    TrimRight(const T* str)
+    TrimRight(const std::basic_string<T>& str)
     {
-        assert(str != NULL);
-
-        std::basic_string<T> s = str;
         const std::locale loc;
-        typename std::basic_string<T>::reverse_iterator it = s.rbegin();
-        while (it != s.rend() && std::isspace(*it, loc))
+        typename std::basic_string<T>::const_reverse_iterator i = str.rbegin();
+        while ((i != str.rend()) && std::isspace(*i, loc))
         {
-            ++it;
+            ++i;
         }
-        return std::basic_string<T>(s.begin(), it.base());
+        return std::basic_string<T>(str.begin(), i.base());
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    Trim(const T* str)
+    Trim(const std::basic_string<T>& str)
     {
-        assert(str != NULL);
-
-        std::basic_string<T> s = TrimLeft(str);
-        return TrimRight(s.c_str());
+        return TrimRight(TrimLeft(str));
     }
 
 
-    template <typename InIt, typename T>
+    template<typename T, typename InIt>
     std::basic_string<T>
-    Join(InIt first, InIt last, const T* ep)
+    Join(InIt first, InIt last, const std::basic_string<T>& sep)
     {
-        assert(ep != NULL);
-
         std::basic_string<T> s;
-        const std::basic_string<T> sep = ep;
-        for (InIt it = first; it != last; ++it)
+        for (InIt i = first; i != last; ++i)
         {
-            s+= *it;
-            s+= sep;
+            s.append(*i);
+            s.append(sep);
         }
-        const typename std::basic_string<T>::size_type sepLen = sep.size();
-        if (s.size() >= sepLen)
+        const std::string::size_type len = sep.size();
+        if (s.size() >= len)
         {
-            s.erase(s.length() - sepLen, sepLen);
+            s.erase(s.length() - len, len);
         }
         return s;
     }
 
 
-    template <typename T>
+    template<typename T>
     std::vector<std::basic_string<T> >
-    Split(const T* str, const T* ep)
+    Split(const std::basic_string<T>& str,
+          const std::basic_string<T>& sep)
     {
-        std::basic_string<T> s = str;
         std::vector<std::basic_string<T> > vs;
-        const std::basic_string<T> sep = ep;
-
-        if (s.empty())
+        if (str.empty())
         {
             return vs;
         }
-        if (sep.empty() || std::string::npos == s.find(sep))
+        if (sep.empty() || (std::string::npos == str.find(sep)))
         {
-            vs.push_back(s);
+            vs.push_back(str);
             return vs;
         }
-
-        const typename std::basic_string<T>::size_type sepLen = sep.size();
-        typename std::basic_string<T>::size_type beg = 0;
-        typename std::basic_string<T>::size_type e = std::string::npos;
-
-        while (std::basic_string<T>::npos != (e = s.find(sep, beg)))
+        std::string::size_type beg = 0;
+        std::string::size_type e = std::string::npos;
+        while (std::string::npos != (e = str.find(sep, beg)))
         {
-            vs.push_back(s.substr(beg, e - beg));
-            beg = e + sepLen;
+            vs.push_back(str.substr(beg, e - beg));
+            beg = e + sep.size();
         }
-        vs.push_back(s.substr(beg, s.size() - beg));
-
+        vs.push_back(str.substr(beg, str.size() - beg));
         return vs;
     }
 
@@ -273,7 +236,7 @@ namespace string
     }
 
 
-    template <int BUFSIZE, typename T>
+    template<int BUFSIZE, typename T>
     std::basic_string<T>
     Format(const T* fmt, ...)
     {
@@ -294,7 +257,7 @@ namespace string
     }
 
 
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
     Format(const T* fmt, ...)
     {
@@ -335,48 +298,41 @@ namespace string
      * "c:\"               -> "c:"
      * "c:"                -> "c:"
      */
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    GetLastPath(const T* str, const T* sep)
+    GetLastPath(const std::basic_string<T>& str,
+                const std::basic_string<T>& sep)
     {
-        assert(str != NULL);
-        assert(sep != NULL);
-
         std::basic_string<T> s = str;
-        const std::string::size_type len = std::basic_string<T>(sep).length();
-        while (EndWith(s.c_str(), sep))
+        while (EndWith(s, sep))
         {
-            s.resize(s.length() - len);
+            s.resize(s.length() - sep.length());
         }
-        std::string::size_type pos = s.rfind(sep);
-        if (pos != std::string::npos)
-        {
-            s = s.substr(pos + 1);
-        }
-        return s;
+        const std::string::size_type pos = s.rfind(sep);
+        return (pos == std::string::npos) ? s : s.substr(pos + 1);
     }
 
 
     inline
     std::string
-    GetLastPath(const char* str)
+    GetLastPath(const std::string& str)
     {
 #ifdef _WIN32
-        return GetLastPath(str, "\\");
+        return GetLastPath<char>(str, "\\");
 #else
-        return GetLastPath(str, "/");
+        return GetLastPath<char>(str, "/");
 #endif
     }
 
 
     inline
     std::wstring
-    GetLastPath(const wchar_t* str)
+    GetLastPath(const std::wstring& str)
     {
 #ifdef _WIN32
-        return GetLastPath(str, L"\\");
+        return GetLastPath<wchar_t>(str, L"\\");
 #else
-        return GetLastPath(str, L"/");
+        return GetLastPath<wchar_t>(str, L"/");
 #endif
     }
 
@@ -401,20 +357,18 @@ namespace string
      * "c:\"               -> "c:\scratch.tiff"
      * "c:"                -> "c:\scratch.tiff"
      */
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    AppendPath(const T* str, const T* comp, const T* sep)
+    AppendPath(const std::basic_string<T>& str,
+               const std::basic_string<T>& comp,
+               const std::basic_string<T>& sep)
     {
-        assert(str != NULL);
-        assert(comp != NULL);
-        assert(sep != NULL);
-
-        std::basic_string<T> s = str;
-        if (s.empty())
+        if (str.empty())
         {
             return comp;
         }
-        if (!EndWith(s.c_str(), sep))
+        std::basic_string<T> s = str;
+        if (!EndWith(s, sep))
         {
             s.append(sep);
         }
@@ -425,24 +379,24 @@ namespace string
 
     inline
     std::string
-    AppendPath(const char* str, const char* comp)
+    AppendPath(const std::string& str, const std::string& comp)
     {
 #ifdef _WIN32
-        return AppendPath(str, comp, "\\");
+        return AppendPath<char>(str, comp, "\\");
 #else
-        return AppendPath(str, comp, "/");
+        return AppendPath<char>(str, comp, "/");
 #endif
     }
 
 
     inline
     std::wstring
-    AppendPath(const wchar_t* str, const wchar_t* comp)
+    AppendPath(const std::wstring& str, const std::wstring& comp)
     {
 #ifdef _WIN32
-        return AppendPath(str, comp, L"\\");
+        return AppendPath<wchar_t>(str, comp, L"\\");
 #else
-        return AppendPath(str, comp, L"/");
+        return AppendPath<wchar_t>(str, comp, L"/");
 #endif
     }
 
@@ -467,20 +421,17 @@ namespace string
      * "c:\"               -> ""(an empty string)
      * "c:"                -> ""(an empty string)
      */
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    DeleteLastPath(const T* str, const T* sep)
+    DeleteLastPath(const std::basic_string<T>& str,
+                   const std::basic_string<T>& sep)
     {
-        assert(str != NULL);
-        assert(sep != NULL);
-
         std::basic_string<T> s = str;
-        const std::string::size_type len = std::basic_string<T>(sep).length();
-        while (EndWith(s.c_str(), sep))
+        while (EndWith(s, sep))
         {
-            s.resize(s.length() - len);
+            s.resize(s.length() - sep.length());
         }
-        std::string::size_type pos = s.rfind(sep);
+        const std::string::size_type pos = s.rfind(sep);
         if (pos == std::string::npos)
         {
             s = std::basic_string<T>();
@@ -499,32 +450,29 @@ namespace string
 
     inline
     std::string
-    DeleteLastPath(const char* str)
+    DeleteLastPath(const std::string& str)
     {
 #ifdef _WIN32
-        return DeleteLastPath(str, "\\");
+        return DeleteLastPath<char>(str, "\\");
 #else
-        return DeleteLastPath(str, "/");
+        return DeleteLastPath<char>(str, "/");
 #endif
     }
 
 
     inline
     std::wstring
-    DeleteLastPath(const wchar_t* str)
+    DeleteLastPath(const std::wstring& str)
     {
 #ifdef _WIN32
-        return DeleteLastPath(str, L"\\");
+        return DeleteLastPath<wchar_t>(str, L"\\");
 #else
-        return DeleteLastPath(str, L"/");
+        return DeleteLastPath<wchar_t>(str, L"/");
 #endif
     }
 
 
     /**
-     * if you want get path extension from full path, e.g. /scratch.tiff/tmp,
-     * you must call GetLastPath() before call this function
-     *
      * if sep is ".":
      * "/tmp/scratch.tiff" -> "tiff"
      * "/tmp//scratch"     -> ""(an empty string)
@@ -532,46 +480,42 @@ namespace string
      * "/scratch..tiff"    -> "tiff"
      * "/scratch.tiff/tmp" -> "tiff/tmp"
      * "/"                 -> ""(an empty string)
+     *
+     * if you want get path extension from full path, e.g. /scratch.tiff/tmp,
+     * you must call GetLastPath() before call this function,
+     * GetPathExtension(GetLastPath("/scratch.tiff/tmp")) will get "".
      */
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    GetPathExtension(const T* str, const T* sep)
+    GetPathExtension(const std::basic_string<T>& str,
+                     const std::basic_string<T>& sep)
     {
-        assert(str != NULL);
-        assert(sep != NULL);
-
-        std::basic_string<T> s = str;
-        std::string::size_type pos = s.rfind(sep);
-        if (pos != std::string::npos)
-        {
-            return s.substr(pos + 1);
-        }
-        else
+        const std::string::size_type pos = str.rfind(sep);
+        if (pos == std::string::npos)
         {
             return std::basic_string<T>();
         }
+        return str.substr(pos + 1);
     }
 
 
     inline
     std::string
-    GetPathExtension(const char* str)
+    GetPathExtension(const std::string& str)
     {
-        return GetPathExtension(str, ".");
+        return GetPathExtension<char>(str, ".");
     }
 
 
     inline
     std::wstring
-    GetPathExtension(const wchar_t* str)
+    GetPathExtension(const std::wstring& str)
     {
-        return GetPathExtension(str, L".");
+        return GetPathExtension<wchar_t>(str, L".");
     }
 
 
     /**
-     * append sep and ext to str directly.
-     *
      * if ext is "tiff" and sep is ".":
      * "/tmp/scratch.old"  -> "/tmp/scratch.old.tiff"
      * "/tmp/scratch."     -> "/tmp/scratch..tiff"
@@ -579,14 +523,12 @@ namespace string
      * "/scratch"          -> "scratch.tiff"
      * "c:\a"              -> "c:\a.tiff"
      */
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    AppendPathExtension(const T* str, const T* ext, const T* sep)
+    AppendPathExtension(const std::basic_string<T>& str,
+                        const std::basic_string<T>& ext,
+                        const std::basic_string<T>& sep)
     {
-        assert(str != NULL);
-        assert(ext != NULL);
-        assert(sep != NULL);
-
         std::basic_string<T> s = str;
         s.append(sep);
         s.append(ext);
@@ -596,25 +538,21 @@ namespace string
 
     inline
     std::string
-    AppendPathExtension(const char* str, const char* ext)
+    AppendPathExtension(const std::string& str, const std::string& ext)
     {
-        return AppendPathExtension(str, ext, ".");
+        return AppendPathExtension<char>(str, ext, ".");
     }
 
 
     inline
     std::wstring
-    AppendPathExtension(const wchar_t* str, const wchar_t* ext)
+    AppendPathExtension(const std::wstring& str, const std::wstring& ext)
     {
-        return AppendPathExtension(str, ext, L".");
+        return AppendPathExtension<wchar_t>(str, ext, L".");
     }
 
 
     /**
-     * if you want get thin path from full path, e.g. /scratch.tiff/tmp,
-     * you must call GetLastPath() before call this function,
-     * DeleteLastPath(GetLastPath("/tmp.bundle/scratch")) will get "scratch".
-     *
      * if ext is "tiff" and sep is ".":
      * "/tmp/scratch.tiff" -> "/tmp/scratch"
      * "/tmp/"             -> "/tmp/"
@@ -624,20 +562,18 @@ namespace string
      * "/"                 -> "/"
      * "scratch..."        -> "scratch.."
      * "tmp.bundle/scrtch" -> "tmp"
+     *
+     * if you want get thin name from full path, e.g. /tmp.bundle/scratch,
+     * you must call GetLastPath() before call this function,
+     * DeleteLastPath(GetLastPath("/tmp.bundle/scratch")) will get "scratch".
      */
-    template <typename T>
+    template<typename T>
     std::basic_string<T>
-    DeletePathExtension(const std::basic_string<T>& str, const T* sep)
+    DeletePathExtension(const std::basic_string<T>& str,
+                        const std::basic_string<T>& sep)
     {
-        assert(sep != NULL);
-
-        std::basic_string<T> s = str;
-        std::string::size_type pos = s.rfind(sep);
-        if (pos != std::string::npos)
-        {
-            s.resize(pos);
-        }
-        return s;
+        const std::string::size_type pos = str.rfind(sep);
+        return (pos == std::string::npos) ? str : str.substr(0, pos);
     }
 
 
@@ -645,7 +581,7 @@ namespace string
     std::string
     DeletePathExtension(const std::string& str)
     {
-        return DeletePathExtension(str, ".");
+        return string::DeletePathExtension<char>(str, ".");
     }
 
 
@@ -653,7 +589,7 @@ namespace string
     std::wstring
     DeletePathExtension(const std::wstring& str)
     {
-        return DeletePathExtension(str, L".");
+        return DeletePathExtension<wchar_t>(str, L".");
     }
 
 }
