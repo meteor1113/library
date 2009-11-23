@@ -26,7 +26,7 @@
 // #include <other library headers>
 
 // #include "customer headers"
-#include "string.hpp"
+#include "str.hpp"
 
 
 class CsvFile
@@ -80,7 +80,7 @@ inline void CsvFile::Read(const std::string& path)
     std::string line;
     while (std::getline(file, line))
     {
-        std::vector<std::string> v = string::Split<char>(line, ",");
+        std::vector<std::string> v = str::Split<char>(line, ",");
         mData.push_back(v);
         mColCount = (v.size() > mColCount) ? v.size() : mColCount;
     }
@@ -99,7 +99,7 @@ inline void CsvFile::Save(const std::string& path)
     for (unsigned int i = 0; i < mData.size(); ++i)
     {
         std::vector<std::string>& line = GetRow(i);
-        std::string str = string::Join<char>(line.begin(), line.end(), ",");
+        std::string str = str::Join<char>(line.begin(), line.end(), ",");
         file << str << std::endl;
     }
 }

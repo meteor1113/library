@@ -6,7 +6,7 @@ EXTRA_DIST = \
 	testencode.dsp \
 	testlogfile.dsp \
 	testproperties.dsp \
-	teststring.dsp
+	teststr.dsp
 
 noinst_PROGRAMS = \
 	testalgo \
@@ -14,7 +14,7 @@ noinst_PROGRAMS = \
 	testencode \
 	testlogfile \
 	testproperties \
-	teststring
+	teststr
 
 testalgo_SOURCES = \
 	testalgo.cpp
@@ -31,5 +31,5 @@ testlogfile_SOURCES = \
 testproperties_SOURCES = \
 	testproperties.cpp
 
-teststring_SOURCES = \
-	teststring.cpp
+teststr_SOURCES = \
+	teststr.cpp

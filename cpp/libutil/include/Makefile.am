@@ -4,4 +4,4 @@ noinst_HEADERS = \
 	encode.hpp \
 	logfile.hpp \
 	properties.hpp \
-	string.hpp
+	str.hpp

@@ -75,7 +75,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "teststring"=.\test\teststring.dsp - Package Owner=<4>
+Project: "teststr"=.\test\teststr.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

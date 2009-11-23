@@ -10,8 +10,8 @@
  */
 
 
-#ifndef STRING_HPP_
-#define STRING_HPP_
+#ifndef STR_HPP_
+#define STR_HPP_
 
 
 #pragma warning(disable: 4786)
@@ -30,7 +30,7 @@
 // #include "customer headers"
 
 
-namespace string
+namespace str
 {
 
     template<typename T>
@@ -581,7 +581,7 @@ namespace string
     std::string
     DeletePathExtension(const std::string& str)
     {
-        return string::DeletePathExtension<char>(str, ".");
+        return DeletePathExtension<char>(str, ".");
     }
 
 
