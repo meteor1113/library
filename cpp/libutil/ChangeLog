@@ -1,8 +1,12 @@
+2009-11-24  Meteor Liu  <meteor1113@gmail.com>
+
+	* configure.in: Rename configure.in to configure.ac.
+
 2009-11-23  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/str.hpp: Rename string.hpp to str.hpp.
 
-	* configure.in: Rename configure.ac to configure.in.
+	* configure.ac: Rename configure.ac to configure.in.
 
 2009-07-06  Meteor Liu  <meteor1113@gmail.com>
 
