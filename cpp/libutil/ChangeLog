@@ -1,3 +1,9 @@
+2009-11-25  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/logfile.hpp: Improve LogFile.
+
+	* include/dailylogfile.hpp: Add.
+
 2009-11-24  Meteor Liu  <meteor1113@gmail.com>
 
 	* configure.in: Rename configure.in to configure.ac.

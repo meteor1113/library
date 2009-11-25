@@ -3,5 +3,6 @@ noinst_HEADERS = \
 	csvfile.hpp \
 	encode.hpp \
 	logfile.hpp \
+	dailylogfile.hpp \
 	properties.hpp \
 	str.hpp
