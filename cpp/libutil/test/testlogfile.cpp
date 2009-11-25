@@ -15,7 +15,7 @@
 void TestPre()
 {
     LogFile::Instance().SetFilepath("default.log");
-    LogFile::Instance().SetLayout("[bank_client] {LOG} {LEVEL} {DATE}");
+    LogFile::Instance().SetLayout("[myproject] {LOG} {LEVEL} {DATE}");
     LogFile::Instance().SetDateFormat("%Y-%m-%d");
     LogFile::Instance().SetLevel(LOGLEVEL_INFO);
 }
@@ -43,7 +43,7 @@ void Test1()
 
 void DailyTestPre()
 {
-    DailyLogFile::Instance().SetLogdir("./log");
+    DailyLogFile::Instance().SetLogdir("../log");
     // DailyLogFile::Instance().SetLayout("[bank_client] {LOG} {LEVEL} {DATE}");
     // DailyLogFile::Instance().SetDateFormat("%Y-%m-%d");
     DailyLogFile::Instance().SetLevel(LOGLEVEL_INFO);

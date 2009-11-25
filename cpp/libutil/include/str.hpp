@@ -19,6 +19,7 @@
 // #include <standard library headers>
 #include <assert.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <string>
 #include <locale>
 #include <algorithm>
