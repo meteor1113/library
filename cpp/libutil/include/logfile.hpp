@@ -165,7 +165,7 @@ void LogFile::ForceLog(const std::string& l, const std::string& log) const
         else
         {
             std::cout << "open file " << filepath
-                      << " failed, write to console:" << std::endl;
+                      << " failed, write log to console:" << std::endl;
             std::cout << str << std::endl;
 
         }
