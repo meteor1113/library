@@ -6,7 +6,7 @@
  *
  * @file
  * @author Meteor Liu <meteor1113@gmail.com>
- * @date 2009-01-01
+ * @date 2009-11-26
  */
 
 
@@ -107,6 +107,7 @@ public:
     /**
      * Set log level, Now it support 6 levels:
      *     TRACE < DEBUG < INFO < WARN < ERROR < FATAL.
+     * If not set, default to DEBUG.
      *
      * @param value log level
      */
