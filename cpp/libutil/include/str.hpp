@@ -34,6 +34,14 @@
 namespace str
 {
 
+
+#ifdef _WIN32
+    const char* const PATHSEP = "\\";
+#else
+    const char* const PATHSEP = "/";
+#endif
+
+
     template<typename T>
     bool
     StartWith(const std::basic_string<T>& str,
@@ -305,11 +313,11 @@ namespace str
                 const std::basic_string<T>& sep)
     {
         std::basic_string<T> s = str;
-        while (EndWith(s, sep))
+        while (s.find_last_of(sep) == (s.length() - 1))
         {
-            s.resize(s.length() - sep.length());
+            s.resize(s.length() - 1);
         }
-        const std::string::size_type pos = s.rfind(sep);
+        const std::string::size_type pos = s.find_last_of(sep);
         return (pos == std::string::npos) ? s : s.substr(pos + 1);
     }
 
@@ -318,11 +326,7 @@ namespace str
     std::string
     GetLastPath(const std::string& str)
     {
-#ifdef _WIN32
-        return GetLastPath<char>(str, "\\");
-#else
-        return GetLastPath<char>(str, "/");
-#endif
+        return GetLastPath<char>(str, "/\\");
     }
 
 
@@ -330,11 +334,7 @@ namespace str
     std::wstring
     GetLastPath(const std::wstring& str)
     {
-#ifdef _WIN32
-        return GetLastPath<wchar_t>(str, L"\\");
-#else
-        return GetLastPath<wchar_t>(str, L"/");
-#endif
+        return GetLastPath<wchar_t>(str, L"/\\");
     }
 
 
@@ -592,6 +592,7 @@ namespace str
     {
         return DeletePathExtension<wchar_t>(str, L".");
     }
+
 
 }
 
