@@ -16,50 +16,92 @@ void Test()
         std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
         bool b1 = str::StartWith<char>(s, "JDK");
         bool b2 = str::StartWith(s, std::string("   dsa "));
-        bool b3 = str::StartWith<char>(s, "   dsa j;fJDKOG:Jd   DK;s 'ghg    ");
+        bool b3 = str::StartWith<char>(s, "");
         assert(!b1);
         assert(b2);
         assert(b3);
-        
+
         std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
         bool wb1 = str::StartWith<wchar_t>(ws, L"JDK");
         bool wb2 = str::StartWith<wchar_t>(ws, L"   dsa ");
-        bool wb3 = str::StartWith(ws, std::wstring(L"   dsa j;fJDKOG:Jd   DK;s 'ghg    "));
+        bool wb3 = str::StartWith(ws, std::wstring(L""));
         assert(!wb1);
         assert(wb2);
         assert(wb3);
     }
-    
+
+    std::cout << std::endl << "StartOf----------------:" << std::endl;
+    {
+        std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
+        bool b1 = str::StartOf<char>(s, "JDK");
+        bool b2 = str::StartOf(s, std::string("a "));
+        bool b3 = str::StartOf<char>(s, "");
+        assert(!b1);
+        assert(b2);
+        assert(!b3);
+
+        std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
+        bool wb1 = str::StartOf<wchar_t>(ws, L"JDK");
+        bool wb2 = str::StartOf<wchar_t>(ws, L"a ");
+        bool wb3 = str::StartOf(ws, std::wstring(L""));
+        assert(!wb1);
+        assert(wb2);
+        assert(!wb3);
+    }
+
     std::cout << std::endl << "EndWith----------------:" << std::endl;
     {
         std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
         bool b1 = str::EndWith<char>(s, "'ghg");
         bool b2 = str::EndWith<char>(s, "ghg    ");
-        bool b3 = str::EndWith<char>(s, ";fJDKOG:Jd   DK;s 'ghg    ");
+        bool b3 = str::EndWith<char>(s, "");
         bool b4 = str::EndWith<char>("", "a");
         assert(!b1);
         assert(b2);
         assert(b3);
         assert(!b4);
-        
+
         std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
         bool wb1 = str::EndWith<wchar_t>(ws, L"'ghg");
         bool wb2 = str::EndWith<wchar_t>(ws, L"ghg    ");
-        bool wb3 = str::EndWith<wchar_t>(ws, L";fJDKOG:Jd   DK;s 'ghg    ");
+        bool wb3 = str::EndWith<wchar_t>(ws, L"");
         bool wb4 = str::EndWith<wchar_t>(L"", L"a");
         assert(!wb1);
         assert(wb2);
         assert(wb3);
         assert(!wb4);
     }
-    
+
+    std::cout << std::endl << "EndOf----------------:" << std::endl;
+    {
+        std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
+        bool b1 = str::EndOf<char>(s, "'ghg");
+        bool b2 = str::EndOf<char>(s, "ghg ");
+        bool b3 = str::EndOf<char>(s, "");
+        bool b4 = str::EndOf<char>("", "a");
+        assert(!b1);
+        assert(b2);
+        assert(!b3);
+        assert(!b4);
+
+        std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
+        bool wb1 = str::EndOf<wchar_t>(ws, L"'ghg");
+        bool wb2 = str::EndOf<wchar_t>(ws, L"ghg ");
+        bool wb3 = str::EndOf<wchar_t>(ws, L"");
+        bool wb4 = str::EndOf<wchar_t>(L"", L"a");
+        assert(!wb1);
+        assert(wb2);
+        assert(!wb3);
+        assert(!wb4);
+    }
+
     std::cout << std::endl << "ToUpper----------------:" << std::endl;
     {
         std::string s = "   JDKhg;i'    ";
         s= str::ToUpper<char>(s);
         assert(s == "   JDKHG;I'    ");
         std::cout << s << std::endl;
-        
+
         std::wstring ws = L"   JDKhg;i'    ";
         ws = str::ToUpper<wchar_t>(ws);
         assert(ws == L"   JDKHG;I'    ");
@@ -67,14 +109,14 @@ void Test()
         std::wcout << ws << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "ToLower----------------:" << std::endl;
     {
         std::string s = "   JDKhg;I'    ";
         s= str::ToLower<char>(s);
         assert(s == "   jdkhg;i'    ");
         std::cout << s << std::endl;
-        
+
         std::wstring ws = L"   JDKhg;I'    ";
         ws = str::ToLower<wchar_t>(ws);
         assert(ws == L"   jdkhg;i'    ");
@@ -82,7 +124,7 @@ void Test()
         std::wcout << ws << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "Replace----------------:" << std::endl;
     {
         std::string s = "   JDKhg;''    '";
@@ -92,7 +134,7 @@ void Test()
         s= str::Replace<char>(s, "'", "|");
         assert(s == "   JDKhg;||||    ||");
         std::cout << s << std::endl;
-        
+
         std::wstring ws = L"   JDKhg;''    '";
         ws = str::Replace<wchar_t>(ws, L"'", L"''");
         assert(ws == L"   JDKhg;''''    ''");
@@ -105,7 +147,7 @@ void Test()
         std::wcout << ws << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "TrimLeft----------------:" << std::endl;
     {
         std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
@@ -121,7 +163,7 @@ void Test()
         std::wcout << str::Replace<wchar_t>(ws, L" ", L"-") << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "TrimRight----------------:" << std::endl;
     {
         std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
@@ -129,7 +171,7 @@ void Test()
         assert(s == "   dsa j;fJDKOG:Jd   DK;s 'ghg");
         std::cout << s << std::endl;
         std::cout << str::Replace<char>(s, " ", "-") << std::endl;
-#ifndef __MINGW32__        
+#ifndef __MINGW32__
         std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
         ws = str::TrimRight<wchar_t>(ws.c_str());
         assert(ws == L"   dsa j;fJDKOG:Jd   DK;s 'ghg");
@@ -137,7 +179,7 @@ void Test()
         std::wcout << str::Replace<wchar_t>(ws, L" ", L"-") << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "Trim----------------:" << std::endl;
     {
         std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
@@ -153,7 +195,7 @@ void Test()
         std::wcout << str::Replace<wchar_t>(ws, L" ", L"-") << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "Join----------------:" << std::endl;
     {
         std::vector<std::string> vs;
@@ -167,7 +209,7 @@ void Test()
         s= str::Join(vs.begin(), vs.end(), std::string(",,,"));
         assert(s == "");
         std::cout << s << std::endl;
-        
+
         std::vector<std::wstring> vws;
         vws.push_back(L"a");
         vws.push_back(L"b");
@@ -184,7 +226,7 @@ void Test()
         std::wcout << ws << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "Split----------------:" << std::endl;
     {
         std::string s = "a||b||c";
@@ -194,7 +236,7 @@ void Test()
         assert(vs[1] == "b");
         assert(vs[2] == "c");
         std::cout << vs.size() << " "<< vs[0] << " " << vs[1] << " "<< vs[2] << std::endl;
-        
+
         std::wstring ws = L"a||b||c";
         std::vector<std::wstring> vws =  str::Split(ws, std::wstring(L"||"));
         assert(vws.size() == 3);
@@ -205,7 +247,7 @@ void Test()
         std::wcout << vws.size() << L" "<< vws[0] << L" " << vws[1] << L" "<< vws[2] << std::endl;
 #endif
     }
-    
+
     std::cout << std::endl << "EqualsIgnoreCase----------------:" << std::endl;
     {
         std::cout << "EqualsIgnoreCase start" << std::endl;
@@ -213,7 +255,7 @@ void Test()
         assert(str::EqualsIgnoreCase<wchar_t>(L"aaDddf", L"AAddDf"));
         std::cout << "EqualsIgnoreCase end" << std::endl;
     }
-    
+
     std::cout << std::endl << "Format----------------:" << std::endl;
     {
         std::string s = str::Format("%d", 4);
@@ -235,8 +277,8 @@ void Test()
         {
             std::cout << e.what() << std::endl;
         }
-        
-        
+
+
         std::wstring ws = str::Format(L"%d", 4);
 #ifndef __MINGW32__
         std::wcout << ws << std::endl;
@@ -277,110 +319,110 @@ void Test()
     std::cout << std::endl << "GetLastPath----------------:" << std::endl;
     {
         std::string s = "/tmp/scratch.tiff";
-        std::string s1 = str::GetLastPath<char>(s, "/");
+        std::string s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "scratch.tiff");
         s = "/tmp//scratch";
-        s1 = str::GetLastPath<char>(s, "/");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "scratch");
         s = "/tmp/";
-        s1 = str::GetLastPath<char>(s, "/");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "tmp");
         s = "scratch";
-        s1 = str::GetLastPath<char>(s, "/");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "scratch");
         s = "/";
-        s1 = str::GetLastPath<char>(s, "/");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "");
         s = "\\tmp\\scratch.tiff";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "scratch.tiff");
         s = "\\tmp\\\\scratch";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "scratch");
         s = "\\tmp\\";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "tmp");
         s = "scratch";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "scratch");
         s = "\\";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "");
         s = "c:\\aaa\\bbb";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "bbb");
         s = "c:\\";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "c:");
         s = "c:";
-        s1 = str::GetLastPath<char>(s, "\\");
+        s1 = str::GetLastPath<char>(s);
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "c:");
     }
 #ifndef __MINGW32__
     {
         std::wstring s = L"/tmp/scratch.tiff";
-        std::wstring s1 = str::GetLastPath<wchar_t>(s, L"/");
+        std::wstring s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"scratch.tiff");
         s = L"/tmp//scratch";
-        s1 = str::GetLastPath<wchar_t>(s, L"/");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"scratch");
         s = L"/tmp/";
-        s1 = str::GetLastPath<wchar_t>(s, L"/");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"tmp");
         s = L"scratch";
-        s1 = str::GetLastPath<wchar_t>(s, L"/");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"scratch");
         s = L"/";
-        s1 = str::GetLastPath<wchar_t>(s, L"/");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"");
         s = L"\\tmp\\scratch.tiff";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"scratch.tiff");
         s = L"\\tmp\\\\scratch";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"scratch");
         s = L"\\tmp\\";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"tmp");
         s = L"scratch";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"scratch");
         s = L"\\";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"");
         s = L"c:\\aaa\\bbb";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"bbb");
         s = L"c:\\";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"c:");
         s = L"c:";
-        s1 = str::GetLastPath<wchar_t>(s, L"\\");
+        s1 = str::GetLastPath<wchar_t>(s);
         std::wcout << s << L" --> " << s1 << std::endl;
         assert(s1 == L"c:");
     }
@@ -680,7 +722,7 @@ void Test()
 #else
         s = "/scratch.tiff/tmp";
 #endif
-        s1 = str::GetPathExtension(str::GetLastPath(s.c_str()).c_str());
+        s1 = str::GetPathExtension(str::GetLastPath(s).c_str());
         std::cout << s << " --> " << s1 << std::endl;
         assert(s1 == "");
         s = "/";
@@ -887,8 +929,8 @@ void Test()
     }
 #endif
 }
-        
-        
+
+
 int main()
 {
     Test();

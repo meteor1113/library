@@ -53,12 +53,30 @@ namespace str
 
     template<typename T>
     bool
+    StartOf(const std::basic_string<T>& str,
+            const std::basic_string<T>& of)
+    {
+        return (str.find_first_of(of) == 0);
+    }
+
+
+    template<typename T>
+    bool
     EndWith(const std::basic_string<T>& str,
             const std::basic_string<T>& sub)
     {
         const std::string::size_type p = str.rfind(sub);
         const std::string::size_type len = str.length() - sub.size();
         return ((p != std::string::npos) && (p == len));
+    }
+
+
+    template<typename T>
+    bool
+    EndOf(const std::basic_string<T>& str,
+          const std::basic_string<T>& of)
+    {
+        return ((!str.empty()) && (str.find_last_of(of) == (str.length() - 1)));
     }
 
 
@@ -289,15 +307,40 @@ namespace str
     }
 
 
+    template<typename T>
+    struct PathSep;
+
+
+    template<>
+    struct PathSep<char>
+    {
+#ifdef _WIN32
+        static std::basic_string<char> Sep() { return "\\"; }
+#else
+        static std::basic_string<char> Sep() { return "/"; }
+#endif
+        static std::basic_string<char> Seps() { return "/\\"; }
+    };
+
+
+    template<>
+    struct PathSep<wchar_t>
+    {
+#ifdef _WIN32
+        static std::basic_string<wchar_t> Sep() { return L"\\"; }
+#else
+        static std::basic_string<wchar_t> Sep() { return L"/"; }
+#endif
+        static std::basic_string<wchar_t> Seps() { return L"/\\"; }
+    };
+
+
     /**
-     * if sep is "/":
      * "/tmp/scratch.tiff" -> "scratch.tiff"
      * "/tmp//scratch"     -> "scratch"
      * "/tmp/"             -> "tmp"
      * "scratch"           -> "scratch"
      * "/"                 -> ""(an empty string)
-     *
-     * if sep is "\"
      * "\tmp\scratch.tiff" -> "scratch.tiff"
      * "\tmp\\scratch"     -> "scratch"
      * "\tmp\"             -> "tmp"
@@ -309,32 +352,15 @@ namespace str
      */
     template<typename T>
     std::basic_string<T>
-    GetLastPath(const std::basic_string<T>& str,
-                const std::basic_string<T>& sep)
+    GetLastPath(const std::basic_string<T>& str)
     {
         std::basic_string<T> s = str;
-        while (s.find_last_of(sep) == (s.length() - 1))
+        while (EndOf(s, PathSep<T>::Seps()))
         {
             s.resize(s.length() - 1);
         }
-        const std::string::size_type pos = s.find_last_of(sep);
+        const std::string::size_type pos = s.find_last_of(PathSep<T>::Seps());
         return (pos == std::string::npos) ? s : s.substr(pos + 1);
-    }
-
-
-    inline
-    std::string
-    GetLastPath(const std::string& str)
-    {
-        return GetLastPath<char>(str, "/\\");
-    }
-
-
-    inline
-    std::wstring
-    GetLastPath(const std::wstring& str)
-    {
-        return GetLastPath<wchar_t>(str, L"/\\");
     }
 
 
@@ -361,8 +387,7 @@ namespace str
     template<typename T>
     std::basic_string<T>
     AppendPath(const std::basic_string<T>& str,
-               const std::basic_string<T>& comp,
-               const std::basic_string<T>& sep)
+               const std::basic_string<T>& comp)
     {
         if (str.empty())
         {
@@ -375,30 +400,6 @@ namespace str
         }
         s.append(comp);
         return s;
-    }
-
-
-    inline
-    std::string
-    AppendPath(const std::string& str, const std::string& comp)
-    {
-#ifdef _WIN32
-        return AppendPath<char>(str, comp, "\\");
-#else
-        return AppendPath<char>(str, comp, "/");
-#endif
-    }
-
-
-    inline
-    std::wstring
-    AppendPath(const std::wstring& str, const std::wstring& comp)
-    {
-#ifdef _WIN32
-        return AppendPath<wchar_t>(str, comp, L"\\");
-#else
-        return AppendPath<wchar_t>(str, comp, L"/");
-#endif
     }
 
 
