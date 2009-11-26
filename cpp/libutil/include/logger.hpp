@@ -115,14 +115,14 @@ public:
     void SetLevel(const std::string& v) { level = GetLevelFromString(v); }
     LogLevel GetLevel() const { return level; }
 
-    void Trace(const std::string& log) const { Log(LOGLEVEL_TRACE, log); }
-    void Debug(const std::string& log) const { Log(LOGLEVEL_DEBUG, log); }
-    void Info(const std::string& log) const { Log(LOGLEVEL_INFO, log); }
-    void Warn(const std::string& log) const { Log(LOGLEVEL_WARN, log); }
-    void Error(const std::string& log) const { Log(LOGLEVEL_ERROR, log); }
-    void Fatal(const std::string& log) const { Log(LOGLEVEL_FATAL, log); }
-    void Log(LogLevel l, const std::string& log) const;
-    void ForceLog(const std::string& l, const std::string& log) const;
+    void Trace(const std::string& log = "") const { Log(LOGLEVEL_TRACE, log); }
+    void Debug(const std::string& log = "") const { Log(LOGLEVEL_DEBUG, log); }
+    void Info(const std::string& log = "") const { Log(LOGLEVEL_INFO, log); }
+    void Warn(const std::string& log = "") const { Log(LOGLEVEL_WARN, log); }
+    void Error(const std::string& log = "") const { Log(LOGLEVEL_ERROR, log); }
+    void Fatal(const std::string& log = "") const { Log(LOGLEVEL_FATAL, log); }
+    void Log(LogLevel l, const std::string& log = "") const;
+    void ForceLog(const std::string& l, const std::string& log = "") const;
 
 protected:
 
