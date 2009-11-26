@@ -1,5 +1,9 @@
 2009-11-26  Meteor Liu  <meteor1113@gmail.com>
 
+	* include/logger.hpp: Add appendToConsole.
+
+	* include/str.hpp : Improve str::Path.
+
 	* include/logfile.hpp (LogFile): Rename to logger.hpp (Logger).
 
 	* include/dailylogfile.hpp: Delete.

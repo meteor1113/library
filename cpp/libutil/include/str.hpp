@@ -35,13 +35,6 @@ namespace str
 {
 
 
-#ifdef _WIN32
-    const char* const PATHSEP = "\\";
-#else
-    const char* const PATHSEP = "/";
-#endif
-
-
     template<typename T>
     bool
     StartWith(const std::basic_string<T>& str,
@@ -320,6 +313,7 @@ namespace str
         static std::basic_string<char> Sep() { return "/"; }
 #endif
         static std::basic_string<char> Seps() { return "/\\"; }
+        static std::basic_string<char> Dot() { return "."; }
     };
 
 
@@ -332,6 +326,7 @@ namespace str
         static std::basic_string<wchar_t> Sep() { return L"/"; }
 #endif
         static std::basic_string<wchar_t> Seps() { return L"/\\"; }
+        static std::basic_string<wchar_t> Dot() { return L"."; }
     };
 
 
@@ -365,15 +360,12 @@ namespace str
 
 
     /**
-     * if sep is "/" and comp is "scratch.tiff":
      * "/tmp"              -> "/tmp/scratch.tiff"
      * "/tmp/"             -> "/tmp/scratch.tiff"
      * "/"                 -> "/scratch.tiff"
      * ""(an empty string) -> "scratch.tiff"
      * "tmp"               -> "tmp/scratch.tiff"
      * "//tmp///"          -> "//tmp///scratch.tiff"
-     *
-     * if sep is "\" and comp is "scratch.tiff":
      * "\tmp"              -> "\tmp\scratch.tiff"
      * "\tmp\"             -> "\tmp\scratch.tiff"
      * "\"                 -> "\scratch.tiff"
@@ -394,9 +386,9 @@ namespace str
             return comp;
         }
         std::basic_string<T> s = str;
-        if (!EndWith(s, sep))
+        if (!EndOf(s, PathSep<T>::Seps()))
         {
-            s.append(sep);
+            s.append(PathSep<T>::Sep());
         }
         s.append(comp);
         return s;
@@ -404,15 +396,12 @@ namespace str
 
 
     /**
-     * if sep is "/":
      * "/tmp/scratch.tiff" -> "/tmp"
      * "/tmp//lock/"       -> "/tmp/"
      * "/tmp/"             -> "/"
      * "/tmp"              -> "/"
      * "/"                 -> "/"
      * "scratch.tiff"      -> ""(an empty string)
-     *
-     * if sep is "\"
      * "\tmp\scratch.tiff" -> "\tmp"
      * "\tmp\\lock\"       -> "\tmp\"
      * "\tmp\"             -> "\"
@@ -425,15 +414,14 @@ namespace str
      */
     template<typename T>
     std::basic_string<T>
-    DeleteLastPath(const std::basic_string<T>& str,
-                   const std::basic_string<T>& sep)
+    DeleteLastPath(const std::basic_string<T>& str)
     {
         std::basic_string<T> s = str;
-        while (EndWith(s, sep))
+        while (EndOf(s, PathSep<T>::Seps()))
         {
-            s.resize(s.length() - sep.length());
+            s.resize(s.length() - 1);
         }
-        const std::string::size_type pos = s.rfind(sep);
+        const std::string::size_type pos = s.find_last_of(PathSep<T>::Seps());
         if (pos == std::string::npos)
         {
             s = std::basic_string<T>();
@@ -442,83 +430,37 @@ namespace str
         {
             s.resize(pos);
         }
-        if (s.empty() && StartWith(str, sep))
+        if ((!str.empty()) &&s.empty() && StartOf(str, PathSep<T>::Seps()))
         {
-            s = sep;
+            s = str[0];
         }
         return s;
     }
 
 
-    inline
-    std::string
-    DeleteLastPath(const std::string& str)
-    {
-#ifdef _WIN32
-        return DeleteLastPath<char>(str, "\\");
-#else
-        return DeleteLastPath<char>(str, "/");
-#endif
-    }
-
-
-    inline
-    std::wstring
-    DeleteLastPath(const std::wstring& str)
-    {
-#ifdef _WIN32
-        return DeleteLastPath<wchar_t>(str, L"\\");
-#else
-        return DeleteLastPath<wchar_t>(str, L"/");
-#endif
-    }
-
-
     /**
-     * if sep is ".":
      * "/tmp/scratch.tiff" -> "tiff"
      * "/tmp//scratch"     -> ""(an empty string)
      * "/tmp/"             -> ""(an empty string)
      * "/scratch..tiff"    -> "tiff"
-     * "/scratch.tiff/tmp" -> "tiff/tmp"
+     * "/scratch.tiff/tmp" -> ""
      * "/"                 -> ""(an empty string)
-     *
-     * if you want get path extension from full path, e.g. /scratch.tiff/tmp,
-     * you must call GetLastPath() before call this function,
-     * GetPathExtension(GetLastPath("/scratch.tiff/tmp")) will get "".
      */
     template<typename T>
     std::basic_string<T>
-    GetPathExtension(const std::basic_string<T>& str,
-                     const std::basic_string<T>& sep)
+    GetPathExtension(const std::basic_string<T>& str)
     {
-        const std::string::size_type pos = str.rfind(sep);
+        std::basic_string<T> s = GetLastPath(str);
+        const std::string::size_type pos = s.rfind(PathSep<T>::Dot());
         if (pos == std::string::npos)
         {
             return std::basic_string<T>();
         }
-        return str.substr(pos + 1);
-    }
-
-
-    inline
-    std::string
-    GetPathExtension(const std::string& str)
-    {
-        return GetPathExtension<char>(str, ".");
-    }
-
-
-    inline
-    std::wstring
-    GetPathExtension(const std::wstring& str)
-    {
-        return GetPathExtension<wchar_t>(str, L".");
+        return s.substr(pos + 1);
     }
 
 
     /**
-     * if ext is "tiff" and sep is ".":
      * "/tmp/scratch.old"  -> "/tmp/scratch.old.tiff"
      * "/tmp/scratch."     -> "/tmp/scratch..tiff"
      * "/tmp//"            -> "/tmp//.tiff"
@@ -528,34 +470,16 @@ namespace str
     template<typename T>
     std::basic_string<T>
     AppendPathExtension(const std::basic_string<T>& str,
-                        const std::basic_string<T>& ext,
-                        const std::basic_string<T>& sep)
+                        const std::basic_string<T>& ext)
     {
         std::basic_string<T> s = str;
-        s.append(sep);
+        s.append(PathSep<T>::Dot());
         s.append(ext);
         return s;
     }
 
 
-    inline
-    std::string
-    AppendPathExtension(const std::string& str, const std::string& ext)
-    {
-        return AppendPathExtension<char>(str, ext, ".");
-    }
-
-
-    inline
-    std::wstring
-    AppendPathExtension(const std::wstring& str, const std::wstring& ext)
-    {
-        return AppendPathExtension<wchar_t>(str, ext, L".");
-    }
-
-
     /**
-     * if ext is "tiff" and sep is ".":
      * "/tmp/scratch.tiff" -> "/tmp/scratch"
      * "/tmp/"             -> "/tmp/"
      * "scratch.bundle/"   -> "scratch"
@@ -571,27 +495,10 @@ namespace str
      */
     template<typename T>
     std::basic_string<T>
-    DeletePathExtension(const std::basic_string<T>& str,
-                        const std::basic_string<T>& sep)
+    DeletePathExtension(const std::basic_string<T>& str)
     {
-        const std::string::size_type pos = str.rfind(sep);
+        const std::string::size_type pos = str.rfind(PathSep<T>::Dot());
         return (pos == std::string::npos) ? str : str.substr(0, pos);
-    }
-
-
-    inline
-    std::string
-    DeletePathExtension(const std::string& str)
-    {
-        return DeletePathExtension<char>(str, ".");
-    }
-
-
-    inline
-    std::wstring
-    DeletePathExtension(const std::wstring& str)
-    {
-        return DeletePathExtension<wchar_t>(str, L".");
     }
 
 

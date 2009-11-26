@@ -36,6 +36,7 @@ void Test()
     Logger::GetLogger("c");
     Logger::GetLogger("a");
     Logger& log = Logger::GetLogger("a");
+    log.SetAppendToConsole(true);
     // log.SetFilepath("a.log");
     log.Info("aaa");
     log.Warn("bbb");
@@ -56,11 +57,7 @@ void Test1()
 
 void DailyTestPre()
 {
-#ifdef _WIN32
-    Logger::GetLogger().SetFilepath("..\\log\\%Y%m%d%H.log");
-#else
     Logger::GetLogger().SetFilepath("../log/%Y%m%d%H.log");
-#endif
     Logger::GetLogger().SetLevel(LOGLEVEL_INFO);
     Logger::GetLogger("dz").SetLevel("error");
     Logger::GetLogger("dy").SetLevel("aabc");

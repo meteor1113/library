@@ -74,6 +74,7 @@ public:
      *    "/var/log/logger.log", will create /var/log/logger.log file
      *    "/var/log/%Y%m%d.log", will create /var/log/YYYYMMDD.log file
      *    "c:\%Y%m%d%H.log", will create c:\YYYYMMDDHH.log file
+     * Default value is empty, so default to write to console.
      *
      * @param value log file path
      */
@@ -86,7 +87,7 @@ public:
      *     {LEVEL}: log level.
      *     {LOG}  : log content.
      *     {PID}  : process id.
-     * It's default value is "{DATE} {LEVEL} {LOG}",
+     * Default value is "{DATE} {LEVEL} {LOG}",
      * user can change it's order and add any other chars.
      *
      * @param value log layout
@@ -97,7 +98,7 @@ public:
     /**
      * Set date format, it use strftime() to format date,
      * so dateFormat must recognize by strftime().
-     * It's default value is "%Y-%m-%d %H:%M:%S".
+     * Default value is "%Y-%m-%d %H:%M:%S".
      *
      * @param value date format
      */
@@ -107,13 +108,23 @@ public:
     /**
      * Set log level, Now it support 6 levels:
      *     TRACE < DEBUG < INFO < WARN < ERROR < FATAL.
-     * If not set, default to DEBUG.
+     * Default value is DEBUG.
      *
      * @param value log level
      */
     void SetLevel(LogLevel value) { level = value; }
     void SetLevel(const std::string& v) { level = GetLevelFromString(v); }
     LogLevel GetLevel() const { return level; }
+
+    /**
+     * Set whether append log to console.
+     * If true, log will write to log file and console together.
+     * Default value is false.
+     *
+     * @param value whether append to console
+     */
+    void SetAppendToConsole(const bool& value) { appendToConsole = value; }
+    bool GetAppendToConsole() const { return appendToConsole; }
 
     void Trace(const std::string& log = "") const { Log(LOGLEVEL_TRACE, log); }
     void Debug(const std::string& log = "") const { Log(LOGLEVEL_DEBUG, log); }
@@ -138,6 +149,7 @@ private:
     std::string layout;
     std::string dateFormat;
     LogLevel level;
+    bool appendToConsole;
 };
 
 
@@ -145,7 +157,8 @@ inline
 Logger::Logger()
     : layout(DEFAULT_LAYOUT),
       dateFormat(DEFAULT_DATE_FORMAT),
-      level(LOGLEVEL_DEBUG)
+      level(LOGLEVEL_DEBUG),
+      appendToConsole(false)
 {
 }
 
@@ -179,9 +192,10 @@ void Logger::ForceLog(const std::string& l, const std::string& log) const
     str = str::Replace<char>(str, "{LOG}", log);
     str = str::Replace<char>(str, "{PID}", str::Format("%d", GetPid()));
 
+    bool consoleappend = appendToConsole;
     if (filepath.empty())
     {
-        std::cout << str << std::endl;
+        consoleappend = true;
     }
     else
     {
@@ -197,8 +211,13 @@ void Logger::ForceLog(const std::string& l, const std::string& log) const
         {
             std::cout << "open file " << filepath
                       << " failed, write log to console:" << std::endl;
-            std::cout << str << std::endl;
+            consoleappend = true;
         }
+    }
+
+    if (consoleappend)
+    {
+        std::cout << str << std::endl;
     }
 }
 
