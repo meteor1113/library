@@ -4,7 +4,7 @@ EXTRA_DIST = \
 	testalgo.dsp \
 	testcsvfile.dsp \
 	testencode.dsp \
-	testlogfile.dsp \
+	testlogger.dsp \
 	testproperties.dsp \
 	teststr.dsp
 
@@ -12,7 +12,7 @@ noinst_PROGRAMS = \
 	testalgo \
 	testcsvfile \
 	testencode \
-	testlogfile \
+	testlogger \
 	testproperties \
 	teststr
 
@@ -25,8 +25,8 @@ testcsvfile_SOURCES = \
 testencode_SOURCES = \
 	testencode.cpp
 
-testlogfile_SOURCES = \
-	testlogfile.cpp
+testlogger_SOURCES = \
+	testlogger.cpp
 
 testproperties_SOURCES = \
 	testproperties.cpp

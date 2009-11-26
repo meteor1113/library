@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = testalgo$(EXEEXT) testcsvfile$(EXEEXT) \
-	testencode$(EXEEXT) testlogfile$(EXEEXT) \
+	testencode$(EXEEXT) testlogger$(EXEEXT) \
 	testproperties$(EXEEXT) teststr$(EXEEXT)
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -56,9 +56,9 @@ testcsvfile_LDADD = $(LDADD)
 am_testencode_OBJECTS = testencode.$(OBJEXT)
 testencode_OBJECTS = $(am_testencode_OBJECTS)
 testencode_LDADD = $(LDADD)
-am_testlogfile_OBJECTS = testlogfile.$(OBJEXT)
-testlogfile_OBJECTS = $(am_testlogfile_OBJECTS)
-testlogfile_LDADD = $(LDADD)
+am_testlogger_OBJECTS = testlogger.$(OBJEXT)
+testlogger_OBJECTS = $(am_testlogger_OBJECTS)
+testlogger_LDADD = $(LDADD)
 am_testproperties_OBJECTS = testproperties.$(OBJEXT)
 testproperties_OBJECTS = $(am_testproperties_OBJECTS)
 testproperties_LDADD = $(LDADD)
@@ -75,10 +75,10 @@ CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 SOURCES = $(testalgo_SOURCES) $(testcsvfile_SOURCES) \
-	$(testencode_SOURCES) $(testlogfile_SOURCES) \
+	$(testencode_SOURCES) $(testlogger_SOURCES) \
 	$(testproperties_SOURCES) $(teststr_SOURCES)
 DIST_SOURCES = $(testalgo_SOURCES) $(testcsvfile_SOURCES) \
-	$(testencode_SOURCES) $(testlogfile_SOURCES) \
+	$(testencode_SOURCES) $(testlogger_SOURCES) \
 	$(testproperties_SOURCES) $(teststr_SOURCES)
 ETAGS = etags
 CTAGS = ctags
@@ -123,7 +123,6 @@ PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
-PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
@@ -187,7 +186,7 @@ EXTRA_DIST = \
 	testalgo.dsp \
 	testcsvfile.dsp \
 	testencode.dsp \
-	testlogfile.dsp \
+	testlogger.dsp \
 	testproperties.dsp \
 	teststr.dsp
 
@@ -200,8 +199,8 @@ testcsvfile_SOURCES = \
 testencode_SOURCES = \
 	testencode.cpp
 
-testlogfile_SOURCES = \
-	testlogfile.cpp
+testlogger_SOURCES = \
+	testlogger.cpp
 
 testproperties_SOURCES = \
 	testproperties.cpp
@@ -255,9 +254,9 @@ testcsvfile$(EXEEXT): $(testcsvfile_OBJECTS) $(testcsvfile_DEPENDENCIES)
 testencode$(EXEEXT): $(testencode_OBJECTS) $(testencode_DEPENDENCIES) 
 	@rm -f testencode$(EXEEXT)
 	$(CXXLINK) $(testencode_OBJECTS) $(testencode_LDADD) $(LIBS)
-testlogfile$(EXEEXT): $(testlogfile_OBJECTS) $(testlogfile_DEPENDENCIES) 
-	@rm -f testlogfile$(EXEEXT)
-	$(CXXLINK) $(testlogfile_OBJECTS) $(testlogfile_LDADD) $(LIBS)
+testlogger$(EXEEXT): $(testlogger_OBJECTS) $(testlogger_DEPENDENCIES) 
+	@rm -f testlogger$(EXEEXT)
+	$(CXXLINK) $(testlogger_OBJECTS) $(testlogger_LDADD) $(LIBS)
 testproperties$(EXEEXT): $(testproperties_OBJECTS) $(testproperties_DEPENDENCIES) 
 	@rm -f testproperties$(EXEEXT)
 	$(CXXLINK) $(testproperties_OBJECTS) $(testproperties_LDADD) $(LIBS)
@@ -274,7 +273,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testalgo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testcsvfile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testencode.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testlogfile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testlogger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testproperties.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/teststr.Po@am__quote@
 

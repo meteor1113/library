@@ -1,3 +1,9 @@
+2009-11-26  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/logfile.hpp (LogFile): Rename to logger.hpp (Logger).
+
+	* include/dailylogfile.hpp: Delete.
+
 2009-11-25  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/logfile.hpp: Improve LogFile.

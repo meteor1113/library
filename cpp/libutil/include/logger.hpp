@@ -10,8 +10,8 @@
  */
 
 
-#ifndef LOGFILE_HPP_
-#define LOGFILE_HPP_
+#ifndef LOGGER_HPP_
+#define LOGGER_HPP_
 
 
 #pragma warning(disable: 4996)
@@ -22,8 +22,17 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <vector>
 
 // #include <other library headers>
+#ifdef _WIN32
+#include <windows.h>
+#include <direct.h>
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 // #include "customer headers"
 #include "str.hpp"
@@ -46,36 +55,44 @@ enum LogLevel
 
 /**
  * This is a logging class like log4j, but it's very very simple.
- * It support singleton and non-singleton mode.
  */
-class LogFile
+class Logger
 {
 public:
-    LogFile();
-    ~LogFile() {}
+    Logger();
+    ~Logger() {}
 
 public:
-    static LogFile& Instance() { static LogFile inst; return inst; }
+    static Logger& GetLogger(const std::string& name = "");
 
 public:
     /**
-     * Set log file path. if empty, will write log to console.
+     * Set log file path.
+     * If empty, will write log to console.
+     * filepath will be replace by strftime() at runtime.
+     * For example:
+     *    "/var/log/logger.log", will create /var/log/logger.log file
+     *    "/var/log/%Y%m%d.log", will create /var/log/YYYYMMDD.log file
+     *    "c:\%Y%m%d%H.log", will create c:\YYYYMMDDHH.log file
      *
      * @param value log file path
      */
     void SetFilepath(const std::string& value) { filepath = value; }
+    std::string GetFilepath() const { return filepath; }
 
     /**
      * Set log layout, now only support:
      *     {DATE} : log date, see SetDateFormat().
      *     {LEVEL}: log level.
      *     {LOG}  : log content.
+     *     {PID}  : process id.
      * It's default value is "{DATE} {LEVEL} {LOG}",
      * user can change it's order and add any other chars.
      *
      * @param value log layout
      */
     void SetLayout(const std::string& value) { layout = value; }
+    std::string GetLayout() const { return layout;}
 
     /**
      * Set date format, it use strftime() to format date,
@@ -85,6 +102,7 @@ public:
      * @param value date format
      */
     void SetDateFormat(const std::string& value) { dateFormat = value; }
+    std::string GetDateFormat() const { return dateFormat; }
 
     /**
      * Set log level, Now it support 6 levels:
@@ -93,6 +111,8 @@ public:
      * @param value log level
      */
     void SetLevel(LogLevel value) { level = value; }
+    void SetLevel(const std::string& v) { level = GetLevelFromString(v); }
+    LogLevel GetLevel() const { return level; }
 
     void Trace(const std::string& log) const { Log(LOGLEVEL_TRACE, log); }
     void Debug(const std::string& log) const { Log(LOGLEVEL_DEBUG, log); }
@@ -107,6 +127,10 @@ protected:
 
 private:
     std::string GetLevelString(LogLevel l) const;
+    LogLevel GetLevelFromString(const std::string& v) const;
+    std::string GetRealFilepath() const;
+    static std::string FormatCurDateTime(const std::string& fmt);
+    static int GetPid();
 
 private:
     std::string filepath;
@@ -117,16 +141,24 @@ private:
 
 
 inline
-LogFile::LogFile()
+Logger::Logger()
     : layout(DEFAULT_LAYOUT),
       dateFormat(DEFAULT_DATE_FORMAT),
-      level(LOGLEVEL_TRACE)
+      level(LOGLEVEL_DEBUG)
 {
 }
 
 
 inline
-void LogFile::Log(LogLevel l, const std::string& log) const
+Logger& Logger::GetLogger(const std::string& name)
+{
+    static std::map<std::string, Logger> map;
+    return map[name];
+}
+
+
+inline
+void Logger::Log(LogLevel l, const std::string& log) const
 {
     if (l < level)
     {
@@ -138,16 +170,13 @@ void LogFile::Log(LogLevel l, const std::string& log) const
 
 
 inline
-void LogFile::ForceLog(const std::string& l, const std::string& log) const
+void Logger::ForceLog(const std::string& l, const std::string& log) const
 {
-    time_t clock;
-    time(&clock);
-    char date[128];
-    memset(date, 0, 128);
-    strftime(date, 128, dateFormat.c_str(), localtime(&clock));
-    std::string str = str::Replace<char>(layout, "{DATE}", date);
+    std::string str = layout;
+    str = str::Replace<char>(str, "{DATE}", FormatCurDateTime(dateFormat));
     str = str::Replace<char>(str, "{LEVEL}", l);
     str = str::Replace<char>(str, "{LOG}", log);
+    str = str::Replace<char>(str, "{PID}", str::Format("%d", GetPid()));
 
     if (filepath.empty())
     {
@@ -155,8 +184,9 @@ void LogFile::ForceLog(const std::string& l, const std::string& log) const
     }
     else
     {
+        std::string path = GetRealFilepath();
         std::ofstream file;
-        file.open(filepath.c_str(), std::ios_base::out | std::ios_base::app);
+        file.open(path.c_str(), std::ios_base::out | std::ios_base::app);
         if (file.is_open())
         {
             file << str << std::endl;
@@ -167,14 +197,13 @@ void LogFile::ForceLog(const std::string& l, const std::string& log) const
             std::cout << "open file " << filepath
                       << " failed, write log to console:" << std::endl;
             std::cout << str << std::endl;
-
         }
     }
 }
 
 
 inline
-std::string LogFile::GetLevelString(LogLevel l) const
+std::string Logger::GetLevelString(LogLevel l) const
 {
     static std::map<LogLevel, std::string> map;
     if (map.empty())
@@ -187,6 +216,71 @@ std::string LogFile::GetLevelString(LogLevel l) const
         map[LOGLEVEL_FATAL] = "FATAL";
     }
     return map[l];
+}
+
+
+inline
+LogLevel Logger::GetLevelFromString(const std::string& v) const
+{
+    static std::vector<std::pair<std::string, LogLevel> > vec;
+    if (vec.empty())
+    {
+        vec.push_back(std::make_pair("TRACE", LOGLEVEL_TRACE));
+        vec.push_back(std::make_pair("DEBUG", LOGLEVEL_DEBUG));
+        vec.push_back(std::make_pair("INFO", LOGLEVEL_INFO));
+        vec.push_back(std::make_pair("WARN", LOGLEVEL_WARN));
+        vec.push_back(std::make_pair("ERROR", LOGLEVEL_ERROR));
+        vec.push_back(std::make_pair("FATAL", LOGLEVEL_FATAL));
+    }
+    std::vector<std::pair<std::string, LogLevel> >::iterator it;
+    for (it = vec.begin(); it != vec.end(); ++it)
+    {
+        if (str::EqualsIgnoreCase(it->first, str::Trim(v)))
+        {
+            return it->second;
+        }
+    }
+    return LOGLEVEL_DEBUG;
+}
+
+
+inline
+std::string Logger::GetRealFilepath() const
+{
+    std::string dir = str::DeleteLastPath(filepath);
+    if (!dir.empty())
+    {
+#ifdef _WIN32
+        mkdir(dir.c_str());
+#else
+        mkdir(dir.c_str(), 0777);
+#endif
+    }
+
+    return FormatCurDateTime(filepath);
+}
+
+
+inline
+std::string Logger::FormatCurDateTime(const std::string& fmt)
+{
+    time_t clock;
+    time(&clock);
+    char date[512];
+    memset(date, 0, 512);
+    strftime(date, 512, fmt.c_str(), localtime(&clock));
+    return date;
+}
+
+
+inline
+int Logger::GetPid()
+{
+#ifdef _WIN32
+    return GetCurrentProcessId();
+#else
+    return getpid();
+#endif
 }
 
 

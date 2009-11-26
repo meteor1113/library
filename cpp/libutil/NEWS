@@ -1,7 +1,10 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.1.10 (2009-11-25)
+* Improve Logger.
+
 Version 0.1.9 (2009-11-25)
-* Import LogFile. Add DailyLogFile.
+* Improve LogFile. Add DailyLogFile.
 
 Version 0.1.8 (2009-11-23)
 * Change include/string.hpp to include/str.hpp.

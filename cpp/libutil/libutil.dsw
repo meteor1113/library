@@ -51,7 +51,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "testlogfile"=.\test\testlogfile.dsp - Package Owner=<4>
+Project: "testlogger"=.\test\testlogger.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

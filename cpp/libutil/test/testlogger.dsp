@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="testlogfile" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="testlogger" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** DO NOT EDIT **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=testlogfile - Win32 Debug
+CFG=testlogger - Win32 Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "testlogfile.mak".
+!MESSAGE NMAKE /f "testlogger.mak".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "testlogfile.mak" CFG="testlogfile - Win32 Debug"
+!MESSAGE NMAKE /f "testlogger.mak" CFG="testlogger - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "testlogfile - Win32 Release" (based on "Win32 (x86) Console Application")
-!MESSAGE "testlogfile - Win32 Debug" (based on "Win32 (x86) Console Application")
+!MESSAGE "testlogger - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "testlogger - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=testlogfile - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "testlogfile - Win32 Release"
+!IF  "$(CFG)" == "testlogger - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -51,17 +51,17 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
 
-!ELSEIF  "$(CFG)" == "testlogfile - Win32 Debug"
+!ELSEIF  "$(CFG)" == "testlogger - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "testlogfile___Win32_Debug"
-# PROP BASE Intermediate_Dir "testlogfile___Win32_Debug"
+# PROP BASE Output_Dir "testlogger___Win32_Debug"
+# PROP BASE Intermediate_Dir "testlogger___Win32_Debug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "testlogfile___Win32_Debug"
-# PROP Intermediate_Dir "testlogfile___Win32_Debug"
+# PROP Output_Dir "testlogger___Win32_Debug"
+# PROP Intermediate_Dir "testlogger___Win32_Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ  /c
 # ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "../include" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ  /c
@@ -78,14 +78,14 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "testlogfile - Win32 Release"
-# Name "testlogfile - Win32 Debug"
+# Name "testlogger - Win32 Release"
+# Name "testlogger - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\testlogfile.cpp
+SOURCE=.\testlogger.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
