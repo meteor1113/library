@@ -434,7 +434,11 @@ void Test()
         std::string s = "/tmp";
         std::string s1 = str::AppendPath<char>(s, name);
         std::cout << s << " --> " << s1 << std::endl;
+#ifdef _WIN32
+        assert(s1 == "/tmp\\scratch.tiff");
+#else
         assert(s1 == "/tmp/scratch.tiff");
+#endif
         s = "/tmp/";
         s1 = str::AppendPath<char>(s, name);
         std::cout << s << " --> " << s1 << std::endl;
@@ -450,7 +454,11 @@ void Test()
         s = "tmp";
         s1 = str::AppendPath<char>(s, name);
         std::cout << s << " --> " << s1 << std::endl;
+#ifdef _WIN32
+        assert(s1 == "tmp\\scratch.tiff");
+#else
         assert(s1 == "tmp/scratch.tiff");
+#endif
         s = "//tmp///";
         s1 = str::AppendPath<char>(s, name);
         std::cout << s << " --> " << s1 << std::endl;
@@ -518,7 +526,11 @@ void Test()
         std::wstring s = L"/tmp";
         std::wstring s1 = str::AppendPath<wchar_t>(s, name);
         std::wcout << s << L" --> " << s1 << std::endl;
+#ifdef _WIN32
+        assert(s1 == L"/tmp\\scratch.tiff");
+#else
         assert(s1 == L"/tmp/scratch.tiff");
+#endif
         s = L"/tmp/";
         s1 = str::AppendPath<wchar_t>(s, name);
         std::wcout << s << L" --> " << s1 << std::endl;
@@ -534,7 +546,11 @@ void Test()
         s = L"tmp";
         s1 = str::AppendPath<wchar_t>(s, name);
         std::wcout << s << L" --> " << s1 << std::endl;
+#ifdef _WIN32
+        assert(s1 == L"tmp\\scratch.tiff");
+#else
         assert(s1 == L"tmp/scratch.tiff");
+#endif
         s = L"//tmp///";
         s1 = str::AppendPath<wchar_t>(s, name);
         std::wcout << s << L" --> " << s1 << std::endl;

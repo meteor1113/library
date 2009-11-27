@@ -1,5 +1,7 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.0 (2009-11-27)
+
 Version 0.1.11 (2009-11-26)
 * Improve str.hpp.
 

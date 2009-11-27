@@ -36,7 +36,6 @@ void Test()
     Logger::GetLogger("c");
     Logger::GetLogger("a");
     Logger& log = Logger::GetLogger("a");
-    log.SetAppendToConsole(true);
     // log.SetFilepath("a.log");
     log.Info("aaa");
     log.Warn("bbb");

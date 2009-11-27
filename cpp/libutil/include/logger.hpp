@@ -116,16 +116,6 @@ public:
     void SetLevel(const std::string& v) { level = GetLevelFromString(v); }
     LogLevel GetLevel() const { return level; }
 
-    /**
-     * Set whether append log to console.
-     * If true, log will write to log file and console together.
-     * Default value is false.
-     *
-     * @param value whether append to console
-     */
-    void SetAppendToConsole(const bool& value) { appendToConsole = value; }
-    bool GetAppendToConsole() const { return appendToConsole; }
-
     void Trace(const std::string& log = "") const { Log(LOGLEVEL_TRACE, log); }
     void Debug(const std::string& log = "") const { Log(LOGLEVEL_DEBUG, log); }
     void Info(const std::string& log = "") const { Log(LOGLEVEL_INFO, log); }
@@ -149,7 +139,6 @@ private:
     std::string layout;
     std::string dateFormat;
     LogLevel level;
-    bool appendToConsole;
 };
 
 
@@ -157,8 +146,7 @@ inline
 Logger::Logger()
     : layout(DEFAULT_LAYOUT),
       dateFormat(DEFAULT_DATE_FORMAT),
-      level(LOGLEVEL_DEBUG),
-      appendToConsole(false)
+      level(LOGLEVEL_DEBUG)
 {
 }
 
@@ -192,10 +180,9 @@ void Logger::ForceLog(const std::string& l, const std::string& log) const
     str = str::Replace<char>(str, "{LOG}", log);
     str = str::Replace<char>(str, "{PID}", str::Format("%d", GetPid()));
 
-    bool consoleappend = appendToConsole;
     if (filepath.empty())
     {
-        consoleappend = true;
+        std::cout << str << std::endl;
     }
     else
     {
@@ -211,13 +198,8 @@ void Logger::ForceLog(const std::string& l, const std::string& log) const
         {
             std::cout << "open file " << filepath
                       << " failed, write log to console:" << std::endl;
-            consoleappend = true;
+            std::cout << str << std::endl;
         }
-    }
-
-    if (consoleappend)
-    {
-        std::cout << str << std::endl;
     }
 }
 
