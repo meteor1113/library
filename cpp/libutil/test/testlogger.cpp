@@ -14,12 +14,11 @@
 void TestPre()
 {
     Logger::GetLogger().SetFilepath("root.log");
-    Logger::GetLogger().SetLayout("[myproject] {LOG} ({PID}) {LEVEL} {DATE}");
-    Logger::GetLogger().SetDateFormat("%Y-%m-%d");
+    Logger::GetLogger().SetLayout("[myproject] {LOG} ({PID}) {LEVEL} %Y-%m-%d");
     Logger::GetLogger().SetLevel(LOGLEVEL_INFO);
     Logger::GetLogger("a").SetFilepath("a.log");
     Logger::GetLogger("b").SetFilepath("b.log");
-    Logger::GetLogger("b").SetDateFormat("%Y-%m");
+    Logger::GetLogger("b").SetLayout("%Y-%m {LEVEL} {LOG}");
 }
 
 

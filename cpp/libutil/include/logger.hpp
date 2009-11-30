@@ -38,8 +38,7 @@
 #include "str.hpp"
 
 
-const char* const DEFAULT_LAYOUT = "{DATE} {LEVEL} {LOG}";
-const char* const DEFAULT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S";
+const char* const DEFAULT_LAYOUT = "%Y-%m-%d %H:%M:%S {LEVEL} {LOG}";
 
 
 enum LogLevel
@@ -83,27 +82,17 @@ public:
 
     /**
      * Set log layout, now only support:
-     *     {DATE} : log date, see SetDateFormat().
-     *     {LEVEL}: log level.
-     *     {LOG}  : log content.
-     *     {PID}  : process id.
-     * Default value is "{DATE} {LEVEL} {LOG}",
+     *     {LEVEL}: log level
+     *     {LOG}  : log content
+     *     {PID}  : process id
+     * Apart from this, you can use strftime' format string.
+     * Default value is "%Y-%m-%d %H:%M:%S {LEVEL} {LOG}",
      * user can change it's order and add any other chars.
      *
      * @param value log layout
      */
     void SetLayout(const std::string& value) { layout = value; }
     std::string GetLayout() const { return layout;}
-
-    /**
-     * Set date format, it use strftime() to format date,
-     * so dateFormat must recognize by strftime().
-     * Default value is "%Y-%m-%d %H:%M:%S".
-     *
-     * @param value date format
-     */
-    void SetDateFormat(const std::string& value) { dateFormat = value; }
-    std::string GetDateFormat() const { return dateFormat; }
 
     /**
      * Set log level, Now it support 6 levels:
@@ -137,7 +126,6 @@ private:
 private:
     std::string filepath;
     std::string layout;
-    std::string dateFormat;
     LogLevel level;
 };
 
@@ -145,7 +133,6 @@ private:
 inline
 Logger::Logger()
     : layout(DEFAULT_LAYOUT),
-      dateFormat(DEFAULT_DATE_FORMAT),
       level(LOGLEVEL_DEBUG)
 {
 }
@@ -174,8 +161,7 @@ void Logger::Log(LogLevel l, const std::string& log) const
 inline
 void Logger::ForceLog(const std::string& l, const std::string& log) const
 {
-    std::string str = layout;
-    str = str::Replace<char>(str, "{DATE}", FormatCurDateTime(dateFormat));
+    std::string str = FormatCurDateTime(layout);
     str = str::Replace<char>(str, "{LEVEL}", l);
     str = str::Replace<char>(str, "{LOG}", log);
     str = str::Replace<char>(str, "{PID}", str::Format("%d", GetPid()));
