@@ -67,13 +67,13 @@ public:
 public:
     /**
      * Set log file path.
-     * If empty, will write log to console.
+     * If empty or can't create directory, will log to console.
      * filepath will be replace by strftime() at runtime.
      * For example:
      *    "/var/log/logger.log", will create /var/log/logger.log file
      *    "/var/log/%Y%m%d.log", will create /var/log/YYYYMMDD.log file
      *    "c:\%Y%m%d%H.log", will create c:\YYYYMMDDHH.log file
-     * Default value is empty, so default to write to console.
+     * Default value is empty, so default to log to console.
      *
      * @param value log file path
      */
@@ -182,9 +182,7 @@ void Logger::ForceLog(const std::string& l, const std::string& log) const
         }
         else
         {
-            std::cout << "open file " << filepath
-                      << " failed, write log to console:" << std::endl;
-            std::cout << str << std::endl;
+            std::cout << "(log to file failed)" << str << std::endl;
         }
     }
 }

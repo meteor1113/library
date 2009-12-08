@@ -19,6 +19,7 @@ void TestPre()
     Logger::GetLogger("a").SetFilepath("a.log");
     Logger::GetLogger("b").SetFilepath("b.log");
     Logger::GetLogger("b").SetLayout("%Y-%m {LEVEL} {LOG}");
+    Logger::GetLogger("c").SetFilepath("log/log/log.log");
 }
 
 
@@ -41,6 +42,7 @@ void Test()
     log.Error("ccc");
     log.Trace("ddd");
     Logger::GetLogger("b").Warn("test b");
+    Logger::GetLogger("c").Warn("test c");
 }
 
 
