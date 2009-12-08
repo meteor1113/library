@@ -283,17 +283,16 @@ namespace str
     {
         assert(fmt != NULL);
 
-        static const int MAX_LINE_LEN = 1024 * 8; // default buffer size
-        static T buf[MAX_LINE_LEN] = {0};
-        buf[0] = 0;
+        static const int BUFSIZE = 1024 * 8; // default buffer size
+        T buf[BUFSIZE + 1] = {0};
         va_list ap;
         va_start(ap, fmt);
-        int count = Vsnprintf(buf, MAX_LINE_LEN, fmt, ap);
+        int count = Vsnprintf(buf, BUFSIZE, fmt, ap);
         va_end(ap);
         if (count == -1)
         {
             char b[100] = {0};
-            sprintf(b, "bufsize[%d] is less", MAX_LINE_LEN);
+            sprintf(b, "bufsize[%d] is less", BUFSIZE);
             throw std::length_error(b);
         }
         return buf;
