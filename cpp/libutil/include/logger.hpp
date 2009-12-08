@@ -247,7 +247,11 @@ void Logger::Log(LogLevel l, const char* format, va_list ap) const
     static const int BUFSIZE = 1024 * 8;
     char buf[BUFSIZE + 1] = {0};
     int count = str::Vsnprintf(buf, BUFSIZE, format, ap);
-    if (count > 0)
+    if (count < 0)
+    {
+        std::cout << "(log too long)" << format << std::endl;
+    }
+    else
     {
         ForceLog(GetLevelString(l), std::string(buf));
     }

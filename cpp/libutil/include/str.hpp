@@ -267,7 +267,7 @@ namespace str
         va_start(ap, fmt);
         int count = Vsnprintf(buf, BUFSIZE, fmt, ap);
         va_end(ap);
-        if (count == -1)
+        if (count < 0)
         {
             char b[100] = {0};
             sprintf(b, "bufsize[%d] is less", BUFSIZE);
@@ -289,7 +289,7 @@ namespace str
         va_start(ap, fmt);
         int count = Vsnprintf(buf, BUFSIZE, fmt, ap);
         va_end(ap);
-        if (count == -1)
+        if (count < 0)
         {
             char b[100] = {0};
             sprintf(b, "bufsize[%d] is less", BUFSIZE);
