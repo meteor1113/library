@@ -264,12 +264,12 @@ void Test()
         s= str::Format("%d,%s", 4, "dafkd");
         std::cout << s << std::endl;
         assert(s == "4,dafkd");
-        s= str::Format<2000>("%d,%s", 4, "dafkd");
+        s= str::Format("%d,%s", 4, "dafkd");
         std::cout << s << std::endl;
         assert(s == "4,dafkd");
         try
         {
-            s = str::Format<2>("%d,%s", 4, "dafkd");
+            s = str::Format("%d,%s", 4, "dafkd");
 //            assert(s == "4,dafkd");
             std::cout << s << std::endl;
         }
@@ -294,9 +294,9 @@ void Test()
 #endif
         assert(ws == L"4,dafkd");
 #ifdef _WIN32
-        ws = str::Format<2000>(L"%d,%s", 4, L"dafkd");
+        ws = str::Format(L"%d,%s", 4, L"dafkd");
 #else
-        ws = str::Format<2000>(L"%d,%S", 4, L"dafkd");
+        ws = str::Format(L"%d,%S", 4, L"dafkd");
 #endif
 #ifndef __MINGW32__
         std::wcout << ws << std::endl;
@@ -304,7 +304,7 @@ void Test()
         assert(ws == L"4,dafkd");
         try
         {
-            ws = str::Format<3>(L"%d,%s", 4, L"dafkd");
+            ws = str::Format(L"%d,%s", 4, L"dafkd");
 //            assert(ws == L"4,dafkd");
 #ifndef __MINGW32__
             std::wcout << ws << std::endl;

@@ -58,7 +58,7 @@ enum LogLevel
 class Logger
 {
 public:
-    Logger();
+    Logger(): layout(DEFAULT_LAYOUT), level(LOGLEVEL_DEBUG) {}
     ~Logger() {}
 
 public:
@@ -136,14 +136,6 @@ private:
     std::string layout;
     LogLevel level;
 };
-
-
-inline
-Logger::Logger()
-    : layout(DEFAULT_LAYOUT),
-      level(LOGLEVEL_DEBUG)
-{
-}
 
 
 inline
@@ -244,17 +236,7 @@ void Logger::Log(LogLevel l, const char* format, va_list ap) const
         return;
     }
 
-    static const int BUFSIZE = 1024 * 8;
-    char buf[BUFSIZE + 1] = {0};
-    int count = str::Vsnprintf(buf, BUFSIZE, format, ap);
-    if (count < 0)
-    {
-        std::cout << "(log too long)" << format << std::endl;
-    }
-    else
-    {
-        ForceLog(GetLevelString(l), std::string(buf));
-    }
+    ForceLog(GetLevelString(l), str::Vformat(format, ap));
 }
 
 
@@ -311,12 +293,12 @@ LogLevel Logger::GetLevelFromString(const std::string& v) const
     static std::vector<std::pair<std::string, LogLevel> > vec;
     if (vec.empty())
     {
-        vec.push_back(std::make_pair("TRACE", LOGLEVEL_TRACE));
-        vec.push_back(std::make_pair("DEBUG", LOGLEVEL_DEBUG));
-        vec.push_back(std::make_pair("INFO", LOGLEVEL_INFO));
-        vec.push_back(std::make_pair("WARN", LOGLEVEL_WARN));
-        vec.push_back(std::make_pair("ERROR", LOGLEVEL_ERROR));
-        vec.push_back(std::make_pair("FATAL", LOGLEVEL_FATAL));
+        vec.push_back(std::make_pair(std::string("TRACE"), LOGLEVEL_TRACE));
+        vec.push_back(std::make_pair(std::string("DEBUG"), LOGLEVEL_DEBUG));
+        vec.push_back(std::make_pair(std::string("INFO"), LOGLEVEL_INFO));
+        vec.push_back(std::make_pair(std::string("WARN"), LOGLEVEL_WARN));
+        vec.push_back(std::make_pair(std::string("ERROR"), LOGLEVEL_ERROR));
+        vec.push_back(std::make_pair(std::string("FATAL"), LOGLEVEL_FATAL));
     }
     std::vector<std::pair<std::string, LogLevel> >::iterator it;
     for (it = vec.begin(); it != vec.end(); ++it)

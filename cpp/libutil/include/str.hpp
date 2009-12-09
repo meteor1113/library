@@ -256,24 +256,35 @@ namespace str
     }
 
 
-    template<int BUFSIZE, typename T>
+    template<typename T>
     std::basic_string<T>
-    Format(const T* fmt, ...)
+    Vformat(const T* fmt, va_list ap)
     {
         assert(fmt != NULL);
 
-        T buf[BUFSIZE] = {0};
-        va_list ap;
-        va_start(ap, fmt);
-        int count = Vsnprintf(buf, BUFSIZE, fmt, ap);
-        va_end(ap);
-        if (count < 0)
+        static const size_t MAXSIZE = 2 * 1024 * 1024;
+        T stackbuf[1024];
+        size_t size = sizeof(stackbuf);
+        T* buf = &stackbuf[0];
+        std::vector<T> dynamicbuf;
+
+        while (1)
         {
-            char b[100] = {0};
-            sprintf(b, "bufsize[%d] is less", BUFSIZE);
-            throw std::length_error(b);
+            int needed = Vsnprintf(buf, size, fmt, ap);
+            if ((needed <= (int)size) && (needed >= 0))
+            {
+                return std::basic_string<T>(buf, (size_t)needed);
+            }
+            size = (needed > 0) ? (needed + 1) : (size * 2);
+            if (size > MAXSIZE)
+            {
+                break;
+            }
+            dynamicbuf.resize(size);
+            buf = &dynamicbuf[0];
         }
-        return buf;
+
+        return fmt;
     }
 
 
@@ -283,18 +294,10 @@ namespace str
     {
         assert(fmt != NULL);
 
-        static const int BUFSIZE = 1024 * 8; // default buffer size
-        T buf[BUFSIZE + 1] = {0};
         va_list ap;
         va_start(ap, fmt);
-        int count = Vsnprintf(buf, BUFSIZE, fmt, ap);
+        std::basic_string<T> buf = Vformat(fmt, ap);
         va_end(ap);
-        if (count < 0)
-        {
-            char b[100] = {0};
-            sprintf(b, "bufsize[%d] is less", BUFSIZE);
-            throw std::length_error(b);
-        }
         return buf;
     }
 

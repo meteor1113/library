@@ -101,7 +101,7 @@ SOURCE=.\include\encode.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\logfile.hpp
+SOURCE=.\include\logger.hpp
 # End Source File
 # Begin Source File
 
@@ -109,7 +109,7 @@ SOURCE=.\include\properties.hpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\string.hpp
+SOURCE=.\include\str.hpp
 # End Source File
 # End Group
 # End Target
