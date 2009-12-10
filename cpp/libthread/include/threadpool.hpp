@@ -32,304 +32,304 @@ namespace thread
 {
 
 
-    class Stopable
+class Stopable
+{
+public:
+    Stopable() : stop(false) {}
+    virtual ~Stopable() {}
+
+public:
+    bool GetStop() const { return stop; }
+    void SetStop(bool value = true) { stop = value;}
+
+private:
+    bool stop;
+};
+
+
+class Task
+{
+public:
+    virtual ~Task() {}
+    virtual void Run() = 0;
+};
+
+
+class TaskQueue
+{
+public:
+    TaskQueue() {}
+    /*virtual*/ ~TaskQueue() {}
+
+public:
+    void Push(Task* t) { Lock l(mutex); coll.push_back(t); }
+    Task* Pop();
+    bool Priority(Task* t);
+    int Size() const { return coll.size(); }
+    void Clear() { Lock l(mutex); coll.clear(); }
+    const std::list<Task*> ToList() const { Lock l(mutex); return coll; }
+
+private:
+    std::list<Task*> coll;
+    mutable Mutex mutex;
+};
+
+
+class TaskThread : public Thread
+{
+public:
+    TaskThread(TaskQueue& q) : queue(q), currentTask(NULL) {}
+    virtual ~TaskThread() { WaitForEnd(); }
+
+public:
+    bool GetRunning() const { return (currentTask != NULL); }
+    Task* GetCurrentTask() { return currentTask; }
+    int GetIdleTime() const { return (time(NULL) - idleStart); }
+
+protected:
+    virtual void Run(const ThreadData& data, void* arg);
+
+private:
+    TaskQueue& queue;
+    Task* currentTask;
+    int idleStart;
+};
+
+
+class ThreadPool
+{
+public:
+    /**
+     * @param min min threads
+     * @param max max threads
+     * @param idle in seconds
+     */
+    ThreadPool(int max = 100, int idle = 60)
+        : maxThread(max), idleTime(idle), histThread(0) {}
+    /*virtual*/ ~ThreadPool() { Stop(); }
+
+private:
+    ThreadPool(const ThreadPool& rhs);
+    ThreadPool& operator=(const ThreadPool& rhs);
+
+public:
+    void Add(Task* t);
+    void Priority(Task* t);
+    void Stop();
+    std::list<Task*> GetRunningTasks() const;
+    std::list<Task*> GetPendingTasks() const { return queue.ToList(); }
+    void ClearPendingTasks() { queue.Clear(); }
+    int GetPendingTaskCount() const { return queue.Size(); }
+    int GetThreadCount() const{ return threads.size(); }
+    int GetIdleThreadCount() const;
+    int GetHistThreadCount() const { return histThread; }
+    int GetMaxThread() const { return maxThread; }
+    void SetMaxThread(const int& value) { maxThread = value; }
+    int GetIdleTime() const { return idleTime; }
+    void SetIdleTime(const int& value) { idleTime = value; }
+
+protected:
+
+private:
+    bool RemoveOneIdleTimeoutThread();
+    void RemoveStopedThreads();
+    void AddThread(int count);
+
+private:
+    std::list<TaskThread*> threads;
+    std::list<TaskThread*> stopThreads;
+    TaskQueue queue;
+    int maxThread;
+    int idleTime;
+    int histThread;
+};
+
+
+inline Task* TaskQueue::Pop()
+{
+    Lock l(mutex);
+    Task* t = NULL;
+    if (coll.size() > 0)
     {
-    public:
-        Stopable() : stop(false) {}
-        virtual ~Stopable() {}
-
-    public:
-        bool GetStop() const { return stop; }
-        void SetStop(bool value = true) { stop = value;}
-
-    private:
-        bool stop;
-    };
-
-
-    class Task
-    {
-    public:
-        virtual ~Task() {}
-        virtual void Run() = 0;
-    };
-
-
-    class TaskQueue
-    {
-    public:
-        TaskQueue() {}
-        /*virtual*/ ~TaskQueue() {}
-
-    public:
-        void Push(Task* t) { Lock l(mutex); coll.push_back(t); }
-        Task* Pop();
-        bool Priority(Task* t);
-        int Size() const { return coll.size(); }
-        void Clear() { Lock l(mutex); coll.clear(); }
-        const std::list<Task*> ToList() const { Lock l(mutex); return coll; }
-
-    private:
-        std::list<Task*> coll;
-        mutable Mutex mutex;
-    };
-
-
-    class TaskThread : public Thread
-    {
-    public:
-        TaskThread(TaskQueue& q) : queue(q), currentTask(NULL) {}
-        virtual ~TaskThread() { WaitForEnd(); }
-
-    public:
-        bool GetRunning() const { return (currentTask != NULL); }
-        Task* GetCurrentTask() { return currentTask; }
-        int GetIdleTime() const { return (time(NULL) - idleStart); }
-
-    protected:
-        virtual void Run(const ThreadData& data, void* arg);
-
-    private:
-        TaskQueue& queue;
-        Task* currentTask;
-        int idleStart;
-    };
-
-
-    class ThreadPool
-    {
-    public:
-        /**
-         * @param min min threads
-         * @param max max threads
-         * @param idle in seconds
-         */
-        ThreadPool(int max = 100, int idle = 60)
-            : maxThread(max), idleTime(idle), histThread(0) {}
-        /*virtual*/ ~ThreadPool() { Stop(); }
-
-    private:
-        ThreadPool(const ThreadPool& rhs);
-        ThreadPool& operator=(const ThreadPool& rhs);
-
-    public:
-        void Add(Task* t);
-        void Priority(Task* t);
-        void Stop();
-        std::list<Task*> GetRunningTasks() const;
-        std::list<Task*> GetPendingTasks() const { return queue.ToList(); }
-        void ClearPendingTasks() { queue.Clear(); }
-        int GetPendingTaskCount() const { return queue.Size(); }
-        int GetThreadCount() const{ return threads.size(); }
-        int GetIdleThreadCount() const;
-        int GetHistThreadCount() const { return histThread; }
-        int GetMaxThread() const { return maxThread; }
-        void SetMaxThread(const int& value) { maxThread = value; }
-        int GetIdleTime() const { return idleTime; }
-        void SetIdleTime(const int& value) { idleTime = value; }
-
-    protected:
-
-    private:
-        bool RemoveOneIdleTimeoutThread();
-        void RemoveStopedThreads();
-        void AddThread(int count);
-
-    private:
-        std::list<TaskThread*> threads;
-        std::list<TaskThread*> stopThreads;
-        TaskQueue queue;
-        int maxThread;
-        int idleTime;
-        int histThread;
-    };
-
-
-    inline Task* TaskQueue::Pop()
-    {
-        Lock l(mutex);
-        Task* t = NULL;
-        if (coll.size() > 0)
-        {
-            t = coll.front();
-            coll.pop_front();
-        }
-        return t;
+        t = coll.front();
+        coll.pop_front();
     }
+    return t;
+}
 
 
-    inline bool TaskQueue::Priority(Task* t)
+inline bool TaskQueue::Priority(Task* t)
+{
+    Lock l(mutex);
+    std::list<Task*>::iterator i;
+    for (i = coll.begin(); i != coll.end(); ++i)
     {
-        Lock l(mutex);
-        std::list<Task*>::iterator i;
-        for (i = coll.begin(); i != coll.end(); ++i)
+        if (*i == t)
         {
-            if (*i == t)
-            {
-                coll.erase(i);
-                coll.push_front(t);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    inline void TaskThread::Run(const ThreadData& data, void* arg)
-    {
-        idleStart = time(NULL);
-        do
-        {
-            currentTask = queue.Pop();
-            if (currentTask != NULL)
-            {
-                currentTask->Run();
-                currentTask = NULL;
-                idleStart = time(NULL);
-            }
-            Sleep(1);
-        }
-        while (!data.GetStop());
-    }
-
-
-    inline void ThreadPool::Add(Task* t)
-    {
-        assert(t != NULL);
-
-        queue.Push(t);
-        if (queue.Size() > GetIdleThreadCount()) // may be need add new thread
-        {
-            int need1 = maxThread - GetThreadCount();
-            int need2 = queue.Size() - GetIdleThreadCount();
-            int count = (need1 > need2) ? need2 : need1;
-            AddThread(count);
-        }
-        else                    // may be need delete idle timeout thread
-        {
-            while (RemoveOneIdleTimeoutThread())
-            {
-            }
-        }
-        RemoveStopedThreads();
-    }
-
-
-    inline void ThreadPool::Priority(Task* t)
-    {
-        if (queue.Priority(t))
-        {
-            TaskThread* thread = new TaskThread(queue);
-            thread->Start();
-            thread->SetStop();
-            stopThreads.push_back(thread);
-            histThread++;
+            coll.erase(i);
+            coll.push_front(t);
+            return true;
         }
     }
+    return false;
+}
 
 
-    inline void ThreadPool::Stop()
+inline void TaskThread::Run(const ThreadData& data, void* arg)
+{
+    idleStart = time(NULL);
+    do
     {
-        std::list<TaskThread*>::iterator i;
-        for (i = threads.begin(); i != threads.end(); ++i)
+        currentTask = queue.Pop();
+        if (currentTask != NULL)
+        {
+            currentTask->Run();
+            currentTask = NULL;
+            idleStart = time(NULL);
+        }
+        Sleep(1);
+    }
+    while (!data.GetStop());
+}
+
+
+inline void ThreadPool::Add(Task* t)
+{
+    assert(t != NULL);
+
+    queue.Push(t);
+    if (queue.Size() > GetIdleThreadCount()) // may be need add new thread
+    {
+        int need1 = maxThread - GetThreadCount();
+        int need2 = queue.Size() - GetIdleThreadCount();
+        int count = (need1 > need2) ? need2 : need1;
+        AddThread(count);
+    }
+    else                    // may be need delete idle timeout thread
+    {
+        while (RemoveOneIdleTimeoutThread())
+        {
+        }
+    }
+    RemoveStopedThreads();
+}
+
+
+inline void ThreadPool::Priority(Task* t)
+{
+    if (queue.Priority(t))
+    {
+        TaskThread* thread = new TaskThread(queue);
+        thread->Start();
+        thread->SetStop();
+        stopThreads.push_back(thread);
+        histThread++;
+    }
+}
+
+
+inline void ThreadPool::Stop()
+{
+    std::list<TaskThread*>::iterator i;
+    for (i = threads.begin(); i != threads.end(); ++i)
+    {
+        (*i)->SetStop();
+    }
+    for (i = stopThreads.begin(); i != stopThreads.end(); ++i)
+    {
+        delete (*i);
+    }
+    stopThreads.clear();
+    for (i = threads.begin(); i != threads.end(); ++i)
+    {
+        delete (*i);
+    }
+    threads.clear();
+}
+
+
+inline std::list<Task*> ThreadPool::GetRunningTasks() const
+{
+    std::list<Task*> col;
+    std::list<TaskThread*>::const_iterator i;
+    for (i = threads.begin(); i != threads.end(); ++i)
+    {
+        Task* t = (*i)->GetCurrentTask();
+        if (t != NULL)
+        {
+            col.push_back(t);
+        }
+    }
+    for (i = stopThreads.begin(); i != stopThreads.end(); ++i)
+    {
+        Task* t = (*i)->GetCurrentTask();
+        if (t != NULL)
+        {
+            col.push_back(t);
+        }
+    }
+    return col;
+}
+
+
+inline int ThreadPool::GetIdleThreadCount() const
+{
+    int count = 0;
+    for (std::list<TaskThread*>::const_iterator i = threads.begin();
+         i != threads.end(); ++i)
+    {
+        count += ((*i)->GetRunning() ? 0 : 1);
+    }
+    return count;
+}
+
+
+inline bool ThreadPool::RemoveOneIdleTimeoutThread()
+{
+    for (std::list<TaskThread*>::iterator i = threads.begin();
+         i != threads.end(); ++i)
+    {
+        if ((!(*i)->GetRunning()) && ((*i)->GetIdleTime() > idleTime))
         {
             (*i)->SetStop();
+            stopThreads.push_back(*i);
+            threads.erase(i);
+            return true;
         }
-        for (i = stopThreads.begin(); i != stopThreads.end(); ++i)
-        {
-            delete (*i);
-        }
-        stopThreads.clear();
-        for (i = threads.begin(); i != threads.end(); ++i)
-        {
-            delete (*i);
-        }
-        threads.clear();
     }
+    return false;
+}
 
 
-    inline std::list<Task*> ThreadPool::GetRunningTasks() const
+inline void ThreadPool::RemoveStopedThreads()
+{
+    std::list<TaskThread*> tmp;
+    for (std::list<TaskThread*>::iterator i = stopThreads.begin();
+         i != stopThreads.end(); ++i)
     {
-        std::list<Task*> col;
-        std::list<TaskThread*>::const_iterator i;
-        for (i = threads.begin(); i != threads.end(); ++i)
+        if ((*i)->IsAlive())
         {
-            Task* t = (*i)->GetCurrentTask();
-            if (t != NULL)
-            {
-                col.push_back(t);
-            }
+            tmp.push_back(*i);
         }
-        for (i = stopThreads.begin(); i != stopThreads.end(); ++i)
+        else
         {
-            Task* t = (*i)->GetCurrentTask();
-            if (t != NULL)
-            {
-                col.push_back(t);
-            }
+            delete *i;
         }
-        return col;
     }
+    stopThreads.swap(tmp);
+}
 
 
-    inline int ThreadPool::GetIdleThreadCount() const
+inline void ThreadPool::AddThread(int count)
+{
+    for (int i = 0; i < count; i++)
     {
-        int count = 0;
-        for (std::list<TaskThread*>::const_iterator i = threads.begin();
-             i != threads.end(); ++i)
-        {
-            count += ((*i)->GetRunning() ? 0 : 1);
-        }
-        return count;
+        TaskThread* thread = new TaskThread(queue);
+        thread->Start();
+        threads.push_back(thread);
+        histThread++;
     }
-
-
-    inline bool ThreadPool::RemoveOneIdleTimeoutThread()
-    {
-        for (std::list<TaskThread*>::iterator i = threads.begin();
-             i != threads.end(); ++i)
-        {
-            if ((!(*i)->GetRunning()) && ((*i)->GetIdleTime() > idleTime))
-            {
-                (*i)->SetStop();
-                stopThreads.push_back(*i);
-                threads.erase(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    inline void ThreadPool::RemoveStopedThreads()
-    {
-        std::list<TaskThread*> tmp;
-        for (std::list<TaskThread*>::iterator i = stopThreads.begin();
-             i != stopThreads.end(); ++i)
-        {
-            if ((*i)->IsAlive())
-            {
-                tmp.push_back(*i);
-            }
-            else
-            {
-                delete *i;
-            }
-        }
-        stopThreads.swap(tmp);
-    }
-
-
-    inline void ThreadPool::AddThread(int count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            TaskThread* thread = new TaskThread(queue);
-            thread->Start();
-            threads.push_back(thread);
-            histThread++;
-        }
-    }
+}
 
 
 }

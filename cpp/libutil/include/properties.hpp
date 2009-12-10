@@ -63,6 +63,7 @@ private:
     DataMap values_;
 };
 
+
 inline void Properties::Load(const std::string& filename)
 {
     Clear();
@@ -92,6 +93,7 @@ inline void Properties::Load(const std::string& filename)
     fs.close();
 }
 
+
 inline void Properties::Save(const std::string& filename)
 {
     std::string name = filename.empty() ? filename_ : filename;
@@ -105,6 +107,7 @@ inline void Properties::Save(const std::string& filename)
     }
     fs.close();
 }
+
 
 /**
  * if not found, return key.

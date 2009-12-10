@@ -68,6 +68,7 @@ private:
     std::string mFilepath;
 };
 
+
 inline void CsvFile::Read(const std::string& path)
 {
     std::ifstream file(path.c_str());
@@ -88,6 +89,7 @@ inline void CsvFile::Read(const std::string& path)
     mFilepath = path;
 }
 
+
 inline void CsvFile::Save(const std::string& path)
 {
     std::ofstream file(path.c_str());
@@ -103,6 +105,7 @@ inline void CsvFile::Save(const std::string& path)
         file << str << std::endl;
     }
 }
+
 
 inline std::vector<std::string>& CsvFile::GetRow(int row)
 {

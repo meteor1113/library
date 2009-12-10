@@ -29,53 +29,55 @@
 namespace algo
 {
 
-    template <typename T>
-    void
-    Delete(T* t)
+
+template <typename T>
+void
+Delete(T* t)
+{
+    delete t;
+}
+
+
+template <typename Target, typename Source>
+bool
+LexicalCast(Target& t, const Source& s)
+{
+    std::stringstream stream;
+    if (std::numeric_limits<Target>::is_specialized)
     {
-        delete t;
+        stream.precision(std::numeric_limits<Target>::digits10 + 1);
     }
-
-
-    template <typename Target, typename Source>
-    bool
-    LexicalCast(Target& t, const Source& s)
+    else if (std::numeric_limits<Source>::is_specialized)
     {
-        std::stringstream stream;
-        if (std::numeric_limits<Target>::is_specialized)
-        {
-            stream.precision(std::numeric_limits<Target>::digits10 + 1);
-        }
-        else if (std::numeric_limits<Source>::is_specialized)
-        {
-            stream.precision(std::numeric_limits<Source>::digits10 + 1);
-        }
-        stream << s;
-        stream >> t;
-        bool ret = !stream.fail();
-        bool eof = (stream.get() == std::char_traits<char>::eof());
-        return (ret && eof);
+        stream.precision(std::numeric_limits<Source>::digits10 + 1);
     }
+    stream << s;
+    stream >> t;
+    bool ret = !stream.fail();
+    bool eof = (stream.get() == std::char_traits<char>::eof());
+    return (ret && eof);
+}
 
 
-    /**
-     *
-     * @param s
-     * @param f one of std::hex, std::dec, std::oct
-     */
-    template <typename T, typename C>
-    bool
-    StringToNumber(T& t,
-                   const C* s,
-                   std::ios_base&(*f)(std::ios_base&) = std::dec)
-    {
-        std::basic_stringstream<C> stream;
-        stream << s;
-        stream >> f >> t;
-        bool ret = !stream.fail();
-        bool eof = (stream.get() == std::char_traits<C>::eof());
-        return (ret && eof);
-    }
+/**
+ *
+ * @param s
+ * @param f one of std::hex, std::dec, std::oct
+ */
+template <typename T, typename C>
+bool
+StringToNumber(T& t,
+               const C* s,
+               std::ios_base&(*f)(std::ios_base&) = std::dec)
+{
+    std::basic_stringstream<C> stream;
+    stream << s;
+    stream >> f >> t;
+    bool ret = !stream.fail();
+    bool eof = (stream.get() == std::char_traits<C>::eof());
+    return (ret && eof);
+}
+
 
 } // end of namespace algo
 
