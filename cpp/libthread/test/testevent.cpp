@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <iostream>
 #include <string>
 
@@ -15,7 +17,7 @@ thread::Event gEvent;
 class Thread1 : public thread::Thread
 {
 public:
-    virtual void Run(const ThreadData& data, void* arg)
+    virtual void Run(void* arg)
         {
             for (int i = 0; i < 5; i++)
             {

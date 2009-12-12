@@ -1,16 +1,15 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([libthread], [0.4.2], [meteor1113@gmail.com])
+AC_INIT([libthread], [0.4.3], [meteor1113@gmail.com])
 AC_CONFIG_SRCDIR([include/thread.hpp])
+AM_INIT_AUTOMAKE
 #AC_CONFIG_HEADER([config.h])
 
 # sets build, host, target variables and the same with _alias
 #AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 #AC_CANONICAL_TARGET
-
-AM_INIT_AUTOMAKE
 
 # Checks for programs.
 AC_PROG_CXX
@@ -76,5 +75,5 @@ AC_MSG_RESULT([
 Build options:
   Version                  $VERSION
   Install prefix           $prefix
-  Debug	  		   $enable_debug
+  Debug	  	   $enable_debug
 ])

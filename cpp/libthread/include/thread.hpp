@@ -31,40 +31,63 @@ namespace thread
 typedef void (*ThreadFunc)(void* arg);
 
 
+inline
+bool StartThread(ThreadFunc tf, void* arg = 0)
+{
+#ifdef _WIN32
+    return (_beginthread(tf, 0, arg) != -1);
+#else
+    ThreadImpl::ThreadStruct ts;
+    return ThreadImpl::Create(ts, (ThreadImpl::ThreadFuncT)tf, arg);
+#endif
+}
+
+
+class Stopable
+{
+public:
+    Stopable() : stop(false) {}
+    virtual ~Stopable() {}
+
+public:
+    bool GetStop() const { return stop; }
+    void SetStop(bool value = true) { stop = value;}
+
+private:
+    bool stop;
+};
+
+
+class ThreadData
+{
+    friend class Thread;
+private:
+    ThreadData() : ref(1) {}
+    /*virtual*/ ~ThreadData() {}
+
+private:
+    ThreadData(const ThreadData& rhs);
+    ThreadData& operator=(const ThreadData& rhs);
+
+private:
+    static ThreadData* Create() { return new ThreadData(); }
+    void AddRef() { Lock l(mutex); ref++; }
+    void Release();
+
+private:
+    ThreadImpl::ThreadStruct ts;
+    void* arg;
+    bool start;
+    bool alive;
+
+private:
+    Mutex mutex;
+    int ref;
+};
+
+
 class Thread
 {
-protected:
-    class ThreadData
-    {
-        friend class Thread;
-    private:
-        ThreadData() : ref(1) {}
-        /*virtual*/ ~ThreadData() {}
-
-    private:
-        ThreadData(const ThreadData& rhs);
-        ThreadData& operator=(const ThreadData& rhs);
-
-    public:
-        bool GetStop() const { return stop; }
-
-    private:
-        static ThreadData* Create() { return new ThreadData(); }
-        void AddRef() { Lock l(mutex); ref++; }
-        void Release();
-
-    private:
-        ThreadImpl::ThreadStruct ts;
-        void* arg;
-        bool start;
-        bool alive;
-        bool stop;
-
-    private:
-        Mutex mutex;
-        int ref;
-    };
-
 public:
     explicit Thread(ThreadFunc f = 0) : td(0), tf(f) {}
     virtual ~Thread() { if (td != 0) { td->Release(); } }
@@ -79,14 +102,12 @@ public:
 public:
     bool Start(void* arg = 0);
     bool IsAlive() const { return (td == 0) ? false : td->alive; }
-    void SetStop() { if (td != 0) { td->stop = true; } }
     bool WaitForEnd(int ms = ThreadImpl::WAIT_INFINITE);
     void Terminate() { if (td != 0) { ThreadImpl::Terminate(td->ts); } }
     int GetId() const { return (td == 0) ? 0 : ThreadImpl::GetId(td->ts); }
 
 protected:
-    virtual void Run(const ThreadData& data, void* arg)
-        { assert(tf != 0); tf(arg); }
+    virtual void Run(void* arg) { assert(tf != 0); tf(arg); }
 
 private:
 #ifdef _WIN32
@@ -109,25 +130,15 @@ public:
     virtual ~ThreadHolder() {}
 
 protected:
-    virtual void Run(const ThreadData& data, void* arg) { obj(); }
+    virtual void Run(void* arg) { obj(); }
 
 private:
     T& obj;
 };
 
 
-inline bool StartThread(ThreadFunc tf, void* arg = 0)
-{
-#ifdef _WIN32
-    return (_beginthread(tf, 0, arg) != -1);
-#else
-    ThreadImpl::ThreadStruct ts;
-    return ThreadImpl::Create(ts, (ThreadImpl::ThreadFuncT)tf, arg);
-#endif
-}
-
-
-inline void Thread::ThreadData::Release()
+inline
+void ThreadData::Release()
 {
     mutex.Lock();
     int r = --ref;
@@ -139,7 +150,8 @@ inline void Thread::ThreadData::Release()
 }
 
 
-inline bool Thread::Start(void* arg)
+inline
+bool Thread::Start(void* arg)
 {
     if (td != 0)
     {
@@ -150,7 +162,6 @@ inline bool Thread::Start(void* arg)
     td->arg = arg;
     td->start = false;
     td->alive = false;
-    td->stop = false;
     bool ret = ThreadImpl::Create(td->ts, ThreadFunction, this);
     if (!ret)
     {
@@ -166,7 +177,8 @@ inline bool Thread::Start(void* arg)
 }
 
 
-inline bool Thread::WaitForEnd(int ms)
+inline
+bool Thread::WaitForEnd(int ms)
 {
     int iDelta = ThreadImpl::WAIT_TIME_SLICE;
     int iTotal = ms;
@@ -188,9 +200,11 @@ inline bool Thread::WaitForEnd(int ms)
 
 
 #ifdef _WIN32
-inline unsigned int __stdcall Thread::ThreadFunction(void* param)
+inline
+unsigned int __stdcall Thread::ThreadFunction(void* param)
 #else
-    inline void* Thread::ThreadFunction(void* param)
+    inline
+    void* Thread::ThreadFunction(void* param)
 #endif
 {
     assert(param != 0);
@@ -200,7 +214,7 @@ inline unsigned int __stdcall Thread::ThreadFunction(void* param)
     data->alive = true;
     data->start = true;
 
-    thread->Run(*data, data->arg);
+    thread->Run(data->arg);
 
     data->alive = false;
     data->Release();

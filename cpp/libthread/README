@@ -1,0 +1,51 @@
+1.mutex.hpp
+封装了win32和pthread的线程间互斥操作。win32使用CRITICAL_SECTION，pthread使用pthread_mutex_t。
+用法：
+实例化Mutex对象，在对象上可以执行Lock(),UnLock(),TryLock()操作。
+另外，有一个工具类Lock，可以方便地对一个存在的Mutex实行Lock()和UnLock()操作。
+
+
+2.event.hpp
+封装了win32的event和pthread的pthread_cond_t。用于通知所有等待的线程，所以只提供了NotifyAll()方法。本来想提供一个Notify来通知队列中的一个线程，可是没找到可以跨平台的方式，所以只能NotifyAll()了。
+用法：
+实例化Event对象，在需要等待的线程中调用Wait()会阻塞，当别的线程调用NotifyAll()时，所有阻塞在Wait()处的线程会从Wait()后开始执行。
+
+
+3.thread.hpp
+封装了win32和pthread的线程操作。
+用法：
+1.要把一个普通函数在新线程中执行，可以用thread::StartThread()函数启动一个自由线程，参数是一个原型为void (*ThreadFunc)(void* arg)的线程函数，和一个传给线程函数的void*类型的参数。
+  自由线程启动后就不能控制了，它执行完后自动退出。
+2.要在新线程中执行一个函数，并且还希望能控制它，可以用thread::Thread类：
+  实例化一个thread::Thread对象，把线程函数作为参数传给构造函数，之后用Start()启动线程，Start()的参数表示传递给线程函数的参数。
+  通过thread::Thread启动的线程可以通过IsAlive()取得线程当前状态；通过Terminate()强制结束线程；通过GetId()取得线程ID；WaitForEnd()会阻塞直到线程执行完退出。
+3.还可以通过继续thread::Thread实在自己的线程类，只要改写子类的void Run(void* arg)方法，Run()方法会在新线程中执行。这应该是最常用的方式，这种方式下如果Run()函数没有使用到类成员，那么类对象可以被析构，线程本身会变成自由线程，不再受控制（因为类对象已经不存在了，想要控制也没办法引用到线程了）；如果Run()函数引用了类成员，析构后让线程继续执行的话可能会因为引用不存在的成员而Crash，所以比较好的作法是在析构函数中调用WaitForEnd()等待线程退出。
+4.上面的方法虽然可以等待线程退出，可是只能被动地等待，不能主动地通知函数结束，这时候可能需要在子类中通过变量或者事件通知线程，在thread.hpp中有个简单的类thread::Stopable，可以让子类同时继承这个类，那么外面就可以通过SetStop()通知线程该结束了，这时候Run()函数就得定时检测GetStop()，当检测到true时就应该主动退出了（继承Stopable之后，因为GetStop()需要访问成员变量，所以也必须等线程结束后才能析构类对象，不能让线程成为自由线程）。
+5.还可以通过thread::ThreadHolder类把一个重载了operator()的类放在新线程中执行。方法是把类对象传给一个thread::ThreadHolder中，执行Start()的时候就会把operator()函数在新线程中执行。
+
+
+4.threadpool.hpp
+通过前面的thread.hpp实现了一个简单的线程池。
+用法：
+1.线程池的任何必须继承thread::Task，在thread::Task::Run()函数中执行真正的任务。
+2.线程池类是thread::ThreadPool，线程池类提供这些方法：
+  ThreadPool()：构造函数，参数分别是：max－线程池中允许的最大线程数；idle－如果一个线程空闲了idle秒就会被停止。
+  Add()：把任务加入到线程池中。
+  Priority()：把指定线程的优先级提高。
+  Stop()：停止所有线程，未执行完的任务可以通过GetPendingTasks()取得。
+  GetRunningTasks()：得到当前正在执行的任务。
+  GetPendingTasks()：得到队列中的任务，也就是还没有执行过的任务。只有在执行完Stop()之后才能取得准确的任务，否则很可能调用完这后函数后马上就有任务开始执行了。
+  GetThreadCount()：取得线程池中的线程数量。
+  GetIdleThreadCount()：取得线程池中空闲的线程（就是说没有任务在执行的线程）。
+  GetHistThreadCount()：取得线程池从开始到现在启动过多少个线程（包括已经析构的线程）。
+  GetMaxThread()：取得线程池最大可启动的线程数（也就是构造函数的max参数或者SetMaxThread设置的值）。
+  SetMaxThread()：设置线程池最大可启动的线程数。
+  GetIdleTime()：取得idletime（构造函数的idle参数或者SetIdleTime()设置的值，单位是秒）。
+  SetIdleTime()：设置idletime。
+3.thread::ThreadPool的常见用法是：
+  a.实例化thread::ThreadPool对象；
+  b.把自定义的Task加入到线程池中；
+  c.在执行过程中可以用Priority把某个任务提前；
+  d.执行完后可以用Stop()停止线程池执行（如果希望所有任务执行完后才停止线程池，可以循环调用GetRunningTasks()和GetPendingTasks()，都返回0时表明没有任务了；不过在这个过程中不能再通过Add()添加新任务了）；
+  e.Stop()会等待当前线程中正在执行的任务执行完后才退出，所以Stop()可能会阻塞很久。Stop()之后可以调用GetPendingTasks()取得还没有执行的任务作后续处理。
+  f.如果没调用Stop()，线程池对象在析构时会自动调用Stop()。

@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include <iostream>
 #include <string>
 
@@ -6,10 +8,11 @@
 
 using namespace std;
 
+
 class Thread1 : public thread::Thread
 {
 protected:
-    virtual void Run(const ThreadData& data, void* arg)
+    virtual void Run(void* arg)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -82,7 +85,7 @@ public:
     virtual ~Thread8() { WaitForEnd();  }
 
 protected:
-    virtual void Run(const ThreadData& data, void* arg)
+    virtual void Run(void* arg)
         {
             for (int i = 0; i < 5; i++)
             {

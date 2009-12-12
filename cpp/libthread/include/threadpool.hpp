@@ -32,21 +32,6 @@ namespace thread
 {
 
 
-class Stopable
-{
-public:
-    Stopable() : stop(false) {}
-    virtual ~Stopable() {}
-
-public:
-    bool GetStop() const { return stop; }
-    void SetStop(bool value = true) { stop = value;}
-
-private:
-    bool stop;
-};
-
-
 class Task
 {
 public:
@@ -75,7 +60,7 @@ private:
 };
 
 
-class TaskThread : public Thread
+class TaskThread : public Thread, public Stopable
 {
 public:
     TaskThread(TaskQueue& q) : queue(q), currentTask(NULL) {}
@@ -87,7 +72,7 @@ public:
     int GetIdleTime() const { return (time(NULL) - idleStart); }
 
 protected:
-    virtual void Run(const ThreadData& data, void* arg);
+    virtual void Run(void* arg);
 
 private:
     TaskQueue& queue;
@@ -175,7 +160,7 @@ inline bool TaskQueue::Priority(Task* t)
 }
 
 
-inline void TaskThread::Run(const ThreadData& data, void* arg)
+inline void TaskThread::Run(void* arg)
 {
     idleStart = time(NULL);
     do
@@ -187,9 +172,12 @@ inline void TaskThread::Run(const ThreadData& data, void* arg)
             currentTask = NULL;
             idleStart = time(NULL);
         }
-        Sleep(1);
+        else
+        {
+            Sleep(1);
+        }
     }
-    while (!data.GetStop());
+    while (!GetStop());
 }
 
 
