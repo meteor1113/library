@@ -1,5 +1,8 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.2 (2009-12-22)
+* Logger: Remove va_list support.
+
 Version 0.2.1 (2009-12-09)
 * Improve str::Format, Add str::Vformat.
 * Improve Logger.

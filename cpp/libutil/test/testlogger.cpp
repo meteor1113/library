@@ -43,14 +43,14 @@ void Test()
     log.Error("ccc");
     log.Trace("ddd");
     Logger::GetLogger("b").Warn("test b");
-    Logger::GetLogger("b").Fatal("test fatal b:%d,%s,0%o,0x%x,%e,%c", 1234,"ok",128,256,3.14,'A');
+    Logger::GetLogger("b").Fatal(str::Format("test fatal b:%d,%s,0%o,0x%x,%e,%c", 1234,"ok",128,256,3.14,'A'));
     Logger::GetLogger("c").Warn("test c");
-    Logger::GetLogger("c").Trace("trace:%d", 1);
-    Logger::GetLogger("c").Debug("debug:%d", 2);
-    Logger::GetLogger("c").Info("info:%d", 3);
-    Logger::GetLogger("c").Warn("warn:%d", 4);
-    Logger::GetLogger("c").Error("error:%d", 5);
-    Logger::GetLogger("c").Fatal("fatal:%d", 6);
+    Logger::GetLogger("c").Trace(str::Format("trace:%d", 1));
+    Logger::GetLogger("c").Debug(str::Format("debug:%d", 2));
+    Logger::GetLogger("c").Info(str::Format("info:%d", 3));
+    Logger::GetLogger("c").Warn(str::Format("warn:%d", 4));
+    Logger::GetLogger("c").Error(str::Format("error:%d", 5));
+    Logger::GetLogger("c").Fatal(str::Format("fatal:%d", 6));
 }
 
 

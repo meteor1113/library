@@ -1,3 +1,7 @@
+2009-12-22  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/logger.hpp: Remove va_list support.
+
 2009-12-09  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/str.hpp (str::Format): Improve str::Format.

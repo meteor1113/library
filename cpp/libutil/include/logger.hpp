@@ -106,24 +106,24 @@ public:
     LogLevel GetLevel() const { return level; }
 
     void Trace(const std::string& log) const { Log(LOGLEVEL_TRACE, log); }
-    void Trace(const char* format, ...) const;
     void Debug(const std::string& log) const { Log(LOGLEVEL_DEBUG, log); }
-    void Debug(const char* format, ...) const;
     void Info(const std::string& log) const { Log(LOGLEVEL_INFO, log); }
-    void Info(const char* format, ...) const;
     void Warn(const std::string& log) const { Log(LOGLEVEL_WARN, log); }
-    void Warn(const char* format, ...) const;
     void Error(const std::string& log) const { Log(LOGLEVEL_ERROR, log); }
-    void Error(const char* format, ...) const;
     void Fatal(const std::string& log) const { Log(LOGLEVEL_FATAL, log); }
-    void Fatal(const char* format, ...) const;
+    // void Trace(const char* format, ...) const;
+    // void Debug(const char* format, ...) const;
+    // void Info(const char* format, ...) const;
+    // void Warn(const char* format, ...) const;
+    // void Error(const char* format, ...) const;
+    // void Fatal(const char* format, ...) const;
 
 protected:
 
 private:
+    // void Log(LogLevel l, const char* format, ...) const;
+    // void Log(LogLevel l, const char* format, va_list ap) const;
     void Log(LogLevel l, const std::string& log) const;
-    void Log(LogLevel l, const char* format, ...) const;
-    void Log(LogLevel l, const char* format, va_list ap) const;
     void ForceLog(const std::string& l, const std::string& log) const;
     std::string GetLevelString(LogLevel l) const;
     LogLevel GetLevelFromString(const std::string& v) const;
@@ -146,64 +146,86 @@ Logger& Logger::GetLogger(const std::string& name)
 }
 
 
-inline
-void Logger::Trace(const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(LOGLEVEL_TRACE, format, ap);
-    va_end(ap);
-}
+// inline
+// void Logger::Trace(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_TRACE, format, ap);
+//     va_end(ap);
+// }
 
 
-inline
-void Logger::Debug(const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(LOGLEVEL_DEBUG, format, ap);
-    va_end(ap);
-}
+// inline
+// void Logger::Debug(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_DEBUG, format, ap);
+//     va_end(ap);
+// }
 
 
-inline
-void Logger::Info(const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(LOGLEVEL_INFO, format, ap);
-    va_end(ap);
-}
+// inline
+// void Logger::Info(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_INFO, format, ap);
+//     va_end(ap);
+// }
 
 
-inline
-void Logger::Warn(const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(LOGLEVEL_WARN, format, ap);
-    va_end(ap);
-}
+// inline
+// void Logger::Warn(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_WARN, format, ap);
+//     va_end(ap);
+// }
 
 
-inline
-void Logger::Error(const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(LOGLEVEL_ERROR, format, ap);
-    va_end(ap);
-}
+// inline
+// void Logger::Error(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_ERROR, format, ap);
+//     va_end(ap);
+// }
 
 
-inline
-void Logger::Fatal(const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(LOGLEVEL_FATAL, format, ap);
-    va_end(ap);
-}
+// inline
+// void Logger::Fatal(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_FATAL, format, ap);
+//     va_end(ap);
+// }
+
+
+// inline
+// void Logger::Log(LogLevel l, const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(l, format, ap);
+//     va_end(ap);
+// }
+
+
+// inline
+// void Logger::Log(LogLevel l, const char* format, va_list ap) const
+// {
+//     if (l < level)
+//     {
+//         return;
+//     }
+
+//     ForceLog(GetLevelString(l), str::Vformat(format, ap));
+// }
 
 
 inline
@@ -215,28 +237,6 @@ void Logger::Log(LogLevel l, const std::string& log) const
     }
 
     ForceLog(GetLevelString(l), log);
-}
-
-
-inline
-void Logger::Log(LogLevel l, const char* format, ...) const
-{
-    va_list ap;
-    va_start(ap, format);
-    Log(l, format, ap);
-    va_end(ap);
-}
-
-
-inline
-void Logger::Log(LogLevel l, const char* format, va_list ap) const
-{
-    if (l < level)
-    {
-        return;
-    }
-
-    ForceLog(GetLevelString(l), str::Vformat(format, ap));
 }
 
 
