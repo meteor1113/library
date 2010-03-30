@@ -35,6 +35,10 @@ namespace str
 {
 
 
+/**
+ * "abcdef" "ab" -> true
+ * "abcdef" "ba" -> false
+ */
 template<typename T>
 bool
 StartWith(const std::basic_string<T>& str,
@@ -44,6 +48,12 @@ StartWith(const std::basic_string<T>& str,
 }
 
 
+/**
+ * "abcdef" "ab" -> true
+ * "abcdef" "ba" -> true
+ * "abcdef" "fa" -> true
+ * "abcdef" "cb" -> false
+ */
 template<typename T>
 bool
 StartOf(const std::basic_string<T>& str,
@@ -53,6 +63,10 @@ StartOf(const std::basic_string<T>& str,
 }
 
 
+/**
+ * "abcdef" "ef" -> true
+ * "abcdef" "fe" -> false
+ */
 template<typename T>
 bool
 EndWith(const std::basic_string<T>& str,
@@ -64,6 +78,12 @@ EndWith(const std::basic_string<T>& str,
 }
 
 
+/**
+ * "abcdef" "ef" -> true
+ * "abcdef" "fe" -> true
+ * "abcdef" "fa" -> true
+ * "abcdef" "ce" -> false
+ */
 template<typename T>
 bool
 EndOf(const std::basic_string<T>& str,
