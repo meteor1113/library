@@ -10,8 +10,8 @@
  */
 
 
-#ifndef LOG_LOGGER_HPP_
-#define LOG_LOGGER_HPP_
+#ifndef LOGGER_HPP_
+#define LOGGER_HPP_
 
 
 #pragma warning(disable: 4996)
@@ -23,7 +23,6 @@
 #include <fstream>
 #include <map>
 #include <vector>
-#include <memory>
 
 // #include <other library headers>
 #ifdef _WIN32
@@ -37,10 +36,6 @@
 
 // #include "customer headers"
 #include "str.hpp"
-
-
-namespace log
-{
 
 
 const char* const DEFAULT_LAYOUT = "%Y-%m-%d %H:%M:%S {LEVEL} {LOG}";
@@ -58,15 +53,33 @@ enum LogLevel
 
 
 /**
- * The appender base class.
+ * This is a logging class like log4j, but it's very very simple.
  */
-class Appender
+class Logger
 {
 public:
-    Appender() : layout(DEFAULT_LAYOUT), level(LOGLEVEL_DEBUG) {}
-    virtual ~Appender() {}
+    Logger(): layout(DEFAULT_LAYOUT), level(LOGLEVEL_DEBUG) {}
+    ~Logger() {}
 
 public:
+    static Logger& GetLogger(const std::string& name = "");
+
+public:
+    /**
+     * Set log file path.
+     * If empty or can't create directory, will log to console.
+     * filepath will be replace by strftime() at runtime.
+     * For example:
+     *    "/var/log/logger.log", will create /var/log/logger.log file
+     *    "/var/log/%Y%m%d.log", will create /var/log/YYYYMMDD.log file
+     *    "c:\%Y%m%d%H.log", will create c:\YYYYMMDDHH.log file
+     * Default value is empty, so default to log to console.
+     *
+     * @param value log file path
+     */
+    void SetFilepath(const std::string& value) { filepath = value; }
+    std::string GetFilepath() const { return filepath; }
+
     /**
      * Set log layout, now only support:
      *     {LEVEL}: log level
@@ -92,118 +105,173 @@ public:
     void SetLevel(const std::string& v) { level = GetLevelFromString(v); }
     LogLevel GetLevel() const { return level; }
 
-    void Append(LogLevel l, const std::string& log);
+    void Trace(const std::string& log) const { Log(LOGLEVEL_TRACE, log); }
+    void Debug(const std::string& log) const { Log(LOGLEVEL_DEBUG, log); }
+    void Info(const std::string& log) const { Log(LOGLEVEL_INFO, log); }
+    void Warn(const std::string& log) const { Log(LOGLEVEL_WARN, log); }
+    void Error(const std::string& log) const { Log(LOGLEVEL_ERROR, log); }
+    void Fatal(const std::string& log) const { Log(LOGLEVEL_FATAL, log); }
+    // void Trace(const char* format, ...) const;
+    // void Debug(const char* format, ...) const;
+    // void Info(const char* format, ...) const;
+    // void Warn(const char* format, ...) const;
+    // void Error(const char* format, ...) const;
+    // void Fatal(const char* format, ...) const;
 
 protected:
-    virtual void DoAppend(const std::string& log) = 0;
-    static std::string FormatCurDateTime(const std::string& fmt);
 
 private:
+    void Log(LogLevel l, const std::string& log) const;
+    // void Log(LogLevel l, const char* format, ...) const;
+    // void Log(LogLevel l, const char* format, va_list ap) const;
+    void ForceLog(const std::string& l, const std::string& log) const;
     std::string GetLevelString(LogLevel l) const;
     LogLevel GetLevelFromString(const std::string& v) const;
+    std::string GetRealFilepath() const;
+    static std::string FormatCurDateTime(const std::string& fmt);
     static int GetPid();
 
 private:
+    std::string filepath;
     std::string layout;
     LogLevel level;
 };
 
 
-class ConsoleAppender : public Appender
+inline
+Logger& Logger::GetLogger(const std::string& name)
 {
-public:
-    ConsoleAppender() {}
-    virtual ~ConsoleAppender() {}
-
-protected:
-    virtual void DoAppend(const std::string& log)
-        { std::cout << log << std::endl; }
-};
+    static std::map<std::string, Logger> map;
+    return map[name];
+}
 
 
-class FileAppender : public Appender
-{
-public:
-    FileAppender() {}
-    virtual ~FileAppender() {}
-
-public:
-    /**
-     * Set log file path.
-     * If empty or can't create directory, will log to console.
-     * filepath will be replace by strftime() at runtime.
-     * For example:
-     *    "/var/log/logger.log", will create /var/log/logger.log file
-     *    "/var/log/%Y%m%d.log", will create /var/log/YYYYMMDD.log file
-     *    "c:\%Y%m%d%H.log", will create c:\YYYYMMDDHH.log file
-     * Default value is empty, so default to log to console.
-     *
-     * @param value log file path
-     */
-    void SetFilepath(const std::string& value) { filepath = value; }
-    std::string GetFilepath() const { return filepath; }
-
-protected:
-    virtual void DoAppend(const std::string& log);
-
-private:
-    std::string GetRealFilepath() const;
-
-private:
-    std::string filepath;
-};
+// inline
+// void Logger::Trace(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_TRACE, format, ap);
+//     va_end(ap);
+// }
 
 
-/**
- * This is a logging class like log4j, but it's very very simple.
- */
-class Logger
-{
-public:
-    Logger() {}
-    ~Logger();
+// inline
+// void Logger::Debug(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_DEBUG, format, ap);
+//     va_end(ap);
+// }
 
-public:
-    static Logger& GetLogger(const std::string& name = "");
 
-public:
-    void AddAppender(std::auto_ptr<Appender> appender)
-        { appenders.push_back(appender.release()); }
-    void Trace(const std::string& log) { Log(LOGLEVEL_TRACE, log); }
-    void Debug(const std::string& log) { Log(LOGLEVEL_DEBUG, log); }
-    void Info(const std::string& log) { Log(LOGLEVEL_INFO, log); }
-    void Warn(const std::string& log) { Log(LOGLEVEL_WARN, log); }
-    void Error(const std::string& log) { Log(LOGLEVEL_ERROR, log); }
-    void Fatal(const std::string& log) { Log(LOGLEVEL_FATAL, log); }
+// inline
+// void Logger::Info(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_INFO, format, ap);
+//     va_end(ap);
+// }
 
-protected:
 
-private:
-    void Log(LogLevel l, const std::string& log);
+// inline
+// void Logger::Warn(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_WARN, format, ap);
+//     va_end(ap);
+// }
 
-private:
-    std::vector<Appender*> appenders;
-};
+
+// inline
+// void Logger::Error(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_ERROR, format, ap);
+//     va_end(ap);
+// }
+
+
+// inline
+// void Logger::Fatal(const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(LOGLEVEL_FATAL, format, ap);
+//     va_end(ap);
+// }
 
 
 inline
-void Appender::Append(LogLevel l, const std::string& log)
+void Logger::Log(LogLevel l, const std::string& log) const
 {
     if (l < level)
     {
         return;
     }
 
+    ForceLog(GetLevelString(l), log);
+}
+
+
+// inline
+// void Logger::Log(LogLevel l, const char* format, ...) const
+// {
+//     va_list ap;
+//     va_start(ap, format);
+//     Log(l, format, ap);
+//     va_end(ap);
+// }
+
+
+// inline
+// void Logger::Log(LogLevel l, const char* format, va_list ap) const
+// {
+//     if (l < level)
+//     {
+//         return;
+//     }
+
+//     ForceLog(GetLevelString(l), str::Vformat(format, ap));
+// }
+
+
+inline
+void Logger::ForceLog(const std::string& l, const std::string& log) const
+{
     std::string str = FormatCurDateTime(layout);
-    str = str::Replace<char>(str, "{LEVEL}", GetLevelString(l));
+    str = str::Replace<char>(str, "{LEVEL}", l);
     str = str::Replace<char>(str, "{LOG}", log);
     str = str::Replace<char>(str, "{PID}", str::Format("%d", GetPid()));
-    DoAppend(str);
+
+    if (filepath.empty())
+    {
+        std::cout << str << std::endl;
+    }
+    else
+    {
+        std::string path = GetRealFilepath();
+        std::ofstream file;
+        file.open(path.c_str(), std::ios_base::out | std::ios_base::app);
+        if (file.is_open())
+        {
+            file << str << std::endl;
+            file.flush();
+        }
+        else
+        {
+            std::cout << "(log to file failed)" << str << std::endl;
+        }
+    }
 }
 
 
 inline
-std::string Appender::GetLevelString(LogLevel l) const
+std::string Logger::GetLevelString(LogLevel l) const
 {
     static std::map<LogLevel, std::string> map;
     if (map.empty())
@@ -220,7 +288,7 @@ std::string Appender::GetLevelString(LogLevel l) const
 
 
 inline
-LogLevel Appender::GetLevelFromString(const std::string& v) const
+LogLevel Logger::GetLevelFromString(const std::string& v) const
 {
     static std::vector<std::pair<std::string, LogLevel> > vec;
     if (vec.empty())
@@ -245,48 +313,7 @@ LogLevel Appender::GetLevelFromString(const std::string& v) const
 
 
 inline
-std::string Appender::FormatCurDateTime(const std::string& fmt)
-{
-    time_t clock;
-    time(&clock);
-    char date[512];
-    memset(date, 0, 512);
-    strftime(date, 512, fmt.c_str(), localtime(&clock));
-    return date;
-}
-
-
-inline
-int Appender::GetPid()
-{
-#ifdef _WIN32
-    return GetCurrentProcessId();
-#else
-    return getpid();
-#endif
-}
-
-
-inline
-void FileAppender::DoAppend(const std::string& log)
-{
-    std::string path = GetRealFilepath();
-    std::ofstream f;
-    f.open(path.c_str(), std::ios_base::out | std::ios_base::app);
-    if (f.is_open())
-    {
-        f << log << std::endl;
-        f.flush();
-    }
-    else
-    {
-        std::cerr << "(FileAppender failed)" << log << std::endl;
-    }
-}
-
-
-inline
-std::string FileAppender::GetRealFilepath() const
+std::string Logger::GetRealFilepath() const
 {
     std::string dir = str::DeleteLastPath(filepath);
     if (!dir.empty())
@@ -303,36 +330,25 @@ std::string FileAppender::GetRealFilepath() const
 
 
 inline
-Logger::~Logger()
+std::string Logger::FormatCurDateTime(const std::string& fmt)
 {
-    std::vector<Appender*>::iterator i;
-    for (i = appenders.begin(); i != appenders.end(); ++i)
-    {
-        delete *i;
-    }
+    time_t clock;
+    time(&clock);
+    char date[512];
+    memset(date, 0, 512);
+    strftime(date, 512, fmt.c_str(), localtime(&clock));
+    return date;
 }
 
 
 inline
-Logger& Logger::GetLogger(const std::string& name)
+int Logger::GetPid()
 {
-    static std::map<std::string, Logger> map;
-    return map[name];
-}
-
-
-inline
-void Logger::Log(LogLevel l, const std::string& log)
-{
-    std::vector<Appender*>::iterator i;
-    for (i = appenders.begin(); i != appenders.end(); ++i)
-    {
-        Appender* appender = *i;
-        appender->Append(l, log);
-    }
-}
-
-
+#ifdef _WIN32
+    return GetCurrentProcessId();
+#else
+    return getpid();
+#endif
 }
 
 

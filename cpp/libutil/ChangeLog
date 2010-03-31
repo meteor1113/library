@@ -1,9 +1,3 @@
-2010-03-24  Meteor Liu  <meteor1113@gmail.com>
-
-	* include/logger.hpp: Add appender support.
-
-	* configure.ac: Rename to configure.in.
-
 2009-12-22  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/logger.hpp: Remove va_list support.
