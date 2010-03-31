@@ -1,5 +1,8 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.3 (2010-03-24)
+* Logger: Add appender support.
+
 Version 0.2.2 (2009-12-22)
 * Logger: Remove va_list support.
 
