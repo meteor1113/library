@@ -43,21 +43,6 @@ bool StartThread(ThreadFunc tf, void* arg = 0)
 }
 
 
-class Stopable
-{
-public:
-    Stopable() : stop(false) {}
-    virtual ~Stopable() {}
-
-public:
-    bool GetStop() const { return stop; }
-    void SetStop(bool value = true) { stop = value;}
-
-private:
-    bool stop;
-};
-
-
 class ThreadData
 {
     friend class Thread;
@@ -134,6 +119,21 @@ protected:
 
 private:
     T& obj;
+};
+
+
+class Stopable
+{
+public:
+    Stopable() : stop(false) {}
+    virtual ~Stopable() {}
+
+public:
+    bool GetStop() const { return stop; }
+    void SetStop(bool value = true) { stop = value;}
+
+private:
+    bool stop;
 };
 
 
