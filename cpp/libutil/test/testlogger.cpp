@@ -19,7 +19,11 @@ void TestPre()
     Logger::GetLogger("b").SetFilepath("b.log");
     Logger::GetLogger("b").SetLayout("%Y-%m {LEVEL} {LOG}");
     Logger::GetLogger("c").SetLevel("TRACE");
-    Logger::GetLogger("c").SetFilepath("log/log/log.log");
+#ifdef _WIN32
+    Logger::GetLogger("c").SetFilepath("d:/log/log/%Y/%m/%d/%H/%M/%S.log");
+#else
+    Logger::GetLogger("c").SetFilepath("~/log/log/%Y/%m/%d/%H/%M/%S.log");
+#endif
 }
 
 
@@ -63,7 +67,7 @@ void Test1()
 
 void DailyTestPre()
 {
-    Logger::GetLogger().SetFilepath("../log/%Y%m%d%H.log");
+    Logger::GetLogger().SetFilepath("../log/%Y/%m/%d/%H.log");
     Logger::GetLogger().SetLevel(LOGLEVEL_INFO);
     Logger::GetLogger("dz").SetLevel("error");
     Logger::GetLogger("dy").SetLevel("aabc");

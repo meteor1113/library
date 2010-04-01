@@ -23,6 +23,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
+#include <stack>
 
 // #include <other library headers>
 #ifdef _WIN32
@@ -315,17 +316,38 @@ LogLevel Logger::GetLevelFromString(const std::string& v) const
 inline
 std::string Logger::GetRealFilepath() const
 {
-    std::string dir = str::DeleteLastPath(filepath);
-    if (!dir.empty())
+    std::string ret = FormatCurDateTime(filepath);
+    std::string path = ret;
+    if (access(path.c_str(), F_OK) != 0)
     {
+        std::stack<std::string> dirs;
+        while (true)
+        {
+            std::string dir = str::DeleteLastPath(path);
+            if (dir.empty() || (dir == path))
+            {
+                break;
+            }
+            dirs.push(dir);
+            path = dir;
+        }
+
+        while (!dirs.empty())
+        {
+            std::string dir = dirs.top();
+            dirs.pop();
+            if (!dir.empty())
+            {
 #ifdef _WIN32
-        mkdir(dir.c_str());
+                mkdir(dir.c_str());
 #else
-        mkdir(dir.c_str(), 0777);
+                mkdir(dir.c_str(), 0777);
 #endif
+            }
+        }
     }
 
-    return FormatCurDateTime(filepath);
+    return ret;
 }
 
 
