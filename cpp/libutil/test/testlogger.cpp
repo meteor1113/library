@@ -14,15 +14,21 @@
 void TestPre()
 {
     std::auto_ptr<log::FileAppender> fa(new log::FileAppender);
-    fa->SetFilepath("root.log");
+#ifdef _WIN32
+    fa->SetFilepath("z:\\root.log");
+#else
+    fa->SetFilepath("/root.log");
+#endif
     fa->SetLayout("[myproject] {LOG} ({PID}) {LEVEL} %Y-%m-%d");
     fa->SetLevel(log::LOGLEVEL_INFO);
-    log::Logger::GetLogger().AddAppender(std::auto_ptr<log::Appender>(fa));
+    log::Logger::GetLogger().AddAppender((std::auto_ptr<log::Appender>)fa);
 
     std::auto_ptr<log::Appender> a(new log::FileAppender("a.log"));
     log::Logger::GetLogger("a").AddAppender(a);
+
     log::Logger::GetLogger("b").AddAppender(
         std::auto_ptr<log::Appender>(new log::FileAppender("b.log", "", "%Y-%m {LEVEL} {LOG}")));
+
     log::Logger::GetLogger("c").AddAppender(
         std::auto_ptr<log::Appender>(new log::FileAppender("log/log/log.log", "TRACE")));
     log::Logger::GetLogger("c").AddAppender(
@@ -68,66 +74,71 @@ void Test1()
     log::Logger::GetLogger().Trace("trace");
     log::Logger::GetLogger().Warn("warn");
     log::Logger::GetLogger().Error("error");
-
     log::Logger::GetLogger().Fatal("fatal");
 }
 
 
 void DailyTestPre()
 {
-    // Logger::GetLogger().SetFilepath("../log/%Y%m%d%H.log");
-    // Logger::GetLogger().SetLevel(LOGLEVEL_INFO);
-    // Logger::GetLogger("dz").SetLevel("error");
-    // Logger::GetLogger("dy").SetLevel("aabc");
+    std::auto_ptr<log::FileAppender> fa(new log::FileAppender());
+#ifdef _WIN32
+    fa->SetFilepath("f:/log/log/%Y/%m/%d/%H/%M/%S.log");
+#else
+    fa->SetFilepath("~/log/log/%Y/%m/%d/%H/%M/%S.log");
+#endif
+    fa->SetLevel(log::LOGLEVEL_DEBUG);
+    log::Logger::GetLogger().AddAppender(std::auto_ptr<log::Appender>(fa));
+
+    log::Logger::GetLogger("dz").AddAppender(std::auto_ptr<log::Appender>(new log::ConsoleAppender("error")));
+    // log::Logger::GetLogger("dy").SetLevel("aabc");
 }
 
 
 void DailyTest()
 {
-//     Logger dx1;
-//     dx1.Fatal("test log dx1");
-//     Logger dx2;
-//     dx2.Fatal("test log dx2");
-//     Logger::GetLogger("da");
-//     Logger::GetLogger("b");
-//     Logger::GetLogger("c");
-//     Logger::GetLogger("c");
-//     Logger::GetLogger("c");
-//     Logger::GetLogger("da");
-//     Logger& log = Logger::GetLogger("da");
-//     log.SetFilepath("logger%Y%m%d%H%M%S.log");
-//     log.Info("aaa");
-//     log.Warn("bbb");
-// #ifdef _WIN32
-//     Sleep(2000);
-// #else
-//     sleep(2);
-// #endif
-//     log.Error("ccc");
-//     log.Trace("ddd");
-
-//     log.Fatal("fatal");
-//     Logger::GetLogger("dz").Trace("test dz trace");
-//     Logger::GetLogger("dz").Debug("test dz debug");
-//     Logger::GetLogger("dz").Info("test dz info");
-//     Logger::GetLogger("dz").Warn("test dz warn");
-//     Logger::GetLogger("dz").Error("test dz error");
-//     Logger::GetLogger("dz").Fatal("test dz fatal");
-//     Logger::GetLogger("dy").Trace("test dy trace");
-//     Logger::GetLogger("dy").Debug("test dy debug");
-//     Logger::GetLogger("dy").Info("test dy info");
-//     Logger::GetLogger("dy").Warn("test dy warn");
-//     Logger::GetLogger("dy").Error("test dy error");
-//     Logger::GetLogger("dy").Fatal("test dy fatal");
+    log::Logger dx1;
+    dx1.Fatal("test log dx1");
+    log::Logger dx2;
+    dx2.Fatal("test log dx2");
+    log::Logger::GetLogger("da");
+    log::Logger::GetLogger("b");
+    log::Logger::GetLogger("c");
+    log::Logger::GetLogger("c");
+    log::Logger::GetLogger("c");
+    log::Logger::GetLogger("da");
+    log::Logger& log = log::Logger::GetLogger("da");
+    log.AddAppender(std::auto_ptr<log::Appender>(new log::FileAppender("logger%Y%m%d%H%M%S.log")));
+    log.Info("aaa");
+    log.Warn("bbb");
+#ifdef _WIN32
+    Sleep(1000);
+#else
+    sleep(1);
+#endif
+    log.Error("ccc");
+    log.Trace("ddd");
+    log.Fatal("fatal");
+    log::Logger::GetLogger("dz").Trace("test dz trace");
+    log::Logger::GetLogger("dz").Debug("test dz debug");
+    log::Logger::GetLogger("dz").Info("test dz info");
+    log::Logger::GetLogger("dz").Warn("test dz warn");
+    log::Logger::GetLogger("dz").Error("test dz error");
+    log::Logger::GetLogger("dz").Fatal("test dz fatal");
+    log::Logger::GetLogger("dy").Trace("test dy trace");
+    log::Logger::GetLogger("dy").Debug("test dy debug");
+    log::Logger::GetLogger("dy").Info("test dy info");
+    log::Logger::GetLogger("dy").Warn("test dy warn");
+    log::Logger::GetLogger("dy").Error("test dy error");
+    log::Logger::GetLogger("dy").Fatal("test dy fatal");
 }
 
 
 void DailyTest1()
 {
-    // Logger::GetLogger().Trace("trace");
-    // Logger::GetLogger().Warn("warn");
-    // Logger::GetLogger().Error("error");
-    // Logger::GetLogger().Fatal("fatal");
+    log::Logger::GetLogger().Trace("trace");
+    log::Logger::GetLogger().Warn("warn");
+    log::Logger::GetLogger().Error("error");
+    log::Logger::GetLogger().Fatal("fatal");
 }
 
 

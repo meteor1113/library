@@ -1,5 +1,10 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.3 (2010-04-02)
+* logger:
+  1.Add appender support.
+  2.Add multi level dirs support.
+
 Version 0.2.2 (2009-12-22)
 * Logger: Remove va_list support.
 

@@ -296,7 +296,8 @@ void FileAppender::DoAppend(const std::string& log)
     }
     else
     {
-        std::cerr << "(FileAppender failed)" << log << std::endl;
+        std::cerr << "(FileAppender[" << path << "] failed) "
+                  << log << std::endl;
     }
 }
 
