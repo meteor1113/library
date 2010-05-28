@@ -95,6 +95,29 @@ void Test()
         assert(!wb4);
     }
 
+    std::cout << std::endl << "GetSubstrCount----------------:" << std::endl;
+    {
+        std::string s = "   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
+        unsigned int i1 = str::GetSubstrCount<char>(s, "DK");
+        unsigned int i2 = str::GetSubstrCount(s, std::string(";"));
+        unsigned int i3 = str::GetSubstrCount<char>(s, "");
+        unsigned int i4 = str::GetSubstrCount<char>(s, "qwer");
+        assert(i1 == 2);
+        assert(i2 == 2);
+        assert(i3 == 0);
+        assert(i4 == 0);
+
+        std::wstring ws = L"   dsa j;fJDKOG:Jd   DK;s 'ghg    ";
+        unsigned int wi1 = str::GetSubstrCount<wchar_t>(ws, L"DK");
+        unsigned int wi2 = str::GetSubstrCount(ws, std::wstring(L";"));
+        unsigned int wi3 = str::GetSubstrCount<wchar_t>(ws, L"");
+        unsigned int wi4 = str::GetSubstrCount<wchar_t>(ws, L"qwer");
+        assert(wi1 == 2);
+        assert(wi2 == 2);
+        assert(wi3 == 0);
+        assert(wi4 == 0);
+    }
+
     std::cout << std::endl << "ToUpper----------------:" << std::endl;
     {
         std::string s = "   JDKhg;i'    ";

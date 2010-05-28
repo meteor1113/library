@@ -93,6 +93,29 @@ EndOf(const std::basic_string<T>& str,
 }
 
 
+template <typename T>
+unsigned int
+GetSubstrCount(const std::basic_string<T>& str,
+               const std::basic_string<T>& sub)
+{
+    std::string::size_type sublen = sub.length();
+    if (sublen <= 0)
+    {
+        return 0;
+    }
+
+    unsigned int ret = 0;
+    std::string::size_type p = str.find(sub);
+    while (p != std::string::npos)
+    {
+        ret++;
+        p = str.find(sub, p + sublen);
+    }
+
+    return ret;
+}
+
+
 template<typename T>
 std::basic_string<T>
 ToUpper(const std::basic_string<T>& str)
