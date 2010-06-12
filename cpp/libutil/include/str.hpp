@@ -238,7 +238,7 @@ TrimRight(const std::basic_string<T>& str, const std::basic_string<T>& of)
 
 
 /**
- * Trim all space.
+ * Trim all space, include CR and LF.
  */
 template<typename T>
 std::basic_string<T>
