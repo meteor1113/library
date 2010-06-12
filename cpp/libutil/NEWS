@@ -1,5 +1,9 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.5 (2010-06-12)
+* str:
+  1.Update Trim.
+
 Version 0.2.4 (2010-05-28)
 * str:
   1.Add function GetSubstrCount.
