@@ -3,16 +3,17 @@
 
 #include <iostream>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#endif
+// #ifdef _WIN32
+// #include <windows.h>
+// #else
+// #endif
 
 #include "logger.hpp"
 
 
 void TestPre()
 {
+    log::Logger::GetLogger().SetLevel(log::LOGLEVEL_INFO);
     std::auto_ptr<log::FileAppender> fa(new log::FileAppender);
 #ifdef _WIN32
     fa->SetFilepath("z:\\root.log");
@@ -20,17 +21,16 @@ void TestPre()
     fa->SetFilepath("/root.log");
 #endif
     fa->SetLayout("[myproject] {LOG} ({PID}) {LEVEL} %Y-%m-%d");
-    fa->SetLevel(log::LOGLEVEL_INFO);
     log::Logger::GetLogger().AddAppender((std::auto_ptr<log::Appender>)fa);
 
     std::auto_ptr<log::Appender> a(new log::FileAppender("a.log"));
     log::Logger::GetLogger("a").AddAppender(a);
 
     log::Logger::GetLogger("b").AddAppender(
-        std::auto_ptr<log::Appender>(new log::FileAppender("b.log", "", "%Y-%m {LEVEL} {LOG}")));
+        std::auto_ptr<log::Appender>(new log::FileAppender("b.log", "%Y-%m {LEVEL} {LOG}")));
 
     log::Logger::GetLogger("c").AddAppender(
-        std::auto_ptr<log::Appender>(new log::FileAppender("log/log/log.log", "TRACE")));
+        std::auto_ptr<log::Appender>(new log::FileAppender("log/log/log.log")));
     log::Logger::GetLogger("c").AddAppender(
         std::auto_ptr<log::Appender>(new log::ConsoleAppender()));
 }
@@ -38,12 +38,6 @@ void TestPre()
 
 void Test()
 {
-    log::Logger x1;
-    x1.Fatal("test log x1");
-    log::Logger x2;
-    std::auto_ptr<log::Appender> a(new log::ConsoleAppender);
-    x2.AddAppender(a);
-    x2.Fatal("test log x2");
     log::Logger::GetLogger("a");
     log::Logger::GetLogger("b");
     log::Logger::GetLogger("c");
@@ -86,20 +80,16 @@ void DailyTestPre()
 #else
     fa->SetFilepath("~/log/log/%Y/%m/%d/%H/%M/%S.log");
 #endif
-    fa->SetLevel(log::LOGLEVEL_DEBUG);
-    log::Logger::GetLogger().AddAppender(std::auto_ptr<log::Appender>(fa));
+    log::Logger::GetLogger("da").SetLevel(log::LOGLEVEL_DEBUG);
+    log::Logger::GetLogger("da").AddAppender(std::auto_ptr<log::Appender>(fa));
 
-    log::Logger::GetLogger("dz").AddAppender(std::auto_ptr<log::Appender>(new log::ConsoleAppender("error")));
-    // log::Logger::GetLogger("dy").SetLevel("aabc");
+    log::Logger::GetLogger("dz").SetLevel(log::LOGLEVEL_ERROR);
+    log::Logger::GetLogger("dz").AddAppender(std::auto_ptr<log::Appender>(new log::ConsoleAppender()));
 }
 
 
 void DailyTest()
 {
-    log::Logger dx1;
-    dx1.Fatal("test log dx1");
-    log::Logger dx2;
-    dx2.Fatal("test log dx2");
     log::Logger::GetLogger("da");
     log::Logger::GetLogger("b");
     log::Logger::GetLogger("c");
@@ -135,10 +125,10 @@ void DailyTest()
 
 void DailyTest1()
 {
-    log::Logger::GetLogger().Trace("trace");
-    log::Logger::GetLogger().Warn("warn");
-    log::Logger::GetLogger().Error("error");
-    log::Logger::GetLogger().Fatal("fatal");
+    log::Logger::GetLogger("da").Trace("trace");
+    log::Logger::GetLogger("da").Warn("warn");
+    log::Logger::GetLogger("da").Error("error");
+    log::Logger::GetLogger("da").Fatal("fatal");
 }
 
 
@@ -149,7 +139,7 @@ int main()
     Test();
     Test1();
     std::cout << "======test Logger end" << std::endl;
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl;
 
     std::cout << "======test DailyLogger begin" << std::endl;
     DailyTestPre();
