@@ -199,6 +199,19 @@ TrimLeft(const std::basic_string<T>& str)
 
 template<typename T>
 std::basic_string<T>
+TrimLeft(const std::basic_string<T>& str, const std::basic_string<T>& of)
+{
+    typename std::basic_string<T>::const_iterator i = str.begin();
+    while ((i != str.end()) && ((of.find(*i) != std::string::npos)))
+    {
+        ++i;
+    }
+    return std::basic_string<T>(i, str.end());
+}
+
+
+template<typename T>
+std::basic_string<T>
 TrimRight(const std::basic_string<T>& str)
 {
     const std::locale loc;
@@ -213,9 +226,36 @@ TrimRight(const std::basic_string<T>& str)
 
 template<typename T>
 std::basic_string<T>
+TrimRight(const std::basic_string<T>& str, const std::basic_string<T>& of)
+{
+    typename std::basic_string<T>::const_reverse_iterator i = str.rbegin();
+    while ((i != str.rend()) && (of.find(*i) != std::string::npos))
+    {
+        ++i;
+    }
+    return std::basic_string<T>(str.begin(), i.base());
+}
+
+
+/**
+ * Trim all space, include CR and LF.
+ */
+template<typename T>
+std::basic_string<T>
 Trim(const std::basic_string<T>& str)
 {
     return TrimRight(TrimLeft(str));
+}
+
+
+/**
+ * Trim all char in of.
+ */
+template<typename T>
+std::basic_string<T>
+Trim(const std::basic_string<T>& str, const std::basic_string<T>& of)
+{
+    return TrimRight(TrimLeft(str, of), of);
 }
 
 
