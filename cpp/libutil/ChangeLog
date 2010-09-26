@@ -1,3 +1,7 @@
+2010-09-26  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/str.hpp (str): Remove Vformat.
+
 2010-08-08  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/logger.hpp: Level setting move to Logger class.

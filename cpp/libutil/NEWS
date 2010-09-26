@@ -1,5 +1,9 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.7 (2010-08-*)
+* str:
+  1.Remove Vformat, because va_list can't reusage.
+
 Version 0.2.6 (2010-08-08)
 * logger:
   1.Level setting move to Logger class.

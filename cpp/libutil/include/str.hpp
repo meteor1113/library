@@ -341,7 +341,7 @@ Vsnprintf(wchar_t* buf, size_t count, const wchar_t* fmt, va_list ap)
 
 template<typename T>
 std::basic_string<T>
-Vformat(const T* fmt, va_list ap)
+Format(const T* fmt, ...)
 {
     assert(fmt != NULL);
 
@@ -353,6 +353,8 @@ Vformat(const T* fmt, va_list ap)
 
     while (1)
     {
+        va_list ap;
+        va_start(ap, fmt);
         int needed = Vsnprintf(buf, size, fmt, ap);
         if ((needed <= (int)size) && (needed >= 0))
         {
@@ -365,23 +367,10 @@ Vformat(const T* fmt, va_list ap)
         }
         dynamicbuf.resize(size);
         buf = &dynamicbuf[0];
+        va_end(ap);
     }
 
     return fmt;
-}
-
-
-template<typename T>
-std::basic_string<T>
-Format(const T* fmt, ...)
-{
-    assert(fmt != NULL);
-
-    va_list ap;
-    va_start(ap, fmt);
-    std::basic_string<T> buf = Vformat(fmt, ap);
-    va_end(ap);
-    return buf;
 }
 
 
