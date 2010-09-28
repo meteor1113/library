@@ -1,8 +1,10 @@
 This NEWS file records noteworthy changes, very tersely.
 
-Version 0.2.7 (2010-08-*)
+Version 0.2.7 (2010-09-28)
 * str:
   1.Remove Vformat, because va_list can't reusage.
+* Logger:
+  1.Change DEFAULT_LAYOUT to "%Y-%m-%dT%H:%M:%S%z {LEVEL} {LOG}".
 
 Version 0.2.6 (2010-08-08)
 * logger:

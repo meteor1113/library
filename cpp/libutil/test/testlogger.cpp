@@ -14,14 +14,14 @@
 void TestPre()
 {
     log::Logger::GetLogger().SetLevel(log::LOGLEVEL_INFO);
-    std::auto_ptr<log::FileAppender> fa(new log::FileAppender);
+    log::FileAppender* fa = new log::FileAppender;
 #ifdef _WIN32
     fa->SetFilepath("z:\\root.log");
 #else
     fa->SetFilepath("/root.log");
 #endif
     fa->SetLayout("[myproject] {LOG} ({PID}) {LEVEL} %Y-%m-%d");
-    log::Logger::GetLogger().AddAppender((std::auto_ptr<log::Appender>)fa);
+    log::Logger::GetLogger().AddAppender(std::auto_ptr<log::Appender>(fa));
 
     std::auto_ptr<log::Appender> a(new log::FileAppender("a.log"));
     log::Logger::GetLogger("a").AddAppender(a);
@@ -74,7 +74,7 @@ void Test1()
 
 void DailyTestPre()
 {
-    std::auto_ptr<log::FileAppender> fa(new log::FileAppender());
+    log::FileAppender* fa = new log::FileAppender();
 #ifdef _WIN32
     fa->SetFilepath("f:/log/log/%Y/%m/%d/%H/%M/%S.log");
 #else
@@ -134,6 +134,8 @@ void DailyTest1()
 
 int main()
 {
+    std::cout << "timezone:" << log::GetTimezone() << std::endl;
+
     std::cout << "======test Logger begin" << std::endl;
     TestPre();
     Test();

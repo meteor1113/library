@@ -1,3 +1,7 @@
+2010-09-28  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/logger.hpp: Change DEFAULT_LAYOUT to "%Y-%m-%dT%H:%M:%S%z {LEVEL} {LOG}".
+
 2010-09-26  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/str.hpp (str): Remove Vformat.
