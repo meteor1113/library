@@ -14,8 +14,10 @@
 #define ENCODE_HPP_
 
 
+#ifdef _MSC_VER
 #pragma warning(disable: 4786)
 #pragma warning(disable: 4996)
+#endif
 // #include <standard library headers>
 #include <string>
 

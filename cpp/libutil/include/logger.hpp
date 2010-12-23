@@ -14,7 +14,9 @@
 #define LOG_LOGGER_HPP_
 
 
+#ifdef _MSC_VER
 #pragma warning(disable: 4996)
+#endif
 // #include <standard library headers>
 #include <time.h>
 #include <string.h>

@@ -14,7 +14,9 @@
 #define PROPERTIES_HPP_
 
 
+#ifdef _MSC_VER
 #pragma warning(disable: 4786)
+#endif
 // #include <standard library headers>
 #include <string>
 #include <map>
