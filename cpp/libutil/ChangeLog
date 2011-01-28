@@ -1,3 +1,13 @@
+2011-01-28  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/logger.hpp (util): Change namespace to util.
+
+	* include/algo.hpp: Change namespace to util.
+
+	* include/str.hpp (util): Change namespace to util.
+
+	* include/encode.hpp (util::Convert): Using iconv in linux.
+
 2010-09-28  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/logger.hpp: Change DEFAULT_LAYOUT to "%Y-%m-%dT%H:%M:%S%z {LEVEL} {LOG}".

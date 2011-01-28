@@ -29,6 +29,10 @@
 #include "str.hpp"
 
 
+namespace util
+{
+
+
 class CsvFile
 {
 public:
@@ -45,9 +49,9 @@ public:
     void Save() { Save(mFilepath); }
     void Save(const std::string& path);
     void Clear() { mData.clear(); mColCount = 0; mFilepath = ""; }
-    int GetRowCount() const { return mData.size(); }
-    int GetColumnCount() const { return mColCount; }
-    void SetColumnCount(const int col) { mColCount = col; }
+    unsigned int GetRowCount() const { return mData.size(); }
+    unsigned int GetColumnCount() const { return mColCount; }
+    void SetColumnCount(const unsigned int col) { mColCount = col; }
     const std::string& GetData(int row, int col) { return GetRow(row).at(col); }
     const std::vector<std::string>& GetData(int row) { return GetRow(row); }
     void SetData(int row, int col, const std::string& data)
@@ -64,7 +68,7 @@ private:
 
 private:
     std::deque<std::vector<std::string> > mData;
-    int mColCount;
+    unsigned int mColCount;
     std::string mFilepath;
 };
 
@@ -81,7 +85,7 @@ inline void CsvFile::Read(const std::string& path)
     std::string line;
     while (std::getline(file, line))
     {
-        std::vector<std::string> v = str::Split<char>(line, ",");
+        std::vector<std::string> v = Split<char>(line, ",");
         mData.push_back(v);
         mColCount = (v.size() > mColCount) ? v.size() : mColCount;
     }
@@ -101,7 +105,7 @@ inline void CsvFile::Save(const std::string& path)
     for (unsigned int i = 0; i < mData.size(); ++i)
     {
         std::vector<std::string>& line = GetRow(i);
-        std::string str = str::Join<char>(line.begin(), line.end(), ",");
+        std::string str = Join<char>(line.begin(), line.end(), ",");
         file << str << std::endl;
     }
 }
@@ -122,6 +126,9 @@ inline std::vector<std::string>& CsvFile::GetRow(int row)
     assert(line.size() == mColCount);
     return line;
 }
+
+
+} // end of namespace
 
 
 #endif // CSVFILE_HPP_

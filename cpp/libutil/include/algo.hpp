@@ -28,7 +28,7 @@
 // #include "customer headers"
 
 
-namespace algo
+namespace util
 {
 
 
@@ -81,7 +81,7 @@ StringToNumber(T& t,
 }
 
 
-} // end of namespace algo
+} // end of namespace
 
 
 #endif // ALGO_HPP_

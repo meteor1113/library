@@ -1,5 +1,11 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.2.8 (2011-01-28)
+* encode:
+  1.using iconv in linux.
+* all:
+  1.change all namespace to util.
+
 Version 0.2.7 (2010-09-28)
 * str:
   1.Remove Vformat, because va_list can't reusage.

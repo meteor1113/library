@@ -33,7 +33,7 @@
 // #include "customer headers"
 
 
-namespace str
+namespace util
 {
 
 
@@ -123,14 +123,14 @@ std::basic_string<T>
 ToUpper(const std::basic_string<T>& str)
 {
     std::basic_string<T> s = str;
-#if _MSC_VER < 1400 // < vc8(vs2005)
+// #ifdef _MSC_VER
     std::transform(s.begin(), s.end(), s.begin(), ::toupper);
-#else
-    const std::locale loc;
-    std::use_facet<std::ctype<T> >(loc).toupper(s.begin(), s.end());
-    //const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);
-    //ct.toupper(&s.at(0), &s.at(s.length() - 1) + 1);
-#endif
+// #else
+//     const std::locale loc;
+//     std::use_facet<std::ctype<T> >(loc).toupper(s.begin(), s.end());
+//     //const std::ctype<T>& ct = std::use_facet<std::ctype<T> >(loc);
+//     //ct.toupper(&s.at(0), &s.at(s.length() - 1) + 1);
+// #endif
     return s;
 }
 
@@ -140,12 +140,12 @@ std::basic_string<T>
 ToLower(const std::basic_string<T>& str)
 {
     std::basic_string<T> s = str;
-#if _MSC_VER < 1400 // < vc8(vs2005)
+// #ifdef _MSC_VER
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-#else
-    const std::locale loc;
-    std::use_facet<std::ctype<T> >(loc).tolower(s.begin(), s.end());
-#endif
+// #else
+//     const std::locale loc;
+//     std::use_facet<std::ctype<T> >(loc).tolower(s.begin(), s.end());
+// #endif
     return s;
 }
 
@@ -578,7 +578,7 @@ DeletePathExtension(const std::basic_string<T>& str)
 }
 
 
-}
+} // end of namespace
 
 
 #endif

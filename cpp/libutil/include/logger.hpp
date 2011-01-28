@@ -44,7 +44,7 @@
 #include "str.hpp"
 
 
-namespace log
+namespace util
 {
 
 
@@ -236,12 +236,12 @@ void Appender::Append(const std::string& level, const std::string& log)
 {
     std::string str = layout;
 #ifdef _WIN32
-    str = str::Replace<char>(str, "%z", GetTimezone());
+    str = Replace<char>(str, "%z", GetTimezone());
 #endif
     str = FormatCurDateTime(str);
-    str = str::Replace<char>(str, "{LEVEL}", level);
-    str = str::Replace<char>(str, "{LOG}", log);
-    str = str::Replace<char>(str, "{PID}", str::Format("%d", GetPid()));
+    str = Replace<char>(str, "{LEVEL}", level);
+    str = Replace<char>(str, "{LOG}", log);
+    str = Replace<char>(str, "{PID}", Format("%d", GetPid()));
     DoAppend(str);
 }
 
@@ -275,7 +275,7 @@ std::string FileAppender::GetRealFilepath() const
         std::stack<std::string> dirs;
         while (true)
         {
-            std::string dir = str::DeleteLastPath(path);
+            std::string dir = DeleteLastPath(path);
             if (dir.empty() || (dir == path))
             {
                 break;
@@ -340,7 +340,7 @@ LogLevel GetLevelFromString(const std::string& v)
     std::vector<std::pair<std::string, LogLevel> >::iterator it;
     for (it = vec.begin(); it != vec.end(); ++it)
     {
-        if (str::EqualsIgnoreCase(it->first, str::Trim(v)))
+        if (EqualsIgnoreCase(it->first, Trim(v)))
         {
             return it->second;
         }
@@ -396,7 +396,7 @@ std::string GetTimezone()
     gmtoff = ptm->tm_gmtoff;
 #endif
 
-    return str::Format("%+03d%02d",
+    return Format("%+03d%02d",
 #ifdef _WIN32
                        -(gmtoff / (60 * 60)),
 #else
@@ -406,7 +406,7 @@ std::string GetTimezone()
 }
 
 
-}
+} // end of namespace
 
 
 #endif

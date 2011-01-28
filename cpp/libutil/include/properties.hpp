@@ -28,6 +28,10 @@
 #include "str.hpp"
 
 
+namespace util
+{
+
+
 /**
  * in Properties file,
  * #, if a line start with #, means this line is a comment;
@@ -88,7 +92,7 @@ inline void Properties::Load(const std::string& filename)
                 std::string key = line.substr(0, pos);
                 std::string value =
                     line.substr(pos + 1, line.length() - pos);
-                Set(str::Trim<char>(key), str::Trim<char>(value));
+                Set(Trim<char>(key), Trim<char>(value));
             }
         }
     }
@@ -129,23 +133,26 @@ inline std::string Properties::Get(const std::string& key,
 
     if (param1 != NULL)
     {
-        value = str::Replace<char>(value, "{1}", param1);
+        value = Replace<char>(value, "{1}", param1);
     }
     if (param2 != NULL)
     {
-        value = str::Replace<char>(value, "{2}", param2);
+        value = Replace<char>(value, "{2}", param2);
     }
     if (param3 != NULL)
     {
-        value = str::Replace<char>(value, "{3}", param3);
+        value = Replace<char>(value, "{3}", param3);
     }
     if (param4 != NULL)
     {
-        value = str::Replace<char>(value, "{4}", param4);
+        value = Replace<char>(value, "{4}", param4);
     }
 
     return value;
 }
+
+
+} // end of namespace
 
 
 #endif

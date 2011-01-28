@@ -5,6 +5,7 @@
 
 #include "csvfile.hpp"
 
+using namespace util;
 
 void Test()
 {

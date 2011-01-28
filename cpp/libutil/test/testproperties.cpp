@@ -5,6 +5,7 @@
 
 #include "properties.hpp"
 
+using namespace util;
 
 void Test()
 {
