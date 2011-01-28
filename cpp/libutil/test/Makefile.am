@@ -6,7 +6,8 @@ EXTRA_DIST = \
 	testencode.dsp \
 	testlogger.dsp \
 	testproperties.dsp \
-	teststr.dsp
+	teststr.dsp \
+	testencode-gbk.cpp
 
 noinst_PROGRAMS = \
 	testalgo \
