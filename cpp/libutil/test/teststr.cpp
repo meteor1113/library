@@ -1161,6 +1161,26 @@ void Test()
         CoutString(AddBracket(s) + L"-->" + AddBracket(s1));
         assert(s1 == L"scrtch");
     }
+
+    std::cout << std::endl << "FormatCurDateTime----------------:" << std::endl;
+    {
+        std::string s = "%Y-%m-%dT%H:%M:%S%z";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%Y-%m-%d %H:%M:%S";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%y-%m-%d %H:%M:%S";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%Y-%m-%d";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%H:%M:%S";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%Y%m%d";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%y%m%d";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+        s = "%H%M%S";
+        CoutString(AddBracket(s) + "-->" + AddBracket(FormatCurDateTime(s)));
+    }
 }
 
 

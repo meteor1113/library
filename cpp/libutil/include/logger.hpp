@@ -63,9 +63,7 @@ const LogLevel DEFAULT_LEVEL = LOGLEVEL_INFO;
 
 std::string GetLevelString(LogLevel l);
 LogLevel GetLevelFromString(const std::string& v);
-std::string FormatCurDateTime(const std::string& fmt);
 int GetPid();
-std::string GetTimezone();
 
 
 class Appender;
@@ -235,10 +233,7 @@ inline
 void Appender::Append(const std::string& level, const std::string& log)
 {
     std::string str = layout;
-#ifdef _WIN32
-    str = Replace<char>(str, "%z", GetTimezone());
-#endif
-    str = FormatCurDateTime(str);
+    str = util::FormatCurDateTime(str);
     str = Replace<char>(str, "{LEVEL}", level);
     str = Replace<char>(str, "{LOG}", log);
     str = Replace<char>(str, "{PID}", Format("%d", GetPid()));
@@ -268,7 +263,7 @@ void FileAppender::DoAppend(const std::string& log)
 inline
 std::string FileAppender::GetRealFilepath() const
 {
-    std::string ret = FormatCurDateTime(filepath);
+    std::string ret = util::FormatCurDateTime(filepath);
     std::string path = ret;
     if (access(path.c_str(), F_OK) != 0)
     {
@@ -350,18 +345,6 @@ LogLevel GetLevelFromString(const std::string& v)
 
 
 inline
-std::string FormatCurDateTime(const std::string& fmt)
-{
-    time_t clock;
-    time(&clock);
-    char date[512];
-    memset(date, 0, 512);
-    strftime(date, 512, fmt.c_str(), localtime(&clock));
-    return date;
-}
-
-
-inline
 int GetPid()
 {
 #ifdef _WIN32
@@ -369,40 +352,6 @@ int GetPid()
 #else
     return getpid();
 #endif
-}
-
-
-/**
- * Get %z get strftime.
- */
-inline
-std::string GetTimezone()
-{
-    time_t now;
-    time(&now);
-    struct tm* ptm = localtime(&now);
-
-    // Get offset from local time to GMT time
-    long gmtoff = 0;
-#if defined(_MSC_VER)
-#   if (_MSC_VER > 1200) // VC6 above, not including VC6
-    _get_timezone(&gmtoff);
-#   else
-    gmtoff = _timezone;
-#   endif
-#elif defined(__MINGW32__)
-    gmtoff = _timezone;
-#elif defined(__GNUC__)
-    gmtoff = ptm->tm_gmtoff;
-#endif
-
-    return Format("%+03d%02d",
-#ifdef _WIN32
-                       -(gmtoff / (60 * 60)),
-#else
-                       (gmtoff / (60 * 60)),
-#endif
-                       (gmtoff % (60 * 60)));
 }
 
 

@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <time.h>
 #include <string>
 #include <locale>
 #include <algorithm>
@@ -575,6 +576,56 @@ DeletePathExtension(const std::basic_string<T>& str)
 {
     const std::string::size_type pos = str.rfind(PathSep<T>::Dot());
     return (pos == std::string::npos) ? str : str.substr(0, pos);
+}
+
+
+/**
+ * Get %z get strftime.
+ */
+inline
+std::string GetTimezone()
+{
+    time_t now;
+    time(&now);
+    struct tm* ptm = localtime(&now);
+
+    // Get offset from local time to GMT time
+    long gmtoff = 0;
+#if defined(_MSC_VER)
+#   if (_MSC_VER > 1200) // VC6 above, not including VC6
+    _get_timezone(&gmtoff);
+#   else
+    gmtoff = _timezone;
+#   endif
+#elif defined(__MINGW32__)
+    gmtoff = _timezone;
+#elif defined(__GNUC__)
+    gmtoff = ptm->tm_gmtoff;
+#endif
+
+    return Format("%+03d%02d",
+#ifdef _WIN32
+                       -(gmtoff / (60 * 60)),
+#else
+                       (gmtoff / (60 * 60)),
+#endif
+                       (gmtoff % (60 * 60)));
+}
+
+
+inline
+std::string FormatCurDateTime(const std::string& fmt)
+{
+    time_t clock;
+    time(&clock);
+    char date[512];
+    memset(date, 0, 512);
+    strftime(date, 512, fmt.c_str(), localtime(&clock));
+    std::string str = date;
+#ifdef _WIN32
+    str = Replace<char>(str, "%z", GetTimezone());
+#endif
+    return str;
 }
 
 
