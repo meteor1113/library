@@ -616,16 +616,17 @@ std::string GetTimezone()
 inline
 std::string FormatCurDateTime(const std::string& fmt)
 {
+    std::string format = fmt;
+#ifdef _WIN32
+    format = Replace<char>(format, "%z", GetTimezone());
+#endif
+
     time_t clock;
     time(&clock);
     char date[512];
     memset(date, 0, 512);
-    strftime(date, 512, fmt.c_str(), localtime(&clock));
-    std::string str = date;
-#ifdef _WIN32
-    str = Replace<char>(str, "%z", GetTimezone());
-#endif
-    return str;
+    strftime(date, 512, format.c_str(), localtime(&clock));
+    return date;
 }
 
 
