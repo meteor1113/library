@@ -48,6 +48,14 @@ else
    AC_DEFINE(NDEBUG)
 fi
 
+case "$host" in
+  *-*-aix*)
+    LIBS="${LIBS} -liconv"
+    ;;
+  *)
+    ;;
+esac
+
 AC_CONFIG_FILES([Makefile
 		include/Makefile
 		test/Makefile])

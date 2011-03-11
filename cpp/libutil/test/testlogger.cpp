@@ -135,7 +135,9 @@ void DailyTest1()
 
 int main()
 {
+#ifdef _WIN32
     std::cout << "timezone:" << GetTimezone() << std::endl;
+#endif
 
     std::cout << "======test Logger begin" << std::endl;
     TestPre();

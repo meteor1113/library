@@ -233,7 +233,7 @@ inline
 void Appender::Append(const std::string& level, const std::string& log)
 {
     std::string str = layout;
-    str = util::FormatCurDateTime(str);
+    str = FormatCurDateTime(str);
     str = Replace<char>(str, "{LEVEL}", level);
     str = Replace<char>(str, "{LOG}", log);
     str = Replace<char>(str, "{PID}", Format("%d", GetPid()));
@@ -263,7 +263,7 @@ void FileAppender::DoAppend(const std::string& log)
 inline
 std::string FileAppender::GetRealFilepath() const
 {
-    std::string ret = util::FormatCurDateTime(filepath);
+    std::string ret = FormatCurDateTime(filepath);
     std::string path = ret;
     if (access(path.c_str(), F_OK) != 0)
     {
