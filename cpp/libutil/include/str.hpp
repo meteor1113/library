@@ -582,6 +582,7 @@ DeletePathExtension(const std::basic_string<T>& str)
 /**
  * Get %z get strftime.
  */
+#ifdef _WIN32                   // struct tm have not tm_gmtoff in Aix.
 inline
 std::string GetTimezone()
 {
@@ -611,6 +612,7 @@ std::string GetTimezone()
 #endif
                        (gmtoff % (60 * 60)));
 }
+#endif
 
 
 inline
