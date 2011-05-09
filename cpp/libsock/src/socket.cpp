@@ -114,7 +114,8 @@ bool Socket::Accept(Socket& ns)
     }
 
     int addr_length = sizeof(sockaddr_in);
-    ns.mSock = ::accept(mSock, (sockaddr*)&ns.mAddr,
+    ns.mSock = ::accept(mSock,
+                        (sockaddr*)&ns.mAddr,
                         (::socklen_t*)&addr_length);
 #ifdef WIN32
     return (ns.mSock != INVALID_SOCKET);
@@ -155,20 +156,16 @@ bool Socket::Connect(const std::string& host, int port)
         return false;
     }
 
-    status = Select(0, mConnTimeout, 0);
+    status = Select(1, mConnTimeout, 0);
+    if (status <= 0)
+    {
+#ifdef _DEBUG
+        PrintError();
+#endif
+    }
     SetNonBlocking(false);
 
     return (status > 0);
-/*
-  if (status != SOCKET_ERROR)
-  {
-  linger m_sLinger;
-  m_sLinger.l_onoff = 1;
-  m_sLinger.l_linger = 0;
-  status = ::setsockopt(mSock, SOL_SOCKET, SO_LINGER,
-  (const char*)&m_sLinger, sizeof(linger));
-  }
-//*/
 }
 
 
@@ -195,6 +192,9 @@ bool Socket::Send(const char* buf, int len)
 
     if (Select(1, mSendTimeout, 0) <= 0)
     {
+#ifdef _DEBUG
+        std::cout << "Send(): Select error" << std::endl;
+#endif
         return false;
     }
 
@@ -213,11 +213,6 @@ bool Socket::Send(const char* buf, int len)
         }
 
         totalSendLen += sendLen;
-        //int sel = SelectWrite(sec, usec);
-        //if (sel <= 0)
-        //{
-        //    return false;
-        //}
     }
 
     return (totalSendLen == len);
@@ -252,6 +247,9 @@ int Socket::Recv(char* buf, int len)
 
     if (Select(0, mRecvTimeout, 0) <= 0)
     {
+#ifdef _DEBUG
+        std::cout << "Recv(): Select error" << std::endl;
+#endif
         return -1;
     }
 

@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
     }
 
     sock::Socket s;
+    s.SetTimeout(10, 100, 100);
     if (!s.Bind(port))
     {
         std::cout << "bind failed!" << std::endl;
