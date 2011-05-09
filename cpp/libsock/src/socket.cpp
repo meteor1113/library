@@ -79,7 +79,7 @@ bool Socket::Bind(int port)
 {
     if (!IsValid())
     {
-        return false;
+        Create(mType);
     }
 
     mAddr.sin_family = AF_INET;
