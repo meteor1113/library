@@ -107,6 +107,7 @@ namespace sock
         Socket& operator = (const Socket& sock);
 
     private:
+        int mType;
         SOCKET mSock;
         unsigned int mConnTimeout;
         unsigned int mRecvTimeout;

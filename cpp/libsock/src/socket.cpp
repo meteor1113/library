@@ -59,14 +59,13 @@ Socket::Socket(int type,
                unsigned int connto,
                unsigned int recvto,
                unsigned int sendto)
-    :mSock(INVALID_SOCKET)
+    :mType(type), mSock(INVALID_SOCKET)
 {
     mConnTimeout = connto;
     mRecvTimeout = recvto;
     mSendTimeout = sendto;
     mConnected = false;
     memset(&mAddr, 0, sizeof(mAddr));
-    Create(type);
 }
 
 
@@ -133,10 +132,7 @@ bool Socket::Connect(const std::string& host, int port)
 
     if (!IsValid())
     {
-#ifdef _DEBUG
-        std::cout << "Connect(): socket is invalid" << std::endl;
-#endif
-        return false;
+        Create(mType);
     }
 
     if (!MakeSockaddr(&mAddr, host, port))
@@ -174,7 +170,6 @@ bool Socket::Connect(const std::string& host, int port)
 bool Socket::Reconnect()
 {
     Close();
-    Create(SOCK_STREAM);
     return Connect(mHost, mPort);
 }
 
