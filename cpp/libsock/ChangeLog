@@ -1,5 +1,7 @@
 2011-05-09  Meteor Liu  <meteor1113@gmail.com>
 
+	* include/socket.h (Socket::IsConnected): Add.
+
 	* src/socket.cpp (sock): Support timeout.
 
 2009-07-03  Meteor Liu  <meteor1113@gmail.com>

@@ -84,8 +84,7 @@ namespace sock
         void SetTimeout(unsigned int connto,
                         unsigned int recvto,
                         unsigned int sendto);
-        bool IsValid() const;
-
+        bool IsConnected() const { return mConnected; }
         const sockaddr_in& GetSocketAddr() const { return mAddr; }
         std::string GetIp() const { return inet_ntoa(mAddr.sin_addr); }
         u_short GetPort() const { return ntohs(mAddr.sin_port); }
@@ -95,6 +94,7 @@ namespace sock
         bool Create(int type);
         void Close();
         int Select(int type, long sec, long usec);
+        bool IsValid() const;
 
         static void PrintError();
         static bool MakeSockaddr(sockaddr_in* addr, const std::string& host,
@@ -112,6 +112,7 @@ namespace sock
         unsigned int mRecvTimeout;
         unsigned int mSendTimeout;
         sockaddr_in mAddr;
+        bool mConnected;
         std::string mHost;
         int mPort;
 

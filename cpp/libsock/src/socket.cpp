@@ -64,6 +64,7 @@ Socket::Socket(int type,
     mConnTimeout = connto;
     mRecvTimeout = recvto;
     mSendTimeout = sendto;
+    mConnected = false;
     memset(&mAddr, 0, sizeof(mAddr));
     Create(type);
 }
@@ -165,7 +166,8 @@ bool Socket::Connect(const std::string& host, int port)
     }
     SetNonBlocking(false);
 
-    return (status > 0);
+    mConnected = (status > 0);
+    return mConnected;
 }
 
 
@@ -377,12 +379,6 @@ void Socket::SetTimeout(unsigned int connto,
 }
 
 
-bool Socket::IsValid() const
-{
-    return (mSock != INVALID_SOCKET);
-}
-
-
 bool Socket::SetNonBlocking(const bool b)
 {
     if (!IsValid())
@@ -435,6 +431,7 @@ void Socket::Close()
 #endif
         mSock = INVALID_SOCKET;
     }
+    mConnected = false;
 }
 
 
@@ -463,6 +460,12 @@ int Socket::Select(int type, long sec, long usec)
     fd_set* exceptfds = (type == 2) ? &fds : NULL;
 
     return ::select(mSock + 1, readfds, writefds, exceptfds, tv);
+}
+
+
+bool Socket::IsValid() const
+{
+    return (mSock != INVALID_SOCKET);
 }
 
 
