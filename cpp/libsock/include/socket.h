@@ -67,6 +67,7 @@ namespace sock
         // Client initialization
         bool Connect(const std::string& host, int port);
         bool Reconnect();
+        void Close();
 
         // TCP
         bool Send(const std::string& s);
@@ -92,7 +93,6 @@ namespace sock
     private:
         bool SetNonBlocking(const bool b);
         bool Create(int type);
-        void Close();
         int Select(int type, long sec, long usec);
         bool IsValid() const;
 

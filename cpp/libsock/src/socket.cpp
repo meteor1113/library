@@ -179,6 +179,21 @@ bool Socket::Reconnect()
 }
 
 
+void Socket::Close()
+{
+    if (IsValid())
+    {
+#ifdef WIN32
+        ::closesocket(mSock);
+#else
+        ::close (mSock);
+#endif
+        mSock = INVALID_SOCKET;
+    }
+    mConnected = false;
+}
+
+
 bool Socket::Send(const std::string& s)
 {
     return Send(s.c_str(), static_cast<int>(s.size()));
@@ -417,21 +432,6 @@ bool Socket::Create(int type)
                          (const char*)&on, sizeof(on));
 
     return (ret != SOCKET_ERROR);
-}
-
-
-void Socket::Close()
-{
-    if (IsValid())
-    {
-#ifdef WIN32
-        ::closesocket(mSock);
-#else
-        ::close (mSock);
-#endif
-        mSock = INVALID_SOCKET;
-    }
-    mConnected = false;
 }
 
 
