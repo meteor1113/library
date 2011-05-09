@@ -1,5 +1,8 @@
 This NEWS file records noteworthy changes, very tersely.
 
+Version 0.3.0 (2011-05-09)
+* support timeout setting.
+
 Version 0.2.2 (2009-05-21)
 * Public Domain.
 

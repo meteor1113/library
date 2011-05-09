@@ -52,7 +52,10 @@ namespace sock
     class Socket
     {
     public:
-        Socket(int type = SOCK_STREAM);
+        Socket(int type = SOCK_STREAM,
+               unsigned int connto = 10,
+               unsigned int recvto = 10,
+               unsigned int sendto = 10);
         virtual ~Socket();
 
     public:
@@ -64,9 +67,6 @@ namespace sock
         // Client initialization
         bool Connect(const std::string& host, int port);
         bool Reconnect();
-
-        int SelectRead(long sec = -1, long usec = -1);
-        int SelectWrite(long sec = -1, long usec = -1);
 
         // TCP
         bool Send(const std::string& s);
@@ -81,7 +81,9 @@ namespace sock
         int RecvFrom(std::string& s, std::string& host, int& port);
         int RecvFrom(char* buf, int len, std::string& host, int& port);
 
-        void SetNonBlocking(const bool b);
+        void SetTimeout(unsigned int connto,
+                        unsigned int recvto,
+                        unsigned int sendto);
         bool IsValid() const;
 
         const sockaddr_in& GetSocketAddr() const { return mAddr; }
@@ -89,6 +91,7 @@ namespace sock
         u_short GetPort() const { return ntohs(mAddr.sin_port); }
 
     private:
+        bool SetNonBlocking(const bool b);
         bool Create(int type);
         void Close();
         int Select(int type, long sec, long usec);
@@ -105,6 +108,9 @@ namespace sock
 
     private:
         SOCKET mSock;
+        unsigned int mConnTimeout;
+        unsigned int mRecvTimeout;
+        unsigned int mSendTimeout;
         sockaddr_in mAddr;
         std::string mHost;
         int mPort;

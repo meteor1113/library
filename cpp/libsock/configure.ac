@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([libsock], [0.2.2], [meteor1113@gmail.com])
+AC_INIT([libsock], [0.3.0], [meteor1113@gmail.com])
 AC_CONFIG_SRCDIR([src/socket.cpp])
 #AC_CONFIG_HEADER([config.h])
 

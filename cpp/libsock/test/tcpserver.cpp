@@ -22,13 +22,21 @@ int main(int argc, char *argv[])
     {
         std::cout << "listen failed!" << std::endl;
     }
+    std::cout << "listen on:" << port << std::endl;
 
     while (true)
     {
         sock::Socket ns;
         std::cout << "accepting" << std::endl;
-        s.Accept(ns);
-        std::cout << "accepted!" << std::endl;
+        if (s.Accept(ns))
+        {
+            std::cout << "accepted!" << std::endl;
+        }
+        else
+        {
+            std::cout << "accept error!" << std::endl;
+            continue;
+        }
         char buf[1000];
         int len = ns.Recv(buf, 1000);
         if (len <= 0)
