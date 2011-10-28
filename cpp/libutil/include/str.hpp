@@ -615,6 +615,11 @@ std::string GetTimezone()
 #endif
 
 
+/**
+ * Convert current time to string format
+ * @param fmt use strftime's format. e.g. "%Y-%m-%dT%H:%M:%S%z"
+ * @return current time's string
+ */
 inline
 std::string FormatCurDateTime(const std::string& fmt)
 {

@@ -1,3 +1,7 @@
+2011-10-28  Meteor Liu  <meteor1113@gmail.com>
+
+	* include/str.hpp (FormatCurDateTime): Add doc.
+
 2011-03-11  Meteor Liu  <meteor1113@gmail.com>
 
 	* include/str.hpp: Move FormatCurDateTime from logger.hpp to str.hpp
